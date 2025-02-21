@@ -1,0 +1,198 @@
+---
+title: "GWAS Analyses of the Osteopenia disease using the CARTaGENE database"
+author: "Bastien CHASSAGNOL and Charles"
+date: last-modified	
+number-sections: true
+toc: true
+toc-depth: 3
+lang: en-GB
+# subject: "Cell-cell benchmark"
+# keywords: ["cell-cell communication", "benchmark", "spatial transcriptomics", "single-cell"]
+# bibliographic options
+bibliography: Cartagene.bib
+link-citations: true
+highlight-style: github
+filters:
+  - highlight-text
+# code options
+execute:
+  message: false
+  warning: false
+  error: false
+# Table options
+tbl-cap-location: bottom
+format: 
+  html:
+    embed-resources: true
+    theme:
+      light: cosmo
+      dark: cosmo
+    sidebar: true
+    lightbox: true # Allows to zoom out on figures.
+    comments: 
+      hypothesis: true
+    # code options
+    code-fold: show
+    code-link: true
+    page-layout: full
+    collapse: true
+  docx:
+    toc-title: Contents
+editor: source
+---
+
+# Questions
+
+- Between files `~/Documents/projet_fabrice_mac_way/data/cartagene_13july.sas7bdat` and `~/Documents/projet_fabrice_mac_way/cartagene.sas7bdat`, what are the key differences? The first one, associated with `html` report `Cartagene_phenos_20230713.html` seems more recent and updated, with same number of individuals, but more phenotype features included. 
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(haven)
+```
+
+# Data management
+
+## Phenotype derivation
+
+### Lire fichier de phénotypes Cartagène
+
+```{r }
+tab<-read_sas("~/Documents/projet_fabrice_mac_way/data/cartagene_13july.sas7bdat")
+tab_df<-as.data.frame(tab)
+head(tab_df)
+```
+```{r}
+dim(tab)
+```
+
+### Liste des indvidus d'origine Européenne
+
+```{r}
+id_corr<-read.table("~/Documents/projet_fabrice_mac_way/01-Mac-Way_782958_code_genetique_24Feb2023 (1).csv", sep=";", header=TRUE)
+colnames(id_corr) <- c("PROJECT_CODE", "geno_id", "batch")
+head(id_corr)
+```
+```{r}
+merged_table<-merge(id_corr, tab_df, by="PROJECT_CODE")
+head(merged_table)
+dim(merged_table)
+```
+### Liste des indvidus d'origine Européenne
+
+```{r}
+EUR<-merged_table$geno_id[merged_table$ETHNICITY6M=="Blanc"]
+head(EUR)
+length(EUR)
+```
+
+### Phénotypes DMOTscore
+```{r}
+merged_table$DMOTSCORE_mod <- merged_table$DMOTSCORE
+sum(is.na(merged_table$DMOTSCORE_mod))
+merged_table$DMOTSCORE_mod[ merged_table$OSTEOSECONDAIRE ==1 ] <- NA
+sum(is.na(merged_table$DMOTSCORE_mod))
+merged_table$osteopenie <- NA
+merged_table$osteopenie[!is.na(merged_table$DMOTSCORE_mod) & merged_table$DMOTSCORE_mod <= -1.5] <-1
+merged_table$osteopenie[!is.na(merged_table$DMOTSCORE_mod) & merged_table$DMOTSCORE_mod > -1.5] <-0
+merged_table$osteoporose <- NA
+merged_table$osteoporose[!is.na(merged_table$DMOTSCORE_mod) & merged_table$DMOTSCORE_mod < -2.5] <-1
+merged_table$osteoporose[!is.na(merged_table$DMOTSCORE_mod) & merged_table$DMOTSCORE_mod >= -2.5] <-0
+summary(merged_table$osteopenie)
+summary(merged_table$osteoporose)
+sum(merged_table$osteopenie==1, na.rm = TRUE)
+sum(merged_table$osteopenie==0, na.rm = TRUE)
+sum(merged_table$osteoporose==1, na.rm = TRUE)
+sum(merged_table$osteoporose==0, na.rm = TRUE)
+
+```
+
+
+### Phénotype de FX_mof_post
+
+```{r}
+merged_table$FXMOF_POST_mod <- merged_table$FXMOF_POST
+sum(is.na(merged_table$FXMOF_POST_mod))
+merged_table$FXMOF_POST_mod[ merged_table$OSTEOSECONDAIRE ==1 ] <- NA
+sum(is.na(merged_table$FXMOF_POST_mod))
+colnames(merged_table)
+```
+
+### Principal components analyses with PLINK
+
+```{r}
+PCs<-read.table("analyses/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.high_LD_excluded.unrelated_ind.PCA.eigenvec", header=FALSE)
+colnames(PCs) <- c("FID", "geno_id", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")
+```
+
+```{r}
+merge_pheno_PCs<-merge(PCs, merged_table, by="geno_id")
+dim(merge_pheno_PCs)
+sum(is.na(merge_pheno_PCs$PC1))
+colnames(merge_pheno_PCs)[1]<-"FID"
+colnames(merge_pheno_PCs)[2]<-"IID"
+head(merge_pheno_PCs)
+write.table(merge_pheno_PCs, file="analyses/merge_phenos_20230713_PCs.txt", col.names=TRUE, row.names = FALSE, sep="\t", quote=FALSE)
+```
+
+
+
+# Analyses
+
+## Cartagène HDAC9
+
+### PCA 
+
+Genotyping data was split into five datasets with five different genotyping arrays:
+
+1. The list of common variants using `PLINK v1.9` was commonly extracted to all datasets.
+2. , for white individuals and for which phenotypic information were available were kept using PLINK v.1.9. We removed variants with genotyping rate <0.95 and with Hardy-Weinberg disequilibrium < 1x10-6.  We then pruned variants using PLINK v1.9. To exclude related individuals, we calculated identity by descent and excluded one individual from pairs of indivduals with PI_HAT > 0.2. 
+3. We removed regions of high linkage disequilibrium (LD) to calculate the 10 first principal components, which were calculated with PLINK v1.9.
+
+### Phenotype definition
+
+Added two auxiliary variables for osteoporosis: 
+  - `DMOTSCORE_mod`:
+    1. Exlude patients with `osteosecondaire==1`, or exhibiting missing values.
+    2. `osteopenia` is `case` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere. **Result: 801 `cases` and 12,463 `controls`.**
+    3. `osteoporosis` is `case` if `DMOTSCORE_mod < -2.5` and `control` elsewhere. **Result: 48 `cases` and 13,216 `controls`**
+    4. `fractures`: 229 `cases` and 13,807 `controls`
+  - `FMOF_POST_mod` correpond to `osteosecondaire ==1` to exclude the corresponding individuals. 
+  
+  
+And for Cardiovasuclar diseases: 
+
+- `AVCGLOBAL_PRE_M`: 282 `cases` and $16375$ `controls`.
+- `MCASGLOBAL`: $871$ `cases` and $15756$ `controls`. 
+- `MVASGLOBAL`: $1069$ `cases` and $15559$ `controls`.
+
+- 14964 indviduals with non-missing `TACAIX` values
+
+### Variants extraction
+
+- HDAC9 variants:
+  - Within the gene boundaries, as defined by the `hg38` reference genome.
+  - Minor allele frequency > 0.01. 
+  - SNPs extracted using [`bcftools` FILTER](https://samtools.github.io/bcftools/howtos/filtering.html).
+
+### GWAS
+
+1. Use of `PLINK2 + glm` with the first 10 principal components as covariates:
+
+  - Remove missing values (13264 individuals)
+  - **Osteo analysis**: `osteoporosis`, `osteopenia` and `fractures` using logistic regression + `DMOT_score` was analyzed using `lm`.
+  - **Cardiovascular association analyses**: `AVCGLOBAL_PRE_M`, `MCASGLOBAL` and `MVASGLOBAL` using logistic regression. 
+  - `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high` -> try removing other spurious and highly-correlated covariates, or increase variance inflation threshold. 
+  - Results in **7 phenotypes, 2613 variants tested, $18291$ tests** overall.
+
+2. **Multiple testing correction**: Significance threshold of $2.7 \times 10^{-6}$ is suggested. 
+
+
+
+
+
+
+
+
+
+
