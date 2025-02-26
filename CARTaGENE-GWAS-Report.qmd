@@ -52,6 +52,7 @@ editor: source
 `find . -type f -name "*.sas7bdat"`
 
 - `git config --global http.sslVerify false`
+- `git config --global pull.rebase false`
 - Username: `bastienchassagnol`
 - Password:`TyBkK2irX9Srh1XZdPdC`
 
