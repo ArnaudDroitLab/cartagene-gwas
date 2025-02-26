@@ -1,6 +1,6 @@
 ---
 title: "GWAS Analyses of the Osteopenia disease using the CARTaGENE database"
-author: "Bastien CHASSAGNOL and Charles"
+author: "Bastien CHASSAGNOL and Charles JOLY BEAUPARLANT"
 date: last-modified	
 number-sections: true
 toc: true
@@ -45,23 +45,31 @@ editor: source
 
 - Between files `~/Documents/projet_fabrice_mac_way/data/cartagene_13july.sas7bdat` and `~/Documents/projet_fabrice_mac_way/cartagene.sas7bdat`, what are the key differences? The first one, associated with `html` report `Cartagene_phenos_20230713.html` seems more recent and updated, with same number of individuals, but more phenotype features included. 
 
+- Who is identifier associated with `galgen01` name? I guess Geneviève.
+
+`find . -type f \( -iname "*.sh" -o -iname "*.py" -o -iname "*.Rmd" -o -iname "*.qmd" -o -iname "*.txt" \) -exec grep -Hn "genotypage" {} \;`
+
+`find . -type f -name "*.sas7bdat"`
+
+
+# Data management
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(haven)
 ```
 
-# Data management
-
 ## Phenotype derivation
 
 ### Lire fichier de phénotypes Cartagène
+
 
 ```{r }
 tab<-read_sas("~/Documents/projet_fabrice_mac_way/data/cartagene_13july.sas7bdat")
 tab_df<-as.data.frame(tab)
 head(tab_df)
 ```
+
 ```{r}
 dim(tab)
 ```
@@ -139,11 +147,22 @@ write.table(merge_pheno_PCs, file="analyses/merge_phenos_20230713_PCs.txt", col.
 
 # Analyses
 
-## Cartagène HDAC9
+## Mapping and aligning sequences
+
+- Folder `genotype/genotypage`: 
+  - BAM: Stores sequence alignments (used for NGS data).
+  - BED: Stores genomic regions of interest (used for visualizing and analyzing specific genomic areas).
+  - BIM: Stores SNP information (used in GWAS with PLINK).
+  - FAM: Stores individual and pedigree data (used with BIM in PLINK for genetic studies).
+  
+- Folder `genotype/imputation`
+  - [Quality control and imputation protocols](https://cartagene.qc.ca/fr/chercheurs/donnees-genetiques.html)
+
+## GWAS HDAC9
 
 ### PCA 
 
-Genotyping data was split into five datasets with five different genotyping arrays:
+Genotypes were split into five datasets with five different genotyping arrays:
 
 1. The list of common variants using `PLINK v1.9` was commonly extracted to all datasets.
 2. , for white individuals and for which phenotypic information were available were kept using PLINK v.1.9. We removed variants with genotyping rate <0.95 and with Hardy-Weinberg disequilibrium < 1x10-6.  We then pruned variants using PLINK v1.9. To exclude related individuals, we calculated identity by descent and excluded one individual from pairs of indivduals with PI_HAT > 0.2. 
@@ -160,13 +179,13 @@ Added two auxiliary variables for osteoporosis:
   - `FMOF_POST_mod` correpond to `osteosecondaire ==1` to exclude the corresponding individuals. 
   
   
-And for Cardiovasuclar diseases: 
+And for Cardiovascular diseases: 
 
 - `AVCGLOBAL_PRE_M`: 282 `cases` and $16375$ `controls`.
 - `MCASGLOBAL`: $871$ `cases` and $15756$ `controls`. 
 - `MVASGLOBAL`: $1069$ `cases` and $15559$ `controls`.
 
-- 14964 indviduals with non-missing `TACAIX` values
+- 14964 individuals with non-missing `TACAIX` values
 
 ### Variants extraction
 
