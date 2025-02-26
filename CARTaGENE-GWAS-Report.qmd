@@ -46,12 +46,18 @@ editor: source
 - Between files `~/Documents/projet_fabrice_mac_way/data/cartagene_13july.sas7bdat` and `~/Documents/projet_fabrice_mac_way/cartagene.sas7bdat`, what are the key differences? The first one, associated with `html` report `Cartagene_phenos_20230713.html` seems more recent and updated, with same number of individuals, but more phenotype features included. 
 
 
-```{r setup, include=FALSE}
+```{r}
+#| label: setup
+#| include: false
 knitr::opts_chunk$set(echo = TRUE)
 library(haven)
 ```
 
 # Data management
+
+```{bash}
+cd "/mnt/projects_tn01/Cartagene"
+```
 
 ## Phenotype derivation
 
@@ -62,6 +68,7 @@ tab<-read_sas("~/Documents/projet_fabrice_mac_way/data/cartagene_13july.sas7bdat
 tab_df<-as.data.frame(tab)
 head(tab_df)
 ```
+
 ```{r}
 dim(tab)
 ```
@@ -189,7 +196,11 @@ And for Cardiovasuclar diseases:
 
 
 
+# Perspectives
 
+- [multi-locus genome-wide association study (GWAS) using `DArTseq`](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-025-11344-z)
+- [`brms` pakcage](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06077-5)
+- [PNL: a software to build polygenic risk scores using a Super Learner approach based on `PairNet`, a Convolutional Neural Network](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf071/8015614)
 
 
 
