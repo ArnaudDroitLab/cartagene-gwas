@@ -1,6 +1,6 @@
 ---
 title: "GWAS Analyses of the Osteopenia disease using the CARTaGENE database"
-author: "Bastien CHASSAGNOL and Charles JOLY BEAUPARLANT"
+author: "Bastien CHASSAGNOL and Marie-Pier"
 date: last-modified	
 number-sections: true
 toc: true
@@ -55,6 +55,7 @@ editor: source
 - Lots of intermediate files generated that are no longer for downstream analyses, nor general pipeline or script to run for reproducing at one all the tools. Suggest use of existing *Nextflow* or *Snanemake* solutions:
 
   - [`kGWASflow` Snakemake pipeline, from @corut2024gg](https://github.com/akcorut/kGWASflow/wiki). [**Does not seem maintained anymore, does not include `plink2` tool**.]{fg="red"}
+  - [`PopGLen` Snakemake pipeline, from @nolen2025b](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf105/8069456). [Not for running downstream analyses, like GWAS, but rather for computing and visualising several alignment quality metrics at the population-level genome.]{fg="red"}
   - [`nf-GWAS` Nextflow pipeline, from @schonherr2024](https://genepi.github.io/nf-gwas/) is actively maintained by Curie Bioinformatics Team + include `plink2` facilities -> Have a look at `kGWASflow`, if, and only if, interesting features provided with the pipeline are not currently implemented in `nf-GWAS`. 
   
 - **Reproducibility**: two main CLI commands are needed for reproducing the analyses and/or delivering new outcomes:
@@ -64,7 +65,7 @@ editor: source
   - The versions of the two tools differ between the two locations + no access to user homes (to be avoided!!) + in both cases, the tool versions are completely out-of-date. 
   - Use Git to version the code, and track any changes, paired with R projects + `renv()` to create a reproducible environment
 
-# Questions
+# Questions {#sec-questions}
 
 - Check Human reference genome 
 - Why starting from BAM/BIM files in @sec-white-selection, instead of FASTQ files available in `/mnt/projects_tn01/Cartagene/data/merged`?
@@ -319,7 +320,7 @@ cartagene_phenodata <- PCs |>
 
 The response variables `osteopenia` and `osteoporosis` have been computed following these rules [@lst-osteopenie-computation], with the resulting contingency tables reported in @tbl-osteopenie-computation. 
 
-1. Exclude patients with `osteosecondaire==1`, or with missing values.
+1. Exclude patients with `osteosecondaire==1`.
 2. `osteopenia` is `case: 1` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere.
 3. `osteoporosis` is `case: 1` if `DMOTSCORE_mod < -2.5` and `control` elsewhere.
 
@@ -527,11 +528,30 @@ flextable(hla_coords) |>
 - [**Remark 4**: `DMOTSCORE_mod` is a strictly positive score, so rather irrelevant to use a standard linear model to predict it. Ensure explicitly that the GLM runs logistic regression on binary outcomes, and linear regression otherwise.]{fg="red"}
 
 
+- [**Remark 5**: Discussion and visualisations on [*VIF influence*](https://www.linkedin.com/feed/update/urn:li:activity:7308463515432833026/)]{fg="red"}.
+
 #### ii) Multiple test correction 
 
 In total, **7 phenotypes, 2613 variants tested, and $18291$ pairwise tests** were performed, implying to correct for multiple test. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value). [The details for the computation of the adjusted $p-$ values are not reported, see [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.]{fg="red"} 
 
 
+
+
+
+# Perspectives
+
+## Beyond GWAS analyses
+
+As mentioned in @sec-questions, this GWAS study is not actually a GWAS study, but rather a gene-centric study, pre-selecting genes based on prior knowledge and/or intuition. 
+
+Alternatively, we could consider a data-driven, and more agnostic approach, to refine the selection of gene candidates. To that end, @gnanaolivu2025bb proposed in [A clinical knowledge graph-based framework to prioritize candidate genes for facilitating diagnosis of Mendelian diseases and rare genetic conditions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06096-2), the `phenotype prioritization and analysis for rare diseases, PPAR` algorithm to rank genes based on *human phenotype ontology (HPO)* terms.^[Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.]. In details, PPAR combines embeddings from the *human knowledge graph*, incorporating genes, HPO terms, and gene ontology annotations connections.  For each input HPO term, a prioritized list of genes is returned based on their relevance and similarity to the HPO term.
+
+## Inclusion of familial pedigrees and environemental factors
+
+- [Multi-locus genome-wide association study (GWAS) using `DArTseq`](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-025-11344-z). Under the hood, relies on the `mrMLM` R package to include both the *population structure matrix* and the *kinship matrix*. Provides a complete GWAS pipeline, including a number of meaningful illustrations.  
+- [`BHCox`: Bayesian heredity-constrained Cox proportional hazards models for detecting gene-environment interactions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06077-5). Under the hood, relies on the `brms` R package. 
+
+- [PNL: a software to build polygenic risk scores using a Super Learner approach based on `PairNet`, a Convolutional Neural Network](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf071/8015614)
 
 
 
