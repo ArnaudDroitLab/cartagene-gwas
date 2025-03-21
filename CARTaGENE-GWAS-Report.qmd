@@ -28,7 +28,7 @@ format:
       light: cosmo
       dark: cosmo
     sidebar: true
-    lightbox: true # Allows to zoom out on figures.
+    lightbox: true
     comments: 
       hypothesis: true
     # code options
@@ -189,18 +189,14 @@ And for Cardiovasuclar diseases:
   - Remove missing values (13264 individuals)
   - **Osteo analysis**: `osteoporosis`, `osteopenia` and `fractures` using logistic regression + `DMOT_score` was analyzed using `lm`.
   - **Cardiovascular association analyses**: `AVCGLOBAL_PRE_M`, `MCASGLOBAL` and `MVASGLOBAL` using logistic regression. 
-  - `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high` -> try removing other spurious and highly-correlated covariates, or increase variance inflation threshold. 
+  - `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high` -> try removing other spurious and highly-correlated covariates, or increase variance inflation threshold. [Discussion and visualisations on [*VIF influence*](https://www.linkedin.com/feed/update/urn:li:activity:7308463515432833026/)]{fg="red"}.
   - Results in **7 phenotypes, 2613 variants tested, $18291$ tests** overall.
 
 2. **Multiple testing correction**: Significance threshold of $2.7 \times 10^{-6}$ is suggested. 
 
 
 
-# Perspectives
 
-- [multi-locus genome-wide association study (GWAS) using `DArTseq`](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-025-11344-z)
-- [`brms` pakcage](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06077-5)
-- [PNL: a software to build polygenic risk scores using a Super Learner approach based on `PairNet`, a Convolutional Neural Network](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf071/8015614)
 
 
 
