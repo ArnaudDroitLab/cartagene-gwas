@@ -29,7 +29,7 @@ format:
       light: cosmo
       dark: cosmo
     sidebar: true
-    lightbox: true # Allows to zoom out on figures.
+    lightbox: true
     comments: 
       hypothesis: true
     # code options
@@ -533,10 +533,15 @@ flextable(hla_coords) |>
 
 -   [**Remark 4**: `DMOTSCORE_mod` is a strictly positive score, so rather irrelevant to use a standard linear model to predict it. Ensure explicitly that the GLM runs logistic regression on binary outcomes, and linear regression otherwise.]{fg="red"}
 
-
 #### ii) Multiple test correction
 
 In total, 2613 variants tested, and $18291$ pairwise tests were performed, implying to correct for multiple test fallacy. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value). [The details for the computation of the adjusted $p-$ values are not reported, see [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.]{fg="red"}
+
+
+
+#### ii) Multiple test correction 
+
+In total, **7 phenotypes, 2613 variants tested, and $18291$ pairwise tests** were performed, implying to correct for multiple test. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value). [The details for the computation of the adjusted $p-$ values are not reported, see [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.]{fg="red"} 
 
 # Perspectives
 
