@@ -1,6 +1,6 @@
 ---
 title: "GWAS Analyses of the Osteopenia disease using the CARTaGENE database"
-author: "Bastien CHASSAGNOL and Charles"
+author: "Bastien CHASSAGNOL and Marie-Pier"
 date: last-modified	
 number-sections: true
 toc: true
@@ -19,11 +19,14 @@ execute:
   message: false
   warning: false
   error: false
+  eval: true
+  echo: true
 # Table options
 tbl-cap-location: bottom
 format: 
   html:
     embed-resources: true
+    toc-location: left
     theme:
       light: cosmo
       dark: cosmo
@@ -34,6 +37,7 @@ format:
     # code options
     code-fold: show
     code-link: true
+    code-annotations: hover # code annotation
     page-layout: full
     collapse: true
   docx:
@@ -41,160 +45,510 @@ format:
 editor: source
 ---
 
-# Questions
+# General Comments and Perspectives
 
-- Between files `~/Documents/projet_fabrice_mac_way/data/cartagene_13july.sas7bdat` and `~/Documents/projet_fabrice_mac_way/cartagene.sas7bdat`, what are the key differences? The first one, associated with `html` report `Cartagene_phenos_20230713.html` seems more recent and updated, with same number of individuals, but more phenotype features included. 
+- Assuming you validate all *pre-processing steps* reported in @sec-white-selection and @sec-preprocessing-redundancy, to adjust the pipeline to any target gene of interest, follow this two-step protocol:
 
+  i. Retrieve all known variants associated with your genes of interest in @sec-variant-extraction, and generate the corresponding VCF file.
+  ii. Change the response variable to predict in @lst-glm-bash (with option `--glm`, the model applied should adjust automatically whether it's discrete or continuous).
+  
+- Lots of intermediate files generated that are no longer for downstream analyses, nor general pipeline or script to run for reproducing at one all the tools. Suggest use of existing *Nextflow* or *Snanemake* solutions:
+
+  - [`kGWASflow` Snakemake pipeline, from @corut2024gg](https://github.com/akcorut/kGWASflow/wiki). [**Does not seem maintained anymore, does not include `plink2` tool**.]{fg="red"}
+  - [`PopGLen` Snakemake pipeline, from @nolen2025b](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf105/8069456). [Not for running downstream analyses, like GWAS, but rather for computing and visualising several alignment quality metrics at the population-level genome.]{fg="red"}
+  - [`nf-GWAS` Nextflow pipeline, from @schonherr2024](https://genepi.github.io/nf-gwas/) is actively maintained by Curie Bioinformatics Team + include `plink2` facilities -> Have a look at `kGWASflow`, if, and only if, interesting features provided with the pipeline are not currently implemented in `nf-GWAS`. 
+  
+- **Reproducibility**: two main CLI commands are needed for reproducing the analyses and/or delivering new outcomes:
+
+  - Core tool: `plink2` for running most of the SNPs analyses, currently in two locations: `/home/galgen01/programs/plink` and `/usr/bin/plink2`.
+  - `bcftools` for extracting variants of interest in a given genomic region: `/home/galgen01/programs/bcftools/bin/bcftools` and `/mnt/software/is1/commonSoftware/bcftools/bcftools-1.3.1/bin/bcftools`.
+  - The versions of the two tools differ between the two locations + no access to user homes (to be avoided!!) + in both cases, the tool versions are completely out-of-date. 
+  - Use Git to version the code, and track any changes, paired with R projects + `renv()` to create a reproducible environment
+
+# Questions {#sec-questions}
+
+- Check Human reference genome 
+- Why starting from BAM/BIM files in @sec-white-selection, instead of FASTQ files available in `/mnt/projects_tn01/Cartagene/data/merged`?
+- Why using biased *candidate gene approaches* instead of true GWAS?
+
+<!-- `find . -type f \( -iname "*.sh" -o -iname "*.py" -o -iname "*.Rmd" -o -iname "*.qmd" -o -iname "*.txt" \) -exec grep -Hn "genotypage" {} \;` -->
+<!-- `find . -type f -name "*.sas7bdat"` -->
+
+# Analyses
 
 ```{r}
 #| label: setup
 #| include: false
-knitr::opts_chunk$set(echo = TRUE)
+
 library(haven)
+library(flextable)
+library(dplyr)
 ```
 
-# Data management
+## Step 1: Merge genotype arrays {#sec-white-selection}
 
-```{bash}
-cd "/mnt/projects_tn01/Cartagene"
-```
+Genotypes were split into five different genotyping arrays. Arrays were merged together using Bash script [merge_datasets.sh](/mnt/projects_tn01/Cartagene/analyses/QC/merge_datasets.sh), and command `--bmerge` of tool `plink2`. This command only keeps matching **SNPs** and **alleles** in the 5 datasets.
 
-## Phenotype derivation
+The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of interest, for viewers), `BIM` (SNP information) and `FAM` (phenotype data, such as individuals and pedigree), are listed in folder `/mnt/projects_tn01/Cartagene/analyses/QC`, with prefix `merge_5_*` (for 5 genotypes concatenated). 
 
-### Lire fichier de phénotypes Cartagène
+## Step 2: Preprocessing for Removing redundancy {#sec-preprocessing-redundancy}
 
-```{r }
-tab<-read_sas("~/Documents/projet_fabrice_mac_way/data/cartagene_13july.sas7bdat")
-tab_df<-as.data.frame(tab)
-head(tab_df)
-```
+**Remark**: the `eur_only` gathers Eurasian, white phenotypes, hence the name of the folder.
 
-```{r}
-dim(tab)
-```
+### i) Trim missing SNPs {#sec-missing-SNPs}
 
-### Liste des indvidus d'origine Européenne
-
-```{r}
-id_corr<-read.table("~/Documents/projet_fabrice_mac_way/01-Mac-Way_782958_code_genetique_24Feb2023 (1).csv", sep=";", header=TRUE)
-colnames(id_corr) <- c("PROJECT_CODE", "geno_id", "batch")
-head(id_corr)
-```
-```{r}
-merged_table<-merge(id_corr, tab_df, by="PROJECT_CODE")
-head(merged_table)
-dim(merged_table)
-```
-### Liste des indvidus d'origine Européenne
-
-```{r}
-EUR<-merged_table$geno_id[merged_table$ETHNICITY6M=="Blanc"]
-head(EUR)
-length(EUR)
-```
-
-### Phénotypes DMOTscore
-```{r}
-merged_table$DMOTSCORE_mod <- merged_table$DMOTSCORE
-sum(is.na(merged_table$DMOTSCORE_mod))
-merged_table$DMOTSCORE_mod[ merged_table$OSTEOSECONDAIRE ==1 ] <- NA
-sum(is.na(merged_table$DMOTSCORE_mod))
-merged_table$osteopenie <- NA
-merged_table$osteopenie[!is.na(merged_table$DMOTSCORE_mod) & merged_table$DMOTSCORE_mod <= -1.5] <-1
-merged_table$osteopenie[!is.na(merged_table$DMOTSCORE_mod) & merged_table$DMOTSCORE_mod > -1.5] <-0
-merged_table$osteoporose <- NA
-merged_table$osteoporose[!is.na(merged_table$DMOTSCORE_mod) & merged_table$DMOTSCORE_mod < -2.5] <-1
-merged_table$osteoporose[!is.na(merged_table$DMOTSCORE_mod) & merged_table$DMOTSCORE_mod >= -2.5] <-0
-summary(merged_table$osteopenie)
-summary(merged_table$osteoporose)
-sum(merged_table$osteopenie==1, na.rm = TRUE)
-sum(merged_table$osteopenie==0, na.rm = TRUE)
-sum(merged_table$osteoporose==1, na.rm = TRUE)
-sum(merged_table$osteoporose==0, na.rm = TRUE)
-
-```
-
-
-### Phénotype de FX_mof_post
-
-```{r}
-merged_table$FXMOF_POST_mod <- merged_table$FXMOF_POST
-sum(is.na(merged_table$FXMOF_POST_mod))
-merged_table$FXMOF_POST_mod[ merged_table$OSTEOSECONDAIRE ==1 ] <- NA
-sum(is.na(merged_table$FXMOF_POST_mod))
-colnames(merged_table)
-```
-
-### Principal components analyses with PLINK
-
-```{r}
-PCs<-read.table("analyses/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.high_LD_excluded.unrelated_ind.PCA.eigenvec", header=FALSE)
-colnames(PCs) <- c("FID", "geno_id", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")
-```
-
-```{r}
-merge_pheno_PCs<-merge(PCs, merged_table, by="geno_id")
-dim(merge_pheno_PCs)
-sum(is.na(merge_pheno_PCs$PC1))
-colnames(merge_pheno_PCs)[1]<-"FID"
-colnames(merge_pheno_PCs)[2]<-"IID"
-head(merge_pheno_PCs)
-write.table(merge_pheno_PCs, file="analyses/merge_phenos_20230713_PCs.txt", col.names=TRUE, row.names = FALSE, sep="\t", quote=FALSE)
-```
-
-
-
-# Analyses
-
-## Cartagène HDAC9
-
-### PCA 
-
-Genotyping data was split into five datasets with five different genotyping arrays:
-
-1. The list of common variants using `PLINK v1.9` was commonly extracted to all datasets.
-2. , for white individuals and for which phenotypic information were available were kept using PLINK v.1.9. We removed variants with genotyping rate <0.95 and with Hardy-Weinberg disequilibrium < 1x10-6.  We then pruned variants using PLINK v1.9. To exclude related individuals, we calculated identity by descent and excluded one individual from pairs of indivduals with PI_HAT > 0.2. 
-3. We removed regions of high linkage disequilibrium (LD) to calculate the 10 first principal components, which were calculated with PLINK v1.9.
-
-### Phenotype definition
-
-Added two auxiliary variables for osteoporosis: 
-  - `DMOTSCORE_mod`:
-    1. Exlude patients with `osteosecondaire==1`, or exhibiting missing values.
-    2. `osteopenia` is `case` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere. **Result: 801 `cases` and 12,463 `controls`.**
-    3. `osteoporosis` is `case` if `DMOTSCORE_mod < -2.5` and `control` elsewhere. **Result: 48 `cases` and 13,216 `controls`**
-    4. `fractures`: 229 `cases` and 13,807 `controls`
-  - `FMOF_POST_mod` correpond to `osteosecondaire ==1` to exclude the corresponding individuals. 
+- **Inputs**:
+  - **Phenotype IDs of white individuals**: `eur_only/cartagene_self_reported_EUR.plink_format.txt`
+  - **BIM/BED/FAM/hh** folder generated with `--make-bed` command: `analyses/QC/merge_5_datasets`
   
+- **Objective**: Keep white individuals and remove SNPs variants with genotyping rate $<0.95$. The **genotyping rate** measures the proportion of successfully genotyped markers and indicates how complete the genotype data is. Removing SNPs with low Genotyping Rate increases Missing Data imputation performance, and overall maintains higher statistical power. 
+
+- [**Remark**: Also advised to exclude samples with low Genotyping Rate, below 0.98. Not done in this study. To be checked]{fg="red"}
+
+- **Bash command**:
+
+```bash
+/home/galgen01/programs/plink \
+  --bfile /mnt/projects_tn01/Cartagene/analyses/QC/merge_5_datasets \
+  --geno 0.05 \
+  --keep /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/cartagene_self_reported_EUR.plink_format.txt \
+  --make-bed \
+  --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095
+```
+
+### ii) Hardy-Weinberg Disequilibrium {#sec-HWD}
+
+- **Inputs**:
+  - **BIM/BED/FAM/hh (Homozygous-Haplotype)** files generated from previous SNP missing removal, see @sec-missing-SNPs.
   
-And for Cardiovasuclar diseases: 
+- **Objective**: Remove SNPs variants with **Hardy-Weinberg disequilibrium** $< 1 \times 10^{-6}$. Indeed, if a SNP is in HWD, it might reflect hidden sub-population structure or poor-quality rather than true genetic associations.
 
-- `AVCGLOBAL_PRE_M`: 282 `cases` and $16375$ `controls`.
-- `MCASGLOBAL`: $871$ `cases` and $15756$ `controls`. 
-- `MVASGLOBAL`: $1069$ `cases` and $15559$ `controls`.
+- [**Remark**: If a SNP is under strong **natural selection**, such as SNPs involved in the HLA genes, they are likely to deviate from HWE due to balancing selection. If the SNP is biologically important, don't exclude it blindly!! Alternative: compute the SNP score.]{fg="red"}
 
-- 14964 indviduals with non-missing `TACAIX` values
+- **Bash command**:
 
-### Variants extraction
+```bash
+/home/galgen01/programs/plink \
+  --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095 \
+  --hwe 1e-6 \
+  --make-bed \
+  --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06
+```
 
-- HDAC9 variants:
-  - Within the gene boundaries, as defined by the `hg38` reference genome.
-  - Minor allele frequency > 0.01. 
-  - SNPs extracted using [`bcftools` FILTER](https://samtools.github.io/bcftools/howtos/filtering.html).
+### iii) Linkage Disequilibrium {#sec-LD}
 
-### GWAS
+#### Local LD analysis {#sec-local-LD}
 
-1. Use of `PLINK2 + glm` with the first 10 principal components as covariates:
+- **Inputs**:
+  - **BIM/BED/FAM/hh (Homozygous-Haplotype)** files `/merge_5_datasets.eur_only.geno095.hwe1e0` generated from previous HWD SNP trimming, see @sec-HWD.
+  
+- **Objective**: Remove SNPs variants associated with strong **linkage disequilibrium**. In an ideal population under random mating, allele combinations should be independent ($r^2=0$). However, due to factors such as genetic drift, or physical proximity, certain alleles tend to be inherited together more often than expected. In GWAS, LD pruning avoids **Overfitting** (SNPs in high LD carry redundant information), avoiding spurious inflation of GWAS association signals.
 
-  - Remove missing values (13264 individuals)
-  - **Osteo analysis**: `osteoporosis`, `osteopenia` and `fractures` using logistic regression + `DMOT_score` was analyzed using `lm`.
+- [**Remark**: Report the Number of SNPs Before and After Pruning, usually more sringent $R^2$ is considered.]{fg="red"}
+
+- **Tool**: `plink --indep-pairwise 50 5 0.5` will discard SNPs with a correlation coefficient above $0.5$ (given that a $R^2$ score of 1 indicates a perfect correlation), on a *rolling window* of $50$ SNPs (focus on local zones) and step $5$ by $5$. 
+
+- **Bash command**:
+
+```bash
+# identify SNPs with low LD
+/home/galgen01/programs/plink \
+  --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06 \
+  --indep-pairwise 50 5 0.5 \
+  --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps
+  
+# save pruned SNPs associated with low LD
+/home/galgen01/programs/plink \
+  --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06 \
+  --extract /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.prune.in \
+  --make-bed \
+  --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile
+
+```
+
+#### Global LD analysis from prior expert knowledge {#sec-global-LD}
+
+- **Inputs**:
+  - **BIM/BED/FAM/hh (Homozygous-Haplotype)** files `merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile` generated from previous local LD trimming, see @sec-local-LD.
+  
+- **Objective**: Remove SNPs variants associated with strong **linkage disequilibrium** genomic regions from prior expert knowledge. In details, list of regions to be excluded is reported [here](http://dougspeed.com/wp-content/uploads/highld.txt), as generated by the Abecasis Group in 2023^[Notably includes MHC, lactase region, and known inversions `8p23` and `17q21.31`. **Haplotypes**?]
+
+- **Bash command**:
+
+```bash
+
+/home/galgen01/programs/plink \
+  --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile \
+  --exclude range /mnt/projects_tn01/Cartagene/analyses/QC/high_ld_regions.plink_format.txt \
+  --make-bed \
+  --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.high_LD_excluded
+
+```
+
+
+### iv) Exclude affiliated individuals based on high IBD scores
+
+- **Inputs**:
+  - **BIM/BED/FAM/hh (Homozygous-Haplotype)** files `merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile` generated from previous local LD trimming, see @sec-local-LD.
+  
+- **Objective**: Exclude related individuals computing **identity by descent** (IBD), a genetic metric of the relatedness between two individuals, and exclude one individual by pairs of individuals with a score above $0.2$. Indeed, strongly associated patients increase bias in GWAS, raising a stronger score than expected in the general population, and prevents quality controls to detect duplicates or sample mix-ups.
+
+- **Details**: A two-step, more stringent IBD filtering strategy has been chosen, eliminating *first* the most problematic individuals, and the *second* ensuring the remaining related individuals are properly filtered (for each correlated pair, prune randomly one of them). The Bash instructions are reported [here](/mnt/projects_tn01/Cartagene/analyses/QC/eur_only/related_ids/Readme.txt).
+
+- [**Remarks**: Choice of a heuristic threshold of $n=68$ affiliated patients removal to be further discussed. Current score of `PI_HAT` score of $0.2$ is surprising, as common thresholds are either $0.25$ for discarding grandparent-grandchild, or $0.125$ or lower for only keeping the most distant relatives. Starting from `PLINK 2.0`, the recommended approach is now utilizing the `--king-cutoff` command, over the older `--rel-cutoff` and `--genome --min` + aggregates all subsequent steps simultaneously, especially in heterogeneous populations^[`--king-cutoff 0.0884` corresponds to `PI_HAT = 0.125`, see details [here](http://biostars.org/p/434832/#434898)].]{fg="red"}
+
+- **Bash command**:
+
+```bash
+
+# Calculate IBD, select individuals with IBD above 0.2 for further pruning
+
+/home/galgen01/programs/plink \
+  --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile \
+  --genome \
+  --memory 12006 \
+  --min 0.2 \
+  --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.IBD
+
+
+# Remove related individuals, in a two-stage process
+
+/home/galgen01/programs/plink \
+  --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile \
+  --make-bed \
+  --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_1_of_2 \
+  --remove /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/related_ids/IBD.genome.iids.merged.sorted.count.reverse.ids_related_to_2_individuals.ids_only.FID_IID_format
+
+
+/home/galgen01/programs/plink \
+  --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_1_of_2 \
+  --make-bed \
+  --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_2_of_2 \
+  --remove /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/related_ids/IBD.genome2.related_individuals_to_remove.txt 
+
+```
+
+### Step 3: PCA {#sec-PCA}
+
+- **Inputs**:
+  - **BIM/BED/FAM/hh (Homozygous-Haplotype)** files `merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.high_LD_excluded` resulting from the pre-processing operations reported in @sec-preprocessing-redundancy (LD, HWD and missing SNPs trimming)
+  - **phenotype IDs** listed in `merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_2_of_2`, where all affiliated patients have been removed.
+  
+- **Objective**: Compute PCA and keep the 10 first principal components.
+
+- [**Remark**: use visualizations, such as *scree plots*, elbow point or/and *Tracy-Widom Test* to select the final number of PCs, instead of hard thresholding, and on the other hand, scatter plots to identify latent structures.]{fg="red"}.
+
+- **Bash command**:
+
+```bash
+
+/home/galgen01/programs/plink \
+  --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.high_LD_excluded \ 
+  --keep merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_2_of_2.fam \
+  --memory 12006 \
+  --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.high_LD_excluded.unrelated_ind.PCA \
+  --pca 10
+```
+
+### Step 4: Phenotype metrics
+
+Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`.
+
+### i) Merge genotype IDs, phenotypes and PCAs values
+
+General phenotype features are provided in 
+
+```{r}
+#| label: tbl-cartage-pheno
+#| tbl-cap: Read SAS table describing CarTaGene phenotypes.
+
+cartagene_phenodata <- haven::read_sas("data/phenotypes/cartagene_phenotypes.sas7bdat")
+flextable(head(cartagene_phenodata)) |> 
+  bold(bold = TRUE, part = "header")
+```
+
+Number of patients overall is `{r} nrow(cartagene_phenodata)`, and number of phenotype variables is `{r} ncol(cartagene_phenodata)`.
+
+We then need to map each individual patient ID (`IID`) with its corresponding genotype array [@tbl-cartage-genotypes-IDs], as done in @lst-join-phenotype-genotype.
+
+```{r}
+#| label: tbl-cartage-genotypes-IDs
+#| tbl-cap: Read SAS table describing CarTaGene phenotypes.
+cartagene_genotypes_ID <- readr::read_csv2("./data/phenotypes/cartagene_genotype_IDs.csv",
+                                           show_col_types = FALSE, 
+                                           col_types = c("d", "c","c")) |> 
+  dplyr::rename(PROJECT_CODE = "project_code", geno_id = "file_111", batch="batch")
+  
+
+flextable(head(cartagene_genotypes_ID)) |> 
+  bold(bold = TRUE, part = "header")
+```
+
+[Avoid using French CSV settings, switch to universal convention, where delimiter is a comma: `,`]{fg="red"}
+
+```{r}
+#| label: join-phenotype-genotype
+#| lst-label: lst-join-phenotype-genotype
+#| lst-cap: Inner join between phenotypes IDs and genotypes, while constraing the remaining individuals to belong to white ethnicity. 
+cartagene_phenodata <- cartagene_phenodata |> 
+  dplyr::inner_join(cartagene_genotypes_ID, by="PROJECT_CODE") |> 
+  dplyr::filter(ETHNICITY6M=="Blanc")
+```
+
+The resulting phenotype table, after joining with genotypes IDs and restraining to Eurasian phenotypes, has been restrained to `{r} nrow(cartagene_phenodata)` individuals.
+
+### ii) PCA merging
+
+PCA vectors computed in @sec-PCA are subsequently merged with phenotype data in @lst-join-phenotype-PCA. 
+
+```{r}
+#| label: join-phenotype-PCA
+#| lst-label: lst-join-phenotype-PCA
+#| lst-cap: Inner join between phenotypes IDs and first 10 PCA eigen vectors.
+
+PCs <- readr::read_delim("data/genotypes/PCA_eigenvec",
+                        col_names = c("FID", "geno_id", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10"), 
+                        delim = " ",
+                        show_col_types = FALSE)
+cartagene_phenodata <- PCs |> 
+  dplyr::inner_join(cartagene_phenodata, by="geno_id") |> 
+  rename(IID = geno_id)
+
+```
+
+### iii) Osteoporosis and osteopenie
+
+The response variables `osteopenia` and `osteoporosis` have been computed following these rules [@lst-osteopenie-computation], with the resulting contingency tables reported in @tbl-osteopenie-computation. 
+
+1. Exclude patients with `osteosecondaire==1`.
+2. `osteopenia` is `case: 1` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere.
+3. `osteoporosis` is `case: 1` if `DMOTSCORE_mod < -2.5` and `control` elsewhere.
+
+```{r}
+#| label: tbl-osteopenie-computation
+#| lst-label: lst-osteopenie-computation
+#| lst-cap: Generate scores of interest.
+#| tbl-cap: osteoporose is considered as more severe than `osteopenie`, hence the striclty lower number of individuals affected by the disease. 
+# NA values treated in the LHS conditions as FALSE, assigning them the .default value. 
+cartagene_phenodata <- cartagene_phenodata |> 
+  dplyr::mutate(DMOTSCORE_mod = dplyr::if_else(OSTEOSECONDAIRE ==1, NA, DMOTSCORE), 
+                osteopenie = dplyr::case_when(DMOTSCORE_mod <= -1.5 ~ 1, 
+                                              DMOTSCORE_mod > -1.5 ~ 0, 
+                                              .default = NA),
+                osteoporose = dplyr::case_when(DMOTSCORE_mod < -2.5 ~ 1, 
+                                              DMOTSCORE_mod >= -2.5 ~ 0, 
+                                              .default = NA), 
+                FXMOF_POST_mod = dplyr::if_else(OSTEOSECONDAIRE ==1, NA, OSTEOSECONDAIRE))
+
+flextable::proc_freq(cartagene_phenodata, 
+                     "osteopenie", "osteoporose")
+
+```
+
+### iv) Cardiovascular diseases
+
+```{r}
+#| label: tbl-cardiovascular-diseases
+#| tbl-cap: "Cardiovascular diseases"
+#| tbl-subcap:
+#|   - "AVCGLOBAL_PRE_M"
+#|   - "MCASGLOBAL"
+#|   - "MVASGLOBAL"
+#| layout-ncol: 3
+
+
+flextable::proc_freq(cartagene_phenodata, 
+                     "AVCGLOBAL_PRE_M")
+flextable::proc_freq(cartagene_phenodata, 
+                     "MCASGLOBAL")
+flextable::proc_freq(cartagene_phenodata, 
+                     "MVASGLOBAL")
+```
+
+
+
+Finally, you can save the global phenotype dataset, merging PCs, phenotype and genotype IDs along with metric computation, using `readr::write_csv`:
+
+```{r}
+#| label: save-global-phenotype
+readr::write_csv(cartagene_phenodata, 
+                 file="data/pheno_data_global.csv")
+```
+
+
+### Step 5: Variants extraction {#sec-variant-extraction}
+
+All the curated VCF files have been downloaded and processed by an external third-party supplier, namely [Email Cartagene](mailto:access@cartagene.qc.ca). Details on how to access and process the database can be found [here](https://cartagene.qc.ca/files/documents/other/Info_GeneticData3juillet2023.pdf)^[Use of dnaseq `Genpipes` pipelines, run on Compute Canada Clusters, version 3.1.5.]
+
+
+#### i) HDAC9 {#sec-HDAC9}
+
+- **Inputs**:
+  - Updated **VCF** file of the chromosome 7 (where `HDAC-9` is present): `chr7.merged.clean.noMono.vcf.gz`. VCF files per chromosome are stored in `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/`. Header metadata lines notably include the statistical software used for inferring missing SNP genotypes, here ...
+
+  
+- **Outputs**:
+  - `chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf`: VCF file, restrained to HDAC9 region with affiliated SNPs.
+  
+- **Objective**: Extract annotated SNPs within `HDAC9` boundaries, as defined by the `hg38` reference genome. **Details**: 
+  - Filter variants based on **Minor Allele Frequency (MAF)** $> 0.01$ (in other words, the SNP must be present in at least $1\%$ of the samples). [This is not done during the VCF extraction, but in the regression stage, see @sec-GWAS.]{fg="red"}
+  - SNPs were extracted using [`bcftools filter`]. [Recommended to use `bcftools view` when extracting per region domains or even `plink2 --bfile your_dataset --chr 7 --from-bp 18086825 --to-bp 19002416` to avoid relying on another tool. See the complete command in ...]{fg="red"}.
+  - No explicit mention of the reference genome used in the metadata lines of the VCF files. Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) to understand why knowing the build version is important. [Even worse, it seems that among the 5 genotype arrays merged in @sec-white-selection, at least one genotype, namely `gsa.17k.final.hg19.bim,` has been mapped thanks to `GRCh37 (hg19)` reference instead of more recent `hg38 (GRCh38, 2013)` version.]
+  - [Start and end locations are hard-written, instead of being fetched automatically. Report to @sec-HLA to retrieve these positions in an automated fashion. Alternatively, it would have been great to add directly gene information within the INFO/GENE fields of the VCF files, but that does not seem to be the case, as reported in @lst-vcf-header]{fg="red"}
+
+- **Bash command**:
+
+```bash
+
+# old command
+/mnt/projects_tn01/Cartagene/analyses/variants_extraction$ /home/galgen01/programs/bcftools/bin/bcftools filter --regions chr7:18086825-19002416 /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr7.merged.clean.noMono.vcf.gz  -o /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf
+
+```
+
+```bash
+
+/home/galgen01/programs/bcftools/bin/bcftools view \
+  --regions chr7:18086825-19002416 \
+  --include 'MAF[0] > 0.01' \ # alternative: 'INFO/AF1 > 0.01 & INFO/AF1 < 0.99'
+  /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr7.merged.clean.noMono.vcf.gz \
+  -o /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf
+
+```
+
+
+
+```{r}
+#| lst-label: lst-vcf-header
+#| lst-cap: Header lines, marked by `##` symbol, on top of VCF files. This metadata can prove useful to know exactly how SNPs were extracted in a given region.
+#| label: vcf-header
+chromosome_vcf6_file <- "../genotypage/imputation/imputation_merged/chr6.merged.clean.noMono.vcf.gz"
+chromosome_vcf6_content <- readr::read_lines(chromosome_vcf6_file, n_max = 30)
+
+# show metadata, with tools and information about VCF structure
+cat(chromosome_vcf6_content[1:22], sep = "\n")
+```
+
+#### ii) HLA-family {#sec-HLA}
+
+HLA genes are usually classified into **Class I (HLA-A, HLA-B, HLA-C)** and **Class II (HLA-DRB1, HLA-DQA1, HLA-DQB1)**, amounting in total to six main genes within the human organism.  
+
+
+To retrieve their positions on the `Hg37/38` build in an automated fashion, see @lst-hla-positions. [Change out-of-date `BiomarT` package for either `rtracklayer` package to query in real time the **UCSC Genome Browser**, or `AnnotationDBI` with `TxDb.Hsapiens.UCSC.hg38.knownGene` for local fetching.]{fg="red"}
+
+- **Objective**: extract the annotated VCF, but this time with the HLA regions, and on chromosome 6 (see @sec-HDAC9 for Bash commands).
+
+```{r}
+#| label: hla-positions
+#| lst-label: lst-hla-positions
+#| lst-cap:  Use `biomaRt` to fetch and retrieve automatically start and end positions of the HLA family. 
+#| eval: false
+
+
+# renv::install("bioc::biomaRt")
+
+# retrieve latest human genome assembly
+human_mart <- biomaRt::useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
+hla_genes <- c("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1")
+hla_coords <- biomaRt::getBM(
+    attributes = c("hgnc_symbol", "chromosome_name", "start_position", "end_position", "strand"),
+    filters = "hgnc_symbol",
+    values = hla_genes,
+    mart = human_mart)
+
+flextable(hla_coords) |> 
+  bold(bold = TRUE, part = "header")
+```
+
+
+
+### Step 6: GWAS
+
+#### i) GLM and GWAS {#sec-GWAS}
+
+- **Objective**: Use of `PLINK2 + glm` with the first 10 principal components as covariates, see @lst-glm-bash for details.
+  - **Osteo analysis**: `osteoporosis`, `osteopenia` and `fractures` using logistic regression + `DMOTSCORE_mod` was analyzed using `lm`.
   - **Cardiovascular association analyses**: `AVCGLOBAL_PRE_M`, `MCASGLOBAL` and `MVASGLOBAL` using logistic regression. 
-  - `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high` -> try removing other spurious and highly-correlated covariates, or increase variance inflation threshold. [Discussion and visualisations on [*VIF influence*](https://www.linkedin.com/feed/update/urn:li:activity:7308463515432833026/)]{fg="red"}.
-  - Results in **7 phenotypes, 2613 variants tested, $18291$ tests** overall.
+  
+- **Input**: 
+  - VCF file on the region/gene of interest
+  - Phenotypes, with indiviudal patient IDs. 
+  - Explanatory variable to predict, just change the `--pheno-name <response_variable>` with the name of your variable.
+  
+::: {#lst-glm-bash}
 
-2. **Multiple testing correction**: Significance threshold of $2.7 \times 10^{-6}$ is suggested. 
+```{.bash}
+
+/home/galgen01/programs/plink2 \
+  --1 \
+  --double-id \
+  --pheno /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \
+  --pheno-name <variable-to-predict> \
+  --vcf /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf dosage=HDS
+  --keep /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \
+  --glm hide-covar \
+  --covar /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \
+  --covar-name PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+  --maf 0.01 \
+  --out <target-gene>_<variable-to-predict>
+  
+```
+
+**Template GLM instruction for GWAS studies.**
+
+:::
+
+```bash
+
+/home/galgen01/programs/plink2 \
+  --1 \ # <1>
+  --double-id \ # <1>
+  --pheno /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <2>
+  --keep /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <2>
+  --pheno-name osteopenie \ # <2>
+  --vcf /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf dosage=HDS # <2>
+  --glm hide-covar \ # <3>
+  --covar /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <3>
+  --covar-name PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \ # <3>
+  --maf 0.01 \ # <3>
+  --out HDAC9_osteopenie # <4>
+  
+```
+1. `--1` ensure independent GWAS analyses per individual (**single-sample mode*). Indeed, `PLINK`usually assumes samples are structured in a family-based format (FID IID pairs), while `--double-id` details the FID/IID format for uniquely identifying a given individual.
+2. **GWAS inputs**: We need the *phenotype information* (provided with `--pheno` and `--keep` commands), the *response variable* (provided with `--pheno-name`) and the *VCF file* (command `--vcf`), here using the SNPs annotations for the HDAC9 gene^[`dosage=HDS`, for Hard Dosage, provides the instruction describing genotype uncertainties for enhanced statistical power. It's particularly useful when working as here with **imputed genotypes**, where part of the SNPs were inferred using reference panels.].
+3. GWAS model options: `--glm` is the general linear model, which uses by default a *logistic regression* for categorical variables, and a *standard linear Gaussian model*, equivalent to `lm` for continuous variables. `--covar` is the covariate file, here storing the principal components resulting from PCA computation described with `--covar-name` option, and computation reported in ... . PCAs are used to describe the population structure in an unsupervised manner; and avoid and detect latent subgroups. Finally, `--maf` guarantees removal of really infrequent SNPs, often associated with low statistical power. 
+4. The output GWAS folder, with `--out` command. Stored for now in `/mnt/projects_tn01/Cartagene/analyses/association`.
 
 
+- **Remark**: you may come up with `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high`. In this case, you may try removing completely covariates (with `--glm allow-no-covars`), or/and increase variance inflation threshold (`--vif number_vif` option). 
+
+- [**Remark 2**: All the pre-processing operations detailed in @sec-preprocessing-redundancy are only used for the computation of the PCA components, but not subsequently used in the glm regression for trimming low-quality SNPs, or even remove strongly correlated individuals. Besides, recommended to use original BIM/BAM/FAM files or even `.pgen` newest formats, inducing faster analysis large datasets, rather than VCF files, using the `--pfile` instruction.]{fg="red"}
+
+- [**Remark 3**: Add phenotype covariates, such as SEX or AGE, which can play a strong leverage on the impact of SNPs.]{fg="red"}
+
+- [**Remark 4**: `DMOTSCORE_mod` is a strictly positive score, so rather irrelevant to use a standard linear model to predict it. Ensure explicitly that the GLM runs logistic regression on binary outcomes, and linear regression otherwise.]{fg="red"}
+
+
+- [**Remark 5**: Discussion and visualisations on [*VIF influence*](https://www.linkedin.com/feed/update/urn:li:activity:7308463515432833026/)]{fg="red"}.
+
+#### ii) Multiple test correction 
+
+In total, **7 phenotypes, 2613 variants tested, and $18291$ pairwise tests** were performed, implying to correct for multiple test. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value). [The details for the computation of the adjusted $p-$ values are not reported, see [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.]{fg="red"} 
+
+# Perspectives
+
+## Beyond GWAS analyses
+
+As mentioned in @sec-questions, this GWAS study is not actually a GWAS study, but rather a gene-centric study, pre-selecting genes based on prior knowledge and/or intuition. 
+
+Alternatively, we could consider a data-driven, and more agnostic approach, to refine the selection of gene candidates. To that end, @gnanaolivu2025bb proposed in [A clinical knowledge graph-based framework to prioritize candidate genes for facilitating diagnosis of Mendelian diseases and rare genetic conditions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06096-2), the `phenotype prioritization and analysis for rare diseases, PPAR` algorithm to rank genes based on *human phenotype ontology (HPO)* terms.^[Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.]. In details, PPAR combines embeddings from the *human knowledge graph*, incorporating genes, HPO terms, and gene ontology annotations connections.  For each input HPO term, a prioritized list of genes is returned based on their relevance and similarity to the HPO term.
+
+## Inclusion of familial pedigrees and environmental factors
+
+- [Multi-locus genome-wide association study (GWAS) using `DArTseq`](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-025-11344-z). Under the hood, relies on the `mrMLM` R package to include both the *population structure matrix* and the *kinship matrix*. Provides a complete GWAS pipeline, including a number of meaningful illustrations.  
+
+- [`BHCox`: Bayesian heredity-constrained Cox proportional hazards models for detecting gene-environment interactions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06077-5). Under the hood, relies on the `brms` R package. 
+
+- [PNL: a software to build polygenic risk scores using a Super Learner approach based on `PairNet`, a Convolutional Neural Network](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf071/8015614)
 
 
 
