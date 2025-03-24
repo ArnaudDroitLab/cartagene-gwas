@@ -1,0 +1,49 @@
+---
+title: "Tools installation"
+format: html
+editor: source
+engine: knitr
+---
+
+## Bash commands to install `plink2` in the `tools` folder
+
+
+```{bash download-plink2}
+# Step 1: Download the latest PLINK2 binary
+wget -O ./bin/plink2.zip "https://s3.amazonaws.com/plink2-assets/alpha6/plink2_linux_x86_64_20250129.zip" 
+
+unzip -d ./bin/plink2 ./bin/plink2.zip && rm ./bin/plink2.zip
+
+# Step 4: Ensure the binary is executable
+chmod 777 ./bin/plink2
+
+# Step 5: Verify installation
+./bin/plink2 --version
+
+```
+
+## Bash commands to install `bcftools` in the `tools` folder
+
+```{bash download-bcftools}
+
+wget -O ./bin/bcftools-1.21.tar.bz2 "https://github.com/samtools/bcftools/releases/download/1.21/bcftools-1.21.tar.bz2" 
+
+tar -xjvf ./bin/bcftools-1.21.tar.bz2 -C ./bin/ && rm ./bin/bcftools-1.21.tar.bz2
+
+cd ./bin/bcftools-1.21
+./configure --prefix=/mnt/projects_tn01/Cartagene/cartagene-gwas/bin/bcftools
+
+make
+make install
+
+rm -rf ./bin/bcftools-1.21
+
+# Temporary (Current Shell Session Only)
+export PATH=./bin/bcftools/bin:$PATH  
+
+# Semi temporary (for a given user)
+echo 'export PATH=./bin/bcftools/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+
+```
+

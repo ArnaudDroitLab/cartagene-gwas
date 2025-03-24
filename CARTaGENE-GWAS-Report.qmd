@@ -538,11 +538,6 @@ flextable(hla_coords) |>
 In total, 2613 variants tested, and $18291$ pairwise tests were performed, implying to correct for multiple test fallacy. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value). [The details for the computation of the adjusted $p-$ values are not reported, see [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.]{fg="red"}
 
 
-
-#### ii) Multiple test correction 
-
-In total, **7 phenotypes, 2613 variants tested, and $18291$ pairwise tests** were performed, implying to correct for multiple test. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value). [The details for the computation of the adjusted $p-$ values are not reported, see [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.]{fg="red"} 
-
 # Perspectives
 
 ## Beyond GWAS analyses {#sec-post-GWAS}
@@ -562,6 +557,25 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 -   [`PNL`: a software to build polygenic risk scores using a Super Learner approach based on `PairNet`, a Convolutional Neural Network](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf071/8015614), from @chen2025b.
 
 # Appendix {.appendix}
+
+## Load CLI `bcftools` and `plink2`
+
+``` bash
+
+export PATH=$PATH:/mnt/software/singularity/bcftools OU bcftools-1.9.sif # <1>
+
+export SINGULARITY_BIND=/mnt/projects_tn01/Cartagene/cartagene-gwas
+singularity exec --bind $SINGULARITY_BIND:/data my_container.sif 
+
+singularity pull docker://quay.io/biocontainers/bcftools:1.21--h3a4d415_1 
+singularity exec bcftools.sif bcftools --version
+
+
+singularity pull biocontainers/bcftools
+```
+
+
+
 
 ## Bibliographic References {.appendix}
 
