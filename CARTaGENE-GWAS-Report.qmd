@@ -93,6 +93,12 @@ library(dplyr)
 # Required for code linking
 library(downlit)
 library(xml2)
+
+# Retrieve gene positions
+# library(AnnotationDbi)
+# library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+# library(org.Hs.eg.db)  # Provides gene symbol to Entrez ID mapping
+# library(GenomicFeatures)
 ```
 
 ## Step 1: Merge genotype arrays {#sec-white-selection}
@@ -268,7 +274,7 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
 ## Step 4: Phenotype feature extraction {#sec-phenotype-extraction}
 
-Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`.
+Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`.[File Naming Convention, waiting for True Database configuration, is detailed in the two following LinkedIn posts: [here](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-hardest-part-of-bioinformatics-naming-activity-7295090463894589441-Ra-j), and [there](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_stop-losing-track-of-your-analysis-files-activity-7311382817110708225-Kl3A). Add date, file type and extension, along with model organism or study name + details General File Organisation.]{fg="red"}
 
 ### i) Merge genotype IDs, phenotypes and PCAs values
 
@@ -281,6 +287,8 @@ General phenotype features are provided in
 cartagene_phenodata <- haven::read_sas("data/phenotypes/cartagene_phenotypes.sas7bdat")
 flextable(head(cartagene_phenodata)) |> 
   bold(bold = TRUE, part = "header")
+
+
 ```
 
 Number of patients overall is `{r} nrow(cartagene_phenodata)`, and number of phenotype variables is `{r} ncol(cartagene_phenodata)`.
@@ -442,27 +450,31 @@ cat(chromosome_vcf6_content[1:22], sep = "\n")
 
 HLA genes are usually classified into **Class I (HLA-A, HLA-B, HLA-C)** and **Class II (HLA-DRB1, HLA-DQA1, HLA-DQB1)**, amounting in total to six main genes within the human organism.
 
-To retrieve their positions on the `Hg37/38` build in an automated fashion, see @lst-hla-positions. [Change out-of-date `BiomarT` package for either `rtracklayer` package to query in real time the **UCSC Genome Browser**, or `AnnotationDBI` with `TxDb.Hsapiens.UCSC.hg38.knownGene` for local fetching.]{fg="red"}
+To retrieve their positions on the `Hg37/38` build in an automated fashion, see @lst-hla-positions. [Do not use the `BiomarT` package: it's not anymore maintained, and can only be used with out-of-date `Hg37` Human Genome Build. for either `rtracklayer` package to query in real time the **UCSC Genome Browser**, or `AnnotationDBI` with `TxDb.Hsapiens.UCSC.hg38.knownGene` for local fetching.]{fg="red"}
 
--   **Objective**: extract the annotated VCF, but this time with the HLA regions, and on chromosome 6 (see @sec-HDAC9 for Bash commands).
+-   **Objective**: extract the annotated VCF, but this time with the HLA regions, and on chromosome 6 (see @sec-HDAC9 for Bash commands). Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) for details.
 
 ```{r}
 #| label: hla-positions
 #| lst-label: lst-hla-positions
-#| lst-cap:  Use `biomaRt` to fetch and retrieve automatically start and end positions of the HLA family. 
+#| lst-cap:  Use `AnnotationDBI` to fetch and retrieve automatically start and end positions of the HLA family. 
 #| eval: false
-
-
-# renv::install("bioc::biomaRt")
+# renv::install(packages = c("bioc::AnnotationDbi", "bioc::TxDb.Hsapiens.UCSC.hg38.knownGene", "bioc::org.Hs.eg.db"))
 
 # retrieve latest human genome assembly
-human_mart <- biomaRt::useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
 hla_genes <- c("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1")
-hla_coords <- biomaRt::getBM(
-    attributes = c("hgnc_symbol", "chromosome_name", "start_position", "end_position", "strand"),
-    filters = "hgnc_symbol",
-    values = hla_genes,
-    mart = human_mart)
+# Convert HGNC symbols to Entrez IDs with org.Hs.eg.db
+hla_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hla_genes, 
+                     column = "ENTREZID", keytype = "SYMBOL", multiVals = "first")
+
+# build human database reference
+txdb <- makeTxDbFromUCSC(genome = "hg38", tablename = "refGene")
+
+# retrieve start and end positions of HLA chromosoms
+hla_coords <- AnnotationDbi::select(txdb, 
+                     keys = hla_entrez_ids, 
+                     columns = c("TXCHROM", "TXSTART", "TXEND"), 
+                     keytype = "GENEID")
 
 flextable(hla_coords) |> 
   bold(bold = TRUE, part = "header")
@@ -527,21 +539,38 @@ flextable(hla_coords) |>
 
 -   **Remark 1**: you may come up with `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high`. In this case, you may try removing completely covariates (with `--glm allow-no-covars`), or/and increase variance inflation threshold (`--vif number_vif` option). **Note that a VIF factor above 10 is considered problematic as it can significantly distort regression estimates.** [Discussion and visualisations on [*VIF influence*](https://www.linkedin.com/feed/update/urn:li:activity:7308463515432833026/). Briefly, VIF quantifies the degree of similarity among predictor variables. Indeed, the GLM-family usually assumes independence between explanatory variables. My premise here is that the whole pipeline described in @sec-preprocessing-redundancy is only used to compute the PCA eigen vectors, and not for GWAS differential downstream analyses. As such, strongly correlated SNPs are kept, inducing logically an inflation of the VIF factor.]{fg="red"}
 
--   [**Remark 2**: All the pre-processing operations detailed in @sec-preprocessing-redundancy are only used for the computation of the PCA components, but not subsequently used in the `glm`regression for trimming low-quality SNPs, or even remove strongly correlated individuals. Besides, recommended to use original BIM/BAM/FAM files or even `.pgen` newest formats, inducing faster analysis large datasets, rather than VCF files, using the `--pfile` instruction.]{fg="red"}
+-   [**Remark 2**: All the pre-processing operations detailed in @sec-preprocessing-redundancy are only used for the computation of the PCA components, but not subsequently used in the `glm` regression for trimming low-quality SNPs, or even remove strongly correlated individuals. Besides, recommended to use original BIM/BAM/FAM files or even `.pgen` newest formats, inducing faster analysis large datasets, rather than VCF files, using the `--pfile` instruction.]{fg="red"}
 
--   [**Remark 3**: Add phenotype covariates, such as `SEX` or `AGE` in the regression framework, which can play a strong leverage on the impact of SNPs.]{fg="red"}
+-   [**Remark 3**: Add phenotype covariates, such as `SEX` or `AGE` in the regression framework, which can play a strong leverage on the impact of SNPs. [`GENESIS`](https://www.bioconductor.org/packages/devel/bioc/vignettes/GENESIS/inst/doc/assoc_test.html#mixed-model-association-testing) is a R package mixing environmental and genetic factors in a *fixed linear model* approach.]{fg="red"}
 
 -   [**Remark 4**: `DMOTSCORE_mod` is a strictly positive score, so rather irrelevant to use a standard linear model to predict it. Ensure explicitly that the GLM runs logistic regression on binary outcomes, and linear regression otherwise.]{fg="red"}
-
-#### ii) Multiple test correction
-
-In total, 2613 variants tested, and $18291$ pairwise tests were performed, implying to correct for multiple test fallacy. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value). [The details for the computation of the adjusted $p-$ values are not reported, see [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.]{fg="red"}
-
 
 
 #### ii) Multiple test correction 
 
-In total, **7 phenotypes, 2613 variants tested, and $18291$ pairwise tests** were performed, implying to correct for multiple test. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value). [The details for the computation of the adjusted $p-$ values are not reported, see [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.]{fg="red"} 
+In total, **7 phenotypes, 2613 variants tested, and $18291$ pairwise tests** were performed, implying to correct for multiple test. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value).
+
+Perspective improvements: 
+
+- The details for the computation of the adjusted $p-$ values are not reported, report to improved approaches here: 
+
+  - [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). 
+  - [Multiple Comparisons Using R](https://www.taylorfrancis.com/books/mono/10.1201/9781420010909/multiple-comparisons-using-frank-bretz-torsten-hothorn-peter-westfall), comprehensive resource of distinct R package strategies for correcting for multiplicity of $p$-values, from @bretz2016. Report also to @nte-MTC for an overview of existing approaches. 
+
+::: {#nte-MTC .callout-note title = "Classes of Multiple Test correction approaches" collapse = "true"}
+
+**Multiple comparison procedures** (MCPs) can be classified into the following adjustment methods:
+
+1. *Fixed sequential*: no adjustment as long as H0s are rejected. One non-rejection and it stops testing with all others non-rejected.
+
+2. *Fallback*: significance level (e.g. 0.05) is split between all hypotheses (can be further weighted). With rejection of the subsequent H0s, their fractions of significance level is accumulated and passed to the next comparison. 
+
+3. *Gatekeeper*: serial, parallel & combined trees, collecting hypotheses into families. Groups of testing can be interpreted as *gatekeepers*: only if any $H_0$ in a family is rejected that the significance is propagated to the next family. The approach is the most versatile, and can be flexibly implemented in R package [`gMCPLite`](https://merck.github.io/gMCPLite). See also [Graphical Approaches
+to Multiple Test Problems](https://baselbiometrics.github.io/home/docs/talks/20220329/2_Glimm_Bretz_Xi.pdf), for additional details.
+
+:::
+  
+- Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.
 
 # Perspectives
 
@@ -566,7 +595,7 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 
 ## Multimodal integration
 
-@zhao2025bib implements [`SC-VAR`: a computational tool for interpreting polygenic disease risks using single-cell epigenomic data](https://academic.oup.com/bib/article/26/2/bbaf123/8092303?searchresult=1&login=false), a novel computational tool avalaible as a GitHub repo and Python application: [`SC-VAR` GitHub](https://github.com/gefeiZ/SC_VAR). `SC-VAR` uses single-cell epigenomic data to predict functional outcomes of the identified disease-associated GWAS variants, enhancing their interpretability. Under the hood, relies on [`MAGMA` linear modelling framework](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004219), developped by @leeuw2015pcb.
+- @zhao2025bib implements [`SC-VAR`: a computational tool for interpreting polygenic disease risks using single-cell epigenomic data](https://academic.oup.com/bib/article/26/2/bbaf123/8092303?searchresult=1&login=false), a novel computational tool avalaible as a GitHub repo and Python application: [`SC-VAR` GitHub](https://github.com/gefeiZ/SC_VAR). `SC-VAR` uses single-cell *epigenomic* data to predict functional outcomes of the identified disease-associated *GWAS variants*, enhancing their interpretability. Under the hood, relies on [`MAGMA` linear modelling framework](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004219), developped by @leeuw2015pcb.
 
 # Appendix {.appendix}
 
