@@ -6,5 +6,6 @@
 # irrelevant files
 old_reports/
 *temp*
+*.log
 
 
