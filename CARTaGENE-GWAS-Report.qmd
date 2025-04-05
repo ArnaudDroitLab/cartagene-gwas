@@ -524,6 +524,8 @@ chromosome_vcf6_content <- readr::read_lines(chromosome_vcf6_file, n_max = 30)
 cat(chromosome_vcf6_content[1:22], sep = "\n")
 ```
 
+
+
 #### ii) HLA-family {#sec-HLA}
 
 HLA genes are usually classified into **Class I (HLA-A, HLA-B, HLA-C)** and **Class II (HLA-DRB1, HLA-DQA1, HLA-DQB1)**, amounting in total to six main genes within the human organism.
@@ -548,34 +550,46 @@ AnnotationDbi::saveDb(txdb, "data/genome_builds/txdb_human_gencode_v42.sqlite")
 # renv::install(packages = c("bioc::AnnotationDbi", "bioc::org.Hs.eg.db"))
 
 # retrieve latest human genome assembly
-hla_genes <- c("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1")
-# Convert HGNC symbols to Entrez IDs with org.Hs.eg.db
-# 1-1 mapping, great!!
-hla_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hla_genes, 
-                     column = "ENTREZID", keytype = "SYMBOL", multiVals = "first")
-hla_entrez_ids <- tibble::tibble(
-  HGNC_SYMBOL = names(hla_entrez_ids),
-  GENEID = hla_entrez_ids)
+# hla_genes <- c("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1")
+# # Convert HGNC symbols to Entrez IDs with org.Hs.eg.db
+# # 1-1 mapping, great!!
+# hla_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hla_genes, 
+#                      column = "ENTREZID", keytype = "SYMBOL", multiVals = "first")
+# hla_entrez_ids <- tibble::tibble(
+#   HGNC_SYMBOL = names(hla_entrez_ids),
+#   GENEID = hla_entrez_ids)
+# 
+# # retrieve start and end positions of HLA chromosoms
+# txdb <- AnnotationDbi::loadDb("data/genome_builds/txdb_human_gencode_v42.sqlite")
+# hla_coords <- AnnotationDbi::select(txdb, 
+#                      keys = hla_entrez_ids$GENEID, 
+#                      columns = c("TXCHROM", "TXSTART", "TXEND"), 
+#                      keytype = "GENEID")
+# 
+# # take the min and max positions for all chromosomes
+# hla_coords <- hla_coords |> 
+#   dplyr::filter(TXCHROM=="chr6") |> 
+#   dplyr::group_by(GENEID, TXCHROM) |> 
+#   dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |> 
+#   dplyr::ungroup() |> 
+#   dplyr::inner_join(hla_entrez_ids, by = "GENEID") |> 
+#   dplyr::arrange(GENEID) |> 
+#   relocate(HGNC_SYMBOL)
+# readr::write_csv(hla_coords, 
+#                  "data/gene_positions/hla_coords.csv")
 
-# retrieve start and end positions of HLA chromosoms
-txdb <- AnnotationDbi::loadDb("data/genome_builds/txdb_human_gencode_v42.sqlite")
-hla_coords <- AnnotationDbi::select(txdb, 
-                     keys = hla_entrez_ids$GENEID, 
-                     columns = c("TXCHROM", "TXSTART", "TXEND"), 
-                     keytype = "GENEID")
-
-# take the min and max positions for all chromosomes
-hla_coords <- hla_coords |> 
-  dplyr::filter(TXCHROM=="chr6") |> 
-  dplyr::group_by(GENEID, TXCHROM) |> 
-  dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |> 
-  dplyr::ungroup() |> 
-  dplyr::inner_join(hla_entrez_ids, by = "GENEID") |> 
-  dplyr::arrange(GENEID) |> 
-  relocate(HGNC_SYMBOL)
-
+hla_coords <- readr::read_csv("data/gene_positions/hla_coords.csv", 
+                              show_col_types = FALSE)
 flextable(hla_coords) |> 
   bold(bold = TRUE, part = "header")
+```
+
+``` bash
+./bin/bcftools/bin/ ./bcftools filter \
+  --regions chr6:29942470-29945884 \
+  --include 'MAF[0] > 0.01'
+  /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr6.merged.clean.noMono.vcf.gz \
+  -o /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr6.HLA-A.vcf
 ```
 
 ## Step 6: GWAS
@@ -724,10 +738,10 @@ singularity pull biocontainers/bcftools
 ::: {#refs}
 :::
 
-## Bash commands to retrieve files' content matching a string pattern, and files extensions {.appendix}
+<!-- ## Bash commands to retrieve files' content matching a string pattern, and files extensions {.appendix} -->
 
-``` bash
-find . -type f \( -iname "*.sh" -o -iname "*.py" -o -iname "*.Rmd" -o -iname "*.qmd" -o -iname "*.txt" \) -exec grep -Hn "genotypage" {} \;
+<!-- ``` bash -->
+<!-- find . -type f \( -iname "*.sh" -o -iname "*.py" -o -iname "*.Rmd" -o -iname "*.qmd" -o -iname "*.txt" \) -exec grep -Hn "genotypage" {} \; -->
 
-find . -type f -name "*.sas7bdat"
-```
+<!-- find . -type f -name "*.sas7bdat" -->
+<!-- ``` -->

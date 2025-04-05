@@ -6,4 +6,4 @@ Analyse biological interactions between HLA genes, and cardiovascular or osteopo
 
 ### Genome sequencing and mappig
 
-The Cartagène project involves 43,000 participants overall. 
+The `CARTaGENE` project involves 43,000 participants overall. 
