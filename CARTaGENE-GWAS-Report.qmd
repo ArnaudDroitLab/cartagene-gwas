@@ -93,6 +93,11 @@ library(dplyr)
 # Required for code linking
 library(downlit)
 library(xml2)
+
+# Retrieve gene positions
+# library(AnnotationDbi)
+library(org.Hs.eg.db)  # Provides gene symbol to Entrez ID mapping
+# library(GenomicFeatures)
 ```
 
 ## Step 1: Merge genotype arrays {#sec-white-selection}
@@ -268,7 +273,7 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
 ## Step 4: Phenotype feature extraction {#sec-phenotype-extraction}
 
-Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`.
+Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`.[File Naming Convention, waiting for True Database configuration, is detailed in the two following LinkedIn posts: [here](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-hardest-part-of-bioinformatics-naming-activity-7295090463894589441-Ra-j), and [there](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_stop-losing-track-of-your-analysis-files-activity-7311382817110708225-Kl3A). Add date, file type and extension, along with model organism or study name + details General File Organisation.]{fg="red"}
 
 ### i) Merge genotype IDs, phenotypes and PCAs values
 
@@ -278,9 +283,10 @@ General phenotype features are provided in
 #| label: tbl-cartage-pheno
 #| tbl-cap: Read SAS table describing CarTaGene phenotypes.
 
-cartagene_phenodata <- haven::read_sas("data/phenotypes/cartagene_phenotypes.sas7bdat")
+cartagene_phenodata <- haven::read_sas("data/phenotypes/cart_mars2025.sas7bdat")
 flextable(head(cartagene_phenodata)) |> 
   bold(bold = TRUE, part = "header")
+
 ```
 
 Number of patients overall is `{r} nrow(cartagene_phenodata)`, and number of phenotype variables is `{r} ncol(cartagene_phenodata)`.
@@ -334,11 +340,11 @@ cartagene_phenodata <- PCs |>
 
 ### iii) Osteoporosis and osteopenie
 
-The response variables `osteopenia` and `osteoporosis` have been computed following these rules [@lst-osteopenie-computation], with the resulting contingency tables reported in @tbl-osteopenie-computation.
+- The response variables `osteopenia` and `osteoporosis` have been computed following these rules [@lst-osteopenie-computation], with the resulting contingency tables reported in @tbl-osteopenie-computation.
 
-1.  Exclude patients with `osteosecondaire==1`.
-2.  `osteopenia` is `case: 1` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere.
-3.  `osteoporosis` is `case: 1` if `DMOTSCORE_mod < -2.5` and `control` elsewhere.
+  1.  Exclude patients with `osteosecondaire==1`.^[Currently done by assigning all corresponding observations a missing value. Unfortunately, no option in `plink2` to subset the dataset, discarding irrelevant observations, however, would not recommend using hard-coded, fake `NA` values instead.]{fg="red"}
+  2.  `osteopenia` is `case: 1` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere^[`DMOTSCORE_mod` represents the measurement of bone mineral density at the calcaneus. While no universally accepted threshold exists for the diagnosis of osteopenia or osteoporosis, we adopt the conventional cut-off of `-1.5`.].
+  3.  `osteoporosis` is `case: 1` if `DMOTSCORE_mod < -2.5` and `control` elsewhere. [`DMOTSCORE_mod` has been likely Gaussian standardised + lacks of evidence supporting clear multi-modal distributions.]{fg="red"}.
 
 ```{r}
 #| label: tbl-osteopenie-computation
@@ -361,24 +367,104 @@ flextable::proc_freq(cartagene_phenodata,
 
 ```
 
+
+- **Fracture events**[Advise to code binary event variables as Boolean, rather than numeric.]{fg="red"}
+  1. We merge `FXALL_PRE5` (any fracture occurring within the five years prior to recruitment) with `FXALL_POST` (all fractures occurring during follow-up) into variable `FXALL`, being positive if an event fracture occured prior or posterior. [Which variable between `FXALL_PRE5` and `FXALL_PRE1` should be considered? Variables differ by `{r} length(which(cartagene_phenodata$FXALL_PRE5!=cartagene_phenodata$FXALL_PRE1)/nrow(cartagene_phenodata))` $\%$ overall!!]{fg="red"}
+  2. `FXMOF_POST` (only osteoporotic fractures during follow-up)^[For both `FXMOF_POST` and `FXALL_POST`, the dates of occurrence and censoring dates are avalaible in `FXALL_POSTDATE` and `FXMOF_POSTDATE` respectively.] [In contrast with labelling, osteoporotic events, as stored in `FXMOF_POST`, contain both pre-, and posterior fracture events, report to Venn Diagram @fig-venn-osteo for details.]{fg="red"} 
+  
+```{r}
+#| label: tbl-fracture-computation
+#| lst-label: lst-fracture-computation
+#| lst-cap: Aggregate all fracture events into a single one (pre- and post- operation).
+#| tbl-cap: Description of fracture events.
+#| tbl-subcap:
+#|   - "All fractures vs osteporotic fractures"
+#|   - "Pre vs post-fractures."
+#| layout-ncol: 2
+
+cartagene_phenodata <- cartagene_phenodata |> 
+  mutate(across(.cols = all_of(c("FXALL_POST", "FXALL_PRE1", "FXMOF_POST")),
+                as.logical), 
+         FXALL = FXALL_POST | FXALL_PRE1)
+
+flextable::proc_freq(cartagene_phenodata, 
+                     "FXALL", "FXMOF_POST")
+
+flextable::proc_freq(cartagene_phenodata, 
+                     "FXALL_POST", "FXALL_PRE1")
+```
+
+  
+```{r}
+#| label: fig-venn-osteo
+#| fig-cap: "Venn Diagrams of fracture events."
+
+labels_OSTEO <- list(`post fracture` = as.character(cartagene_phenodata$IID[cartagene_phenodata$FXALL_POST==1]), 
+                          `pre facture` = as.character(cartagene_phenodata$IID[cartagene_phenodata$FXALL_PRE1==1]), 
+                          `osteoporotic fracture` = as.character(cartagene_phenodata$IID[cartagene_phenodata$FXMOF_POST==1]))
+# Chart
+venn.diagram(
+        x = labels_OSTEO,
+        filename = 'figures/venn_diagramm_fractures.png',
+        output=TRUE,
+        # Output features
+        imagetype="png" ,
+        height = 480 , 
+        width = 480 , 
+        resolution = 300,
+        # Circles
+        lwd = 2,
+        lty = 'blank',
+        col=c("#440154ff", '#21908dff', '#fde725ff'),
+        fill = c(scales::alpha("#440154ff",0.3), scales::alpha('#21908dff',0.3), scales::alpha('#fde725ff',0.3)),
+        # Numbers
+        fontface = "bold",
+        fontfamily = "sans",
+        # Set names
+        cex = 0.5,
+        cat.cex = 0.4,
+        cat.fontface = "bold",
+        cat.default.pos = "outer",
+        cat.pos = c(-27, 27, 135),
+        cat.dist = c(0.055, 0.055, 0.085),
+        cat.fontfamily = "sans",
+        rotation = 1
+)
+
+knitr::include_graphics("figures/venn_diagramm_fractures.png")
+
+```
+
+
 ### iv) Cardiovascular diseases
+
+<!-- - The variable `PWV1`, newly included in the dataset, represents an algorithmic estimation of pulse wave velocity. It is a continuous measure positively correlated with arterial stiffness. -->
+
+- The variables `CVALL_POST` and `CVMACE_POST` correspond to the occurrence of any cardiovascular event and **major adverse cardiovascular events** (MACE), including myocardial infarction, stroke, or cardiovascular death events, is the cognate subset of the most life-threating heart conditions. [An extended follow-up dataset is available for `CVALL_POST`; however, it is not currently accessible.]{fg="red"}
+
+- The variable `MCASGLOBAL_PRE_M` captures ischaemic heart disease events, at baseline.
+
+- The variable `AVCGLOBAL_PRE_M` represents the history of stroke events.
+
+Contingency tables of both pre-, and post-, cardiovascular events are reported in @tbl-cardiovascular-diseases. 
+
 
 ```{r}
 #| label: tbl-cardiovascular-diseases
-#| tbl-cap: "Cardiovascular diseases"
+#| tbl-cap: "Cardiovascular disease events"
 #| tbl-subcap:
-#|   - "AVCGLOBAL_PRE_M"
-#|   - "MCASGLOBAL"
-#|   - "MVASGLOBAL"
-#| layout-ncol: 3
+#|   - "CVALL_POST vs CVMACE_POST"
+#|   - "MCASGLOBAL_PRE_M vs AVCGLOBAL_PRE_M"
+#| layout-ncol: 2
 
+cartagene_phenodata <- cartagene_phenodata |> 
+  mutate(across(.cols = all_of(c("CVALL_POST", "CVMACE_POST", "MCASGLOBAL_PRE_M", "AVCGLOBAL_PRE_M")),
+                as.logical))
 
 flextable::proc_freq(cartagene_phenodata, 
-                     "AVCGLOBAL_PRE_M")
+                     "CVALL_POST", "CVMACE_POST")
 flextable::proc_freq(cartagene_phenodata, 
-                     "MCASGLOBAL")
-flextable::proc_freq(cartagene_phenodata, 
-                     "MVASGLOBAL")
+                     "MCASGLOBAL_PRE_M", "AVCGLOBAL_PRE_M")
 ```
 
 Finally, you can save the global phenotype dataset, merging PCs, phenotype and genotype IDs along with metric computation, using `readr::write_csv`:
@@ -442,27 +528,51 @@ cat(chromosome_vcf6_content[1:22], sep = "\n")
 
 HLA genes are usually classified into **Class I (HLA-A, HLA-B, HLA-C)** and **Class II (HLA-DRB1, HLA-DQA1, HLA-DQB1)**, amounting in total to six main genes within the human organism.
 
-To retrieve their positions on the `Hg37/38` build in an automated fashion, see @lst-hla-positions. [Change out-of-date `BiomarT` package for either `rtracklayer` package to query in real time the **UCSC Genome Browser**, or `AnnotationDBI` with `TxDb.Hsapiens.UCSC.hg38.knownGene` for local fetching.]{fg="red"}
+To retrieve their positions on the latest `Hg38` Genome Build in an automated fashion, see @lst-hla-positions. HLA positions are reported in @tbl-hla-positions. [Do not use the `BiomarT` package: it's not anymore maintained, and can only be used with out-of-date `Hg37` Human Genome Build. Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) for details. Besides, note that when several start and end positions were assigned to a given gene, we consider each time the minimal starting position, and the maximal end position.]{fg="red"}
 
--   **Objective**: extract the annotated VCF, but this time with the HLA regions, and on chromosome 6 (see @sec-HDAC9 for Bash commands).
+-   **Objective**: extract the annotated VCF, but this time with the HLA regions, and on chromosome 6 (see @sec-HDAC9 for Bash commands). 
 
 ```{r}
-#| label: hla-positions
-#| lst-label: lst-hla-positions
-#| lst-cap:  Use `biomaRt` to fetch and retrieve automatically start and end positions of the HLA family. 
+#| label: build human database reference
 #| eval: false
+txdb <- GenomicFeatures::makeTxDbFromUCSC(genome = "hg38", tablename = "refGene")
+AnnotationDbi::saveDb(txdb, "data/genome_builds/txdb_human_gencode_v42.sqlite")
+```
 
 
-# renv::install("bioc::biomaRt")
+```{r}
+#| label: tbl-hla-positions
+#| lst-label: lst-hla-positions
+#| lst-cap:  Use `AnnotationDBI` to fetch and retrieve automatically start and end positions of the HLA family. 
+#| tbl-cap: "HLA Gene Positions"
+# renv::install(packages = c("bioc::AnnotationDbi", "bioc::org.Hs.eg.db"))
 
 # retrieve latest human genome assembly
-human_mart <- biomaRt::useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
 hla_genes <- c("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1")
-hla_coords <- biomaRt::getBM(
-    attributes = c("hgnc_symbol", "chromosome_name", "start_position", "end_position", "strand"),
-    filters = "hgnc_symbol",
-    values = hla_genes,
-    mart = human_mart)
+# Convert HGNC symbols to Entrez IDs with org.Hs.eg.db
+# 1-1 mapping, great!!
+hla_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hla_genes, 
+                     column = "ENTREZID", keytype = "SYMBOL", multiVals = "first")
+hla_entrez_ids <- tibble::tibble(
+  HGNC_SYMBOL = names(hla_entrez_ids),
+  GENEID = hla_entrez_ids)
+
+# retrieve start and end positions of HLA chromosoms
+txdb <- AnnotationDbi::loadDb("data/genome_builds/txdb_human_gencode_v42.sqlite")
+hla_coords <- AnnotationDbi::select(txdb, 
+                     keys = hla_entrez_ids$GENEID, 
+                     columns = c("TXCHROM", "TXSTART", "TXEND"), 
+                     keytype = "GENEID")
+
+# take the min and max positions for all chromosomes
+hla_coords <- hla_coords |> 
+  dplyr::filter(TXCHROM=="chr6") |> 
+  dplyr::group_by(GENEID, TXCHROM) |> 
+  dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |> 
+  dplyr::ungroup() |> 
+  dplyr::inner_join(hla_entrez_ids, by = "GENEID") |> 
+  dplyr::arrange(GENEID) |> 
+  relocate(HGNC_SYMBOL)
 
 flextable(hla_coords) |> 
   bold(bold = TRUE, part = "header")
@@ -527,34 +637,66 @@ flextable(hla_coords) |>
 
 -   **Remark 1**: you may come up with `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high`. In this case, you may try removing completely covariates (with `--glm allow-no-covars`), or/and increase variance inflation threshold (`--vif number_vif` option). **Note that a VIF factor above 10 is considered problematic as it can significantly distort regression estimates.** [Discussion and visualisations on [*VIF influence*](https://www.linkedin.com/feed/update/urn:li:activity:7308463515432833026/). Briefly, VIF quantifies the degree of similarity among predictor variables. Indeed, the GLM-family usually assumes independence between explanatory variables. My premise here is that the whole pipeline described in @sec-preprocessing-redundancy is only used to compute the PCA eigen vectors, and not for GWAS differential downstream analyses. As such, strongly correlated SNPs are kept, inducing logically an inflation of the VIF factor.]{fg="red"}
 
--   [**Remark 2**: All the pre-processing operations detailed in @sec-preprocessing-redundancy are only used for the computation of the PCA components, but not subsequently used in the `glm`regression for trimming low-quality SNPs, or even remove strongly correlated individuals. Besides, recommended to use original BIM/BAM/FAM files or even `.pgen` newest formats, inducing faster analysis large datasets, rather than VCF files, using the `--pfile` instruction.]{fg="red"}
+-   [**Remark 2**: All the pre-processing operations detailed in @sec-preprocessing-redundancy are only used for the computation of the PCA components, but not subsequently used in the `glm` regression for trimming low-quality SNPs, or even remove strongly correlated individuals. Besides, recommended to use original BIM/BAM/FAM files or even `.pgen` newest formats, inducing faster analysis large datasets, rather than VCF files, using the `--pfile` instruction.]{fg="red"}
 
--   [**Remark 3**: Add phenotype covariates, such as `SEX` or `AGE` in the regression framework, which can play a strong leverage on the impact of SNPs.]{fg="red"}
+-   [**Remark 3**: Add phenotype covariates, such as `SEX` or `AGE` in the regression framework, which can play a strong leverage on the impact of SNPs. [`GENESIS`](https://www.bioconductor.org/packages/devel/bioc/vignettes/GENESIS/inst/doc/assoc_test.html#mixed-model-association-testing) is a R package mixing environmental and genetic factors in a *fixed linear model* approach.]{fg="red"}
 
 -   [**Remark 4**: `DMOTSCORE_mod` is a strictly positive score, so rather irrelevant to use a standard linear model to predict it. Ensure explicitly that the GLM runs logistic regression on binary outcomes, and linear regression otherwise.]{fg="red"}
 
-#### ii) Multiple test correction
+#### ii) Multiple test correction 
 
-In total, 2613 variants tested, and $18291$ pairwise tests were performed, implying to correct for multiple test fallacy. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value). [The details for the computation of the adjusted $p-$ values are not reported, see [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.]{fg="red"}
+In total, **7 phenotypes, 2613 variants tested, and $18291$ pairwise tests** were performed, implying to correct for multiple test. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value).
 
+Perspective improvements: 
+
+- The details for the computation of the adjusted $p-$ values are not reported, report to improved approaches here: 
+
+  - [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). 
+  - [Multiple Comparisons Using R](https://www.taylorfrancis.com/books/mono/10.1201/9781420010909/multiple-comparisons-using-frank-bretz-torsten-hothorn-peter-westfall), comprehensive resource of distinct R package strategies for correcting for multiplicity of $p$-values, from @bretz2016. Report also to @nte-MTC for an overview of existing approaches. 
+
+::: {#nte-MTC .callout-note title = "Classes of Multiple Test correction approaches" collapse = "true"}
+
+**Multiple comparison procedures** (MCPs) can be classified into the following adjustment methods:
+
+1. *Fixed sequential*: no adjustment as long as H0s are rejected. One non-rejection and it stops testing with all others non-rejected.
+
+2. *Fallback*: significance level (e.g. 0.05) is split between all hypotheses (can be further weighted). With rejection of the subsequent H0s, their fractions of significance level is accumulated and passed to the next comparison. 
+
+3. *Gatekeeper*: serial, parallel & combined trees, collecting hypotheses into families. Groups of testing can be interpreted as *gatekeepers*: only if any $H_0$ in a family is rejected that the significance is propagated to the next family. The approach is the most versatile, and can be flexibly implemented in R package [`gMCPLite`](https://merck.github.io/gMCPLite). See also [Graphical Approaches
+to Multiple Test Problems](https://baselbiometrics.github.io/home/docs/talks/20220329/2_Glimm_Bretz_Xi.pdf), for additional details.
+
+:::
+  
+- Add **QQplots** and **Manhattan plots**, to visualise the distribution of p-values.
 
 # Perspectives
 
-## Beyond GWAS analyses {#sec-post-GWAS}
+## Beyond GWAS analyses: retrieve automatically variants of interest {#sec-post-GWAS}
 
 This analysis is not formally a GWAS study, but rather a *gene-centric* study, pre-selecting genes based on prior knowledge and/or intuition.
 
-Alternatively, we could consider a data-driven, and more agnostic approach, to refine the selection of gene candidates. To that end, @gnanaolivu2025bb proposed in [A clinical knowledge graph-based framework to prioritize candidate genes for facilitating diagnosis of Mendelian diseases and rare genetic conditions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06096-2), the `phenotype prioritization and analysis for rare diseases, PPAR` algorithm to rank genes based on *human phenotype ontology (HPO)* terms.[^5]. In details, `PPAR` combines embeddings from the *human knowledge graph*, incorporating genes, HPO terms, and gene ontology annotations connections. For each input HPO term, a prioritized list of genes is returned based on their relevance and similarity to the HPO term.
+Alternatively, we could consider a data-driven, and more agnostic approach, to refine the selection of gene candidates. Several approaches to that end have been implemented:
+
+- @gnanaolivu2025bb proposed in [A clinical knowledge graph-based framework to prioritize candidate genes for facilitating diagnosis of Mendelian diseases and rare genetic conditions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06096-2), the `phenotype prioritization and analysis for rare diseases, PPAR` algorithm to rank genes based on *human phenotype ontology (HPO)* terms.[^5]. In details, `PPAR` combines embeddings from the *human knowledge graph*, incorporating genes, HPO terms, and gene ontology annotations connections. For each input HPO term, a prioritized list of genes is returned based on their relevance and similarity to the HPO term.
+- @bridges2025bb developped in [Towards a standard benchmark for phenotype-driven variant and gene prioritisation algorithms: `PhEval`, Phenotypic inference Evaluation framework](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06105-4) a unified benchmarking platform to clean inputs for *phenotype-driven VGPAs*. Variant and Gene Prioritisation Algorithms integrate complex and multi-modal datasets, such as ontologies and gene-to-phenotype associations, to predict the most influential and promising gene targets controlling the evolution of rare diseases. Model is avalaible as GitHub Repo [`PhEval`](https://github.com/monarch-initiative/pheval).
 
 [^5]: Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.
 
-## Incoporation of familial pedigrees and/or environmental factors
+## Incorporation of familial pedigrees and/or environmental factors
 
 -   [Genome-wide association study of fat content and fatty acid composition of shea tree.](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-025-11344-z), from @attikora2025bg. Under the hood, relies on the `mrMLM` R package to include both the *population structure matrix* and the *kinship matrix*. Provides a complete GWAS pipeline, including a number of meaningful illustrations.
 
 -   [`BHCox`: Bayesian heredity-constrained Cox proportional hazards models for detecting gene-environment interactions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06077-5), from @sun2025bb. Under the hood, relies on the `brms` R package.
 
+## Inference of polygenic scores
+
+- [`XPRS`: A Tool for Interpretable and Explainable Polygenic Risk Score](10.1093/bioinformatics/btaf143), from @kim2025b, is a R package for inferring the *polygenic risk score* for assessing genetic susceptibility to diseases, providing additional interpretation and visualisation tools.  PRSs are further split and classified into genes and single nucleotide polymorphism (SNP) contribution scores via *Shapley additive explanations* (SHAPs), visualised as **Manhattan plots**, **LocusZoom-like** plots and tables at the population and individual levels.
+
 -   [`PNL`: a software to build polygenic risk scores using a Super Learner approach based on `PairNet`, a Convolutional Neural Network](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf071/8015614), from @chen2025b.
+
+## Multimodal integration
+
+- @zhao2025bib implements [`SC-VAR`: a computational tool for interpreting polygenic disease risks using single-cell epigenomic data](https://academic.oup.com/bib/article/26/2/bbaf123/8092303?searchresult=1&login=false), a novel computational tool avalaible as a GitHub repo and Python application: [`SC-VAR` GitHub](https://github.com/gefeiZ/SC_VAR). `SC-VAR` uses single-cell *epigenomic* data to predict functional outcomes of the identified disease-associated *GWAS variants*, enhancing their interpretability. Under the hood, relies on [`MAGMA` linear modelling framework](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004219), developped by @leeuw2015pcb.
 
 # Appendix {.appendix}
 
