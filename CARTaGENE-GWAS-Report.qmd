@@ -491,8 +491,8 @@ All the curated VCF files have been downloaded and processed by an external thir
     
 -   **Objective**: Extract annotated SNPs within `HDAC9` boundaries, as defined by the `hg38` reference genome. **Details**:
     -   Filter variants based on **Minor Allele Frequency (MAF)** $> 0.01$ (in other words, the SNP must be present in at least $1\%$ of the samples). [This is not done during the VCF extraction, but in the regression stage, see @sec-GWAS.]{fg="red"}
-    -   SNPs were extracted using `bcftools filter`. [Recommended to use `bcftools view` when extracting per region domains or even `plink2 --bfile your_dataset --chr 7 --from-bp 18086825 --to-bp 19002416` to avoid relying on another tool. See the complete command in ...]{fg="red"}.
-    -   No explicit mention of the reference genome used in the metadata lines of the VCF files. Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) to understand why knowing the build version is important. [Even worse, it seems that among the 5 genotype arrays merged in @sec-white-selection, at least one genotype, namely `gsa.17k.final.hg19.bim,` has been mapped thanks to `GRCh37 (hg19)` reference instead of more recent `hg38 (GRCh38, 2013)` version.]
+    -   SNPs were extracted using `bcftools filter`. [Recommended to use `bcftools view` when extracting per region domains or even `plink2 --bfile your_dataset --chr 7 --from-bp 18086825 --to-bp 19002416` to avoid relying on another tool.]{fg="red"}.
+    -   No explicit mention of the reference genome used in the metadata lines of the VCF files.[It seems that among the 5 genotype arrays merged in @sec-white-selection, at least one genotype, namely `gsa.17k.final.hg19.bim,` has been mapped thanks to `GRCh37 (hg19)` reference instead of more recent `hg38 (GRCh38, 2013)` version.]
     -   [Start and end locations are hard-written, instead of being fetched automatically. Report to @sec-HLA to retrieve these positions in an automated fashion. Alternatively, it would have been great to add directly gene information within the INFO/GENE fields of the VCF files, but that does not seem to be the case, as reported in @lst-vcf-header]{fg="red"}
 
 -   **Bash command**:
@@ -500,7 +500,7 @@ All the curated VCF files have been downloaded and processed by an external thir
 ``` bash
 
 # old command
-/mnt/projects_tn01/Cartagene/analyses/variants_extraction$ /home/galgen01/programs/bcftools/bin/bcftools filter --regions chr7:18086825-19002416 /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr7.merged.clean.noMono.vcf.gz  -o /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf
+/home/galgen01/programs/bcftools/bin/bcftools filter --regions chr7:18086825-19002416 /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr7.merged.clean.noMono.vcf.gz  -o /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf
 ```
 
 ``` bash
@@ -508,7 +508,7 @@ All the curated VCF files have been downloaded and processed by an external thir
 # recent version
 /home/galgen01/programs/bcftools/bin/bcftools view \
   --regions chr7:18086825-19002416 \
-  --include 'MAF[0] > 0.01' \ # alternative: 'INFO/AF1 > 0.01 & INFO/AF1 < 0.99'
+  --include 'MAF[0] > 0.01'
   /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr7.merged.clean.noMono.vcf.gz \
   -o /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf
 ```
