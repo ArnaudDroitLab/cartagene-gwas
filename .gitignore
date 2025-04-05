@@ -6,5 +6,4 @@
 # irrelevant files
 old_reports/
 *temp*
-bin/
 *.log
