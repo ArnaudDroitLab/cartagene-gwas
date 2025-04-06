@@ -82,6 +82,15 @@ Besides, use Git + GitLab to version the code, work in a R project to compartmen
 
 # Analyses
 
+- Bash configuration
+
+```{bash}
+export PATH=./bin/bcftools/bin:$PATH
+export PATH=./bin/plink2:$PATH
+```
+
+- R configuration:
+
 ```{r}
 #| label: setup
 #| include: false
@@ -95,6 +104,9 @@ library(downlit)
 library(xml2)
 
 # Retrieve gene positions
+# renv::install(packages = c("bioc::AnnotationDbi",
+#                           "bioc::org.Hs.eg.db",
+#                          "bioc::GenomicFeatures"))
 # library(AnnotationDbi)
 library(org.Hs.eg.db)  # Provides gene symbol to Entrez ID mapping
 # library(GenomicFeatures)
@@ -115,7 +127,7 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 -   **Inputs**:
 
     -   **Phenotype IDs of white individuals**: `eur_only/cartagene_self_reported_EUR.plink_format.txt`
-    -   **BIM/BED/FAM/hh** folder generated with `--make-bed` command: `analyses/QC/merge_5_datasets`
+    -   **BIM/BED/FAM/hh** folder generated with `--make-bed` command: `analyses/QC/merge_5_datasets`. [It seems that among the 5 genotype arrays concatenated, at least one genotype, namely `gsa.17k.final.hg19.bim,` has been mapped thanks to `GRCh37 (hg19)` reference instead of more recent `hg38 (GRCh38, 2013)` version.]{fg="red"}]
 
 -   **Objective**: Keep white individuals and remove SNPs variants with genotyping rate $<0.95$. The **genotyping rate** measures the proportion of successfully genotyped markers and indicates how complete the genotype data is. Removing SNPs with low Genotyping Rate increases Missing Data imputation performance, and overall maintains higher statistical power.
 
@@ -257,7 +269,7 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
 -   **Objective**: Compute PCA and keep the 10 first principal components.
 
--   [**Remark**: use visualizations, such as *scree plots*, elbow point or/and *Tracy-Widom Test* to select the final number of PCs, instead of hard threshold, and on the other hand, scatter plots to identify latent structures.]{fg="red"}.
+-   [**Remark**: use visualizations, such as *scree plots*, elbow point or/and *Tracy-Widom Test* to select the final number of PCs, instead of hard threshold, and on the other hand, scatter plots to identify latent structures. See details [here](https://www.linkedin.com/posts/joachim-schork_statistics-research-visualanalytics-activity-7251577056570785795-b6Rk) and [there](https://www.linkedin.com/feed/update/urn:li:activity:730919293617122508)]{fg="red"}.
 
 -   **Bash command**:
 
@@ -273,7 +285,11 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
 ## Step 4: Phenotype feature extraction {#sec-phenotype-extraction}
 
-Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`.[File Naming Convention, waiting for True Database configuration, is detailed in the two following LinkedIn posts: [here](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-hardest-part-of-bioinformatics-naming-activity-7295090463894589441-Ra-j), and [there](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_stop-losing-track-of-your-analysis-files-activity-7311382817110708225-Kl3A). Add date, file type and extension, along with model organism or study name + details General File Organisation.]{fg="red"}
+Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`.
+
+- [File Naming Convention, waiting for True Database configuration, is detailed in the two following LinkedIn posts: [here](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-hardest-part-of-bioinformatics-naming-activity-7295090463894589441-Ra-j), and [there](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_stop-losing-track-of-your-analysis-files-activity-7311382817110708225-Kl3A). Add date, file type and extension, along with model organism or study name + details General File Organisation.]{fg="red"}
+
+- [Consider adding *symbolic links* to encapsulate the whole project, see [`ln -s` Post](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-most-underrated-unix-command-for-bioinformatics-activity-7287842704753848321-qhe) for details.]{fg="red}
 
 ### i) Merge genotype IDs, phenotypes and PCAs values
 
@@ -334,15 +350,16 @@ PCs <- readr::read_delim("data/genotypes/PCA_eigenvec",
                         show_col_types = FALSE)
 cartagene_phenodata <- PCs |> 
   dplyr::inner_join(cartagene_phenodata, by="geno_id") |> 
-  rename(IID = geno_id)
+  dplyr::rename(IID = geno_id)
 
 ```
 
-### iii) Osteoporosis and osteopenie
+### iii) Bone damage: osteoporosis and fractures
 
 - The response variables `osteopenia` and `osteoporosis` have been computed following these rules [@lst-osteopenie-computation], with the resulting contingency tables reported in @tbl-osteopenie-computation.
 
-  1.  Exclude patients with `osteosecondaire==1`.^[Currently done by assigning all corresponding observations a missing value. Unfortunately, no option in `plink2` to subset the dataset, discarding irrelevant observations, however, would not recommend using hard-coded, fake `NA` values instead.]{fg="red"}
+
+  1.  Exclude patients with `osteosecondaire==1`.^[Currently done by assigning all corresponding observations a missing value. To be replaced by extracting patients with `osteosecondaire` and subsequently use `--remove` option when running `glm + plink2`.]{fg="red"}
   2.  `osteopenia` is `case: 1` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere^[`DMOTSCORE_mod` represents the measurement of bone mineral density at the calcaneus. While no universally accepted threshold exists for the diagnosis of osteopenia or osteoporosis, we adopt the conventional cut-off of `-1.5`.].
   3.  `osteoporosis` is `case: 1` if `DMOTSCORE_mod < -2.5` and `control` elsewhere. [`DMOTSCORE_mod` has been likely Gaussian standardised + lacks of evidence supporting clear multi-modal distributions.]{fg="red"}.
 
@@ -370,7 +387,7 @@ flextable::proc_freq(cartagene_phenodata,
 
 - **Fracture events**[Advise to code binary event variables as Boolean, rather than numeric.]{fg="red"}
   1. We merge `FXALL_PRE5` (any fracture occurring within the five years prior to recruitment) with `FXALL_POST` (all fractures occurring during follow-up) into variable `FXALL`, being positive if an event fracture occured prior or posterior. [Which variable between `FXALL_PRE5` and `FXALL_PRE1` should be considered? Variables differ by `{r} length(which(cartagene_phenodata$FXALL_PRE5!=cartagene_phenodata$FXALL_PRE1)/nrow(cartagene_phenodata))` $\%$ overall!!]{fg="red"}
-  2. `FXMOF_POST` (only osteoporotic fractures during follow-up)^[For both `FXMOF_POST` and `FXALL_POST`, the dates of occurrence and censoring dates are avalaible in `FXALL_POSTDATE` and `FXMOF_POSTDATE` respectively.] [In contrast with labelling, osteoporotic events, as stored in `FXMOF_POST`, contain both pre-, and posterior fracture events, report to Venn Diagram @fig-venn-osteo for details.]{fg="red"} 
+  2. `FXMOF_POST` (only osteoporotic fractures during follow-up)^[For both `FXMOF_POST` and `FXALL_POST`, the dates of occurrence and censoring dates are available in `FXALL_POSTDATE` and `FXMOF_POSTDATE` respectively.] [In contrast with labelling, osteoporotic events, as stored in `FXMOF_POST`, contain both pre-, and posterior fracture events, report to Venn Diagram @fig-venn-osteo for details, which can be further improved with [`ggVennDiagram` package](https://gaospecial.github.io/ggVennDiagram/articles/using-ggVennDiagram.html)]{fg="red"} 
   
 ```{r}
 #| label: tbl-fracture-computation
@@ -440,9 +457,9 @@ knitr::include_graphics("figures/venn_diagramm_fractures.png")
 
 <!-- - The variable `PWV1`, newly included in the dataset, represents an algorithmic estimation of pulse wave velocity. It is a continuous measure positively correlated with arterial stiffness. -->
 
-- The variables `CVALL_POST` and `CVMACE_POST` correspond to the occurrence of any cardiovascular event and **major adverse cardiovascular events** (MACE), including myocardial infarction, stroke, or cardiovascular death events, is the cognate subset of the most life-threating heart conditions. [An extended follow-up dataset is available for `CVALL_POST`; however, it is not currently accessible.]{fg="red"}
+- The variables `CVALL_POST` and `CVMACE_POST` correspond to the occurrence of any cardiovascular event and **major adverse cardiovascular events** (MACE), including myocardial infarction, stroke, or cardiovascular death events, is the cognate subset of the most life-threatening heart conditions. [An extended follow-up dataset is available for `CVALL_POST`; however, it is not currently accessible.]{fg="red"}
 
-- The variable `MCASGLOBAL_PRE_M` captures ischaemic heart disease events, at baseline.
+- The variable `MCASGLOBAL_PRE_M` captures ischemic heart disease events, at baseline.
 
 - The variable `AVCGLOBAL_PRE_M` represents the history of stroke events.
 
@@ -471,8 +488,8 @@ Finally, you can save the global phenotype dataset, merging PCs, phenotype and g
 
 ```{r}
 #| label: save-global-phenotype
-readr::write_csv(cartagene_phenodata, 
-                 file="data/pheno_data_global.csv")
+readr::write_tsv(cartagene_phenodata, 
+                 file="data/phenotypes/merge_phenos_PCs.txt")
 ```
 
 ## Step 5: Variants extraction {#sec-variant-extraction}
@@ -481,116 +498,161 @@ All the curated VCF files have been downloaded and processed by an external thir
 
 [^3]: Use of dnaseq `Genpipes` pipelines, run on Compute Canada Clusters, version 3.1.5.
 
-#### i) HDAC9 {#sec-HDAC9}
+#### a) HDAC-family {#sec-HDAC9}
+
+
+##### i) Retrieve HDAC positions
+
+-   **Objective**: extract the annotated VCF, for the 6 HDAC genes identified of interest, on chromosome 7 (see @sec-HDAC9 for Bash commands). 
+
+-   **Methods**: To retrieve positions of the `HDAC` genes (HDAC 4, 5, 6, 7, 9 and 10) on the latest `Hg38` Genome Build in an automated fashion, report to @lst-hdac-positions. HLA positions are reported in @tbl-hdac-positions. [Do not use the `BiomarT` package: it's not anymore maintained, and can only be used with out-of-date `Hg37` Human Genome Build. Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) for details. Besides, note that when several start and end positions were assigned to the same gene, we consider each time the minimal starting position, and the maximal end position.]{fg="red"}
+
+```{r}
+#| label: build human database reference
+#| eval: false
+
+txdb <- GenomicFeatures::makeTxDbFromUCSC(genome = "hg38", tablename = "refGene")
+AnnotationDbi::saveDb(txdb, "./data/genome_builds/human_gencode_v42.sqlite")
+```
+
+
+```{r}
+#| label: tbl-hdac-positions
+#| lst-label: lst-hdac-positions
+#| lst-cap:  Use `AnnotationDBI` to fetch and retrieve automatically start and end positions of the HDAC family. 
+#| tbl-cap: "HDAC Gene Positions"
+#| cache: true
+
+hdac_genes <- c("HDAC4", "HDAC5", "HDAC6", "HDAC7", "HDAC9", "HDAC10")
+
+# Convert HGNC symbols to Entrez IDs with org.Hs.eg.db
+# 1-1 mapping, great!!
+hdac_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hdac_genes,
+                     column = "ENTREZID", keytype = "SYMBOL", multiVals = "first")
+hdac_entrez_ids <- tibble::tibble(
+  HGNC_SYMBOL = names(hdac_entrez_ids),
+  GENEID = hdac_entrez_ids)
+
+# retrieve start and end positions of hdac chromosoms
+txdb <- AnnotationDbi::loadDb("data/genome_builds/txdb_human_gencode_v42.sqlite")
+hdac_coords <- AnnotationDbi::select(txdb,
+                     keys = hdac_entrez_ids$GENEID,
+                     columns = c("TXCHROM", "TXSTART", "TXEND"),
+                     keytype = "GENEID")
+
+# take the min and max positions for all chromosomes
+hdac_coords <- hdac_coords |>
+  dplyr::filter(TXCHROM=="chr6") |>
+  dplyr::group_by(GENEID, TXCHROM) |>
+  dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |>
+  dplyr::ungroup() |>
+  dplyr::inner_join(hdac_entrez_ids, by = "GENEID") |>
+  dplyr::arrange(GENEID) |>
+  relocate(HGNC_SYMBOL)
+readr::write_csv(hdac_coords,
+                 "data/gene_positions/hdac_coords.csv")
+
+hdac_coords <- readr::read_csv("data/gene_positions/hdac_coords.csv", 
+                              show_col_types = FALSE)
+flextable(hdac_coords) |> 
+  bold(bold = TRUE, part = "header")
+```
+
+- [**Remark**: Instead of fetching start and end locations automatically, alternative would have consisted of adding an `INFO/GENE` field within the `VCF` files.]{fg="red"}
+
+##### ii) Extract SNPs corresponding to provided HDAC gene
 
 -   **Inputs**:
-    -   Updated **VCF** file of the chromosome 7 (where `HDAC-9` is present): `chr7.merged.clean.noMono.vcf.gz`. VCF files per chromosome are stored in `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/`. Header metadata lines notably include the statistical software used for inferring missing SNP genotypes, here ...
+    -   Cleaned **VCF** file of the chromosome 7 (where `HDAC-9` is present): `chr7.merged.clean.noMono.vcf.gz`^[All VCF files per chromosome are stored in `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/` folder.]. 
     
 -   **Outputs**:
-    -   `chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf`: VCF file, restrained to HDAC9 region with affiliated SNPs.
+    -   `chr7.HDAC9.vcf`: VCF file, restrained to HDAC9 region with affiliated SNPs.
     
 -   **Objective**: Extract annotated SNPs within `HDAC9` boundaries, as defined by the `hg38` reference genome. **Details**:
-    -   Filter variants based on **Minor Allele Frequency (MAF)** $> 0.01$ (in other words, the SNP must be present in at least $1\%$ of the samples). [This is not done during the VCF extraction, but in the regression stage, see @sec-GWAS.]{fg="red"}
-    -   SNPs were extracted using `bcftools filter`. [Recommended to use `bcftools view` when extracting per region domains or even `plink2 --bfile your_dataset --chr 7 --from-bp 18086825 --to-bp 19002416` to avoid relying on another tool.]{fg="red"}.
-    -   No explicit mention of the reference genome used in the metadata lines of the VCF files.[It seems that among the 5 genotype arrays merged in @sec-white-selection, at least one genotype, namely `gsa.17k.final.hg19.bim,` has been mapped thanks to `GRCh37 (hg19)` reference instead of more recent `hg38 (GRCh38, 2013)` version.]
-    -   [Start and end locations are hard-written, instead of being fetched automatically. Report to @sec-HLA to retrieve these positions in an automated fashion. Alternatively, it would have been great to add directly gene information within the INFO/GENE fields of the VCF files, but that does not seem to be the case, as reported in @lst-vcf-header]{fg="red"}
+    -   Filter variants based on **Minor Allele Frequency (MAF)** $> 0.01$ (in other words, the SNP must be present in at least $1\%$ of the samples).
+    -   SNPs were extracted using `bcftools view`. [**Alternative**: `plink2 --bfile your_dataset --chr 7 --from-bp 18086825 --to-bp 19002416`, but requires BIM files as input.]{fg="red"}.
+
 
 -   **Bash command**:
 
 ``` bash
-
-# old command
-/home/galgen01/programs/bcftools/bin/bcftools filter --regions chr7:18086825-19002416 /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr7.merged.clean.noMono.vcf.gz  -o /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf
+bcftools filter --regions chr6:29942470-29945884 --include 'MAF[0] > 0.01' /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr6.merged.clean.noMono.vcf.gz -o ./data/variants/chr6.HLA-A.vcf
 ```
 
-``` bash
 
-# recent version
-/home/galgen01/programs/bcftools/bin/bcftools view \
-  --regions chr7:18086825-19002416 \
-  --include 'MAF[0] > 0.01'
-  /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr7.merged.clean.noMono.vcf.gz \
-  -o /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf
-```
+- **Remark:** `--maf` guarantees removal of highly recessive SNPs, present in less than $1\%$ of cases with respect to the dominant form. Such SNPs are indeed associated with low statistical power.
 
 ```{r}
 #| lst-label: lst-vcf-header
 #| lst-cap: Header lines, marked by `##` symbol, on top of VCF files. This metadata can prove useful to know exactly how SNPs were extracted in a given region.
 #| label: vcf-header
+#| echo: false
+
+
 chromosome_vcf6_file <- "../genotypage/imputation/imputation_merged/chr6.merged.clean.noMono.vcf.gz"
 chromosome_vcf6_content <- readr::read_lines(chromosome_vcf6_file, n_max = 30)
 
 # show metadata, with tools and information about VCF structure
-cat(chromosome_vcf6_content[1:22], sep = "\n")
+cat(chromosome_vcf6_content |> 
+      stringr::str_subset("^##"), sep = "\n")
 ```
 
 
 
-#### ii) HLA-family {#sec-HLA}
+<!-- #### b) HLA-family {#sec-HLA} -->
 
-HLA genes are usually classified into **Class I (HLA-A, HLA-B, HLA-C)** and **Class II (HLA-DRB1, HLA-DQA1, HLA-DQB1)**, amounting in total to six main genes within the human organism.
+<!-- HLA genes are usually classified into **Class I (HLA-A, HLA-B, HLA-C)** and **Class II (HLA-DRB1, HLA-DQA1, HLA-DQB1)**, amounting in total to six main genes within the human organism. -->
 
-To retrieve their positions on the latest `Hg38` Genome Build in an automated fashion, see @lst-hla-positions. HLA positions are reported in @tbl-hla-positions. [Do not use the `BiomarT` package: it's not anymore maintained, and can only be used with out-of-date `Hg37` Human Genome Build. Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) for details. Besides, note that when several start and end positions were assigned to a given gene, we consider each time the minimal starting position, and the maximal end position.]{fg="red"}
-
--   **Objective**: extract the annotated VCF, but this time with the HLA regions, and on chromosome 6 (see @sec-HDAC9 for Bash commands). 
-
-```{r}
-#| label: build human database reference
-#| eval: false
-txdb <- GenomicFeatures::makeTxDbFromUCSC(genome = "hg38", tablename = "refGene")
-AnnotationDbi::saveDb(txdb, "data/genome_builds/txdb_human_gencode_v42.sqlite")
-```
+<!-- To retrieve their positions on the latest `Hg38` Genome Build in an automated fashion, see @lst-hla-positions. HLA positions are reported in @tbl-hla-positions. [Do not use the `BiomarT` package: it's not anymore maintained, and can only be used with out-of-date `Hg37` Human Genome Build. Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) for details. Besides, note that when several start and end positions were assigned to the same gene, we consider each time the minimal starting position, and the maximal end position.]{fg="red"} -->
 
 
-```{r}
-#| label: tbl-hla-positions
-#| lst-label: lst-hla-positions
-#| lst-cap:  Use `AnnotationDBI` to fetch and retrieve automatically start and end positions of the HLA family. 
-#| tbl-cap: "HLA Gene Positions"
-# renv::install(packages = c("bioc::AnnotationDbi", "bioc::org.Hs.eg.db"))
 
-# retrieve latest human genome assembly
-# hla_genes <- c("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1")
-# # Convert HGNC symbols to Entrez IDs with org.Hs.eg.db
-# # 1-1 mapping, great!!
-# hla_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hla_genes, 
-#                      column = "ENTREZID", keytype = "SYMBOL", multiVals = "first")
-# hla_entrez_ids <- tibble::tibble(
-#   HGNC_SYMBOL = names(hla_entrez_ids),
-#   GENEID = hla_entrez_ids)
-# 
-# # retrieve start and end positions of HLA chromosoms
-# txdb <- AnnotationDbi::loadDb("data/genome_builds/txdb_human_gencode_v42.sqlite")
-# hla_coords <- AnnotationDbi::select(txdb, 
-#                      keys = hla_entrez_ids$GENEID, 
-#                      columns = c("TXCHROM", "TXSTART", "TXEND"), 
-#                      keytype = "GENEID")
-# 
-# # take the min and max positions for all chromosomes
-# hla_coords <- hla_coords |> 
-#   dplyr::filter(TXCHROM=="chr6") |> 
-#   dplyr::group_by(GENEID, TXCHROM) |> 
-#   dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |> 
-#   dplyr::ungroup() |> 
-#   dplyr::inner_join(hla_entrez_ids, by = "GENEID") |> 
-#   dplyr::arrange(GENEID) |> 
-#   relocate(HGNC_SYMBOL)
-# readr::write_csv(hla_coords, 
-#                  "data/gene_positions/hla_coords.csv")
+<!-- ```{r} -->
+<!-- #| label: tbl-hla-positions -->
+<!-- #| lst-label: lst-hla-positions -->
+<!-- #| lst-cap:  Use `AnnotationDBI` to fetch and retrieve automatically start and end positions of the HLA family.  -->
+<!-- #| tbl-cap: "HLA Gene Positions" -->
+<!-- # renv::install(packages = c("bioc::AnnotationDbi", "bioc::org.Hs.eg.db")) -->
 
-hla_coords <- readr::read_csv("data/gene_positions/hla_coords.csv", 
-                              show_col_types = FALSE)
-flextable(hla_coords) |> 
-  bold(bold = TRUE, part = "header")
-```
+<!-- # retrieve latest human genome assembly -->
+<!-- # hla_genes <- c("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1") -->
+<!-- # # Convert HGNC symbols to Entrez IDs with org.Hs.eg.db -->
+<!-- # # 1-1 mapping, great!! -->
+<!-- # hla_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hla_genes,  -->
+<!-- #                      column = "ENTREZID", keytype = "SYMBOL", multiVals = "first") -->
+<!-- # hla_entrez_ids <- tibble::tibble( -->
+<!-- #   HGNC_SYMBOL = names(hla_entrez_ids), -->
+<!-- #   GENEID = hla_entrez_ids) -->
+<!-- #  -->
+<!-- # # retrieve start and end positions of HLA chromosoms -->
+<!-- # txdb <- AnnotationDbi::loadDb("data/genome_builds/txdb_human_gencode_v42.sqlite") -->
+<!-- # hla_coords <- AnnotationDbi::select(txdb,  -->
+<!-- #                      keys = hla_entrez_ids$GENEID,  -->
+<!-- #                      columns = c("TXCHROM", "TXSTART", "TXEND"),  -->
+<!-- #                      keytype = "GENEID") -->
+<!-- #  -->
+<!-- # # take the min and max positions for all chromosomes -->
+<!-- # hla_coords <- hla_coords |>  -->
+<!-- #   dplyr::filter(TXCHROM=="chr6") |>  -->
+<!-- #   dplyr::group_by(GENEID, TXCHROM) |>  -->
+<!-- #   dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |>  -->
+<!-- #   dplyr::ungroup() |>  -->
+<!-- #   dplyr::inner_join(hla_entrez_ids, by = "GENEID") |>  -->
+<!-- #   dplyr::arrange(GENEID) |>  -->
+<!-- #   relocate(HGNC_SYMBOL) -->
+<!-- # readr::write_csv(hla_coords,  -->
+<!-- #                  "data/gene_positions/hla_coords.csv") -->
 
-``` bash
-./bin/bcftools/bin/ ./bcftools filter \
-  --regions chr6:29942470-29945884 \
-  --include 'MAF[0] > 0.01'
-  /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr6.merged.clean.noMono.vcf.gz \
-  -o /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr6.HLA-A.vcf
-```
+<!-- hla_coords <- readr::read_csv("data/gene_positions/hla_coords.csv",  -->
+<!--                               show_col_types = FALSE) -->
+<!-- flextable(hla_coords) |>  -->
+<!--   bold(bold = TRUE, part = "header") -->
+<!-- ``` -->
+
+
+<!-- ``` bash -->
+<!-- bcftools filter --regions chr6:29942470-32666657 --include 'MAF[0] > 0.01' /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr6.merged.clean.noMono.vcf.gz -o ./data/variants/chr6.HLA-complex.vcf -->
+<!-- ``` -->
 
 ## Step 6: GWAS
 
@@ -598,7 +660,7 @@ flextable(hla_coords) |>
 
 -   **Objective**: Use of `PLINK2 + glm` with the first 10 principal components as covariates, see @lst-glm-bash.
     -   **Osteo analysis**: `osteoporosis`, `osteopenia` and `fractures` using logistic regression + `DMOTSCORE_mod` was analysed using `lm`.
-    -   **Cardiovascular association analyses**: `AVCGLOBAL_PRE_M`, `MCASGLOBAL` and `MVASGLOBAL` using logistic regression.
+    -   **Cardiovascular association analyses**:  using logistic regression.
     
 -   **Input**:
     -   VCF file on the region/gene of interest
@@ -606,48 +668,32 @@ flextable(hla_coords) |>
     -   Explanatory variable to predict, provided with `--pheno-name <response_variable>`.
 
 ::: {#lst-glm-bash}
-``` bash
 
-/home/galgen01/programs/plink2 \
-  --1 \
-  --double-id \
-  --pheno /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \
-  --pheno-name <variable-to-predict> \
-  --vcf /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf dosage=HDS
-  --keep /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \
-  --glm hide-covar \
-  --covar /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \
-  --covar-name PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
-  --maf 0.01 \
-  --out <target-gene>_<variable-to-predict>
-  
-```
-
-**Template GLM instruction for GWAS studies.**
-:::
+**Template GLM instruction for GWAS studies:**
 
 ``` bash
 
-/home/galgen01/programs/plink2 \
+plink2 \
   --1 \ # <1>
   --double-id \ # <1>
-  --pheno /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <2>
+  --pheno ./phenotypes/merge_phenos_PCs.txt \ # <2>
   --keep /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <2>
   --pheno-name osteopenie \ # <2>
   --vcf /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf dosage=HDS # <2>
   --glm hide-covar \ # <3>
   --covar /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <3>
   --covar-name PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \ # <3>
-  --maf 0.01 \ # <3>
   --out HDAC9_osteopenie # <4>
   
 ```
 1.  `--1` ensure independent GWAS analyses per individual, aka the *single-sample mode*. Indeed, `PLINK` usually assumes samples are structured in a family-based format (FID IID pairs), while `--double-id` details the FID/IID format for uniquely identifying a given individual.
 2.  **GWAS inputs**: We need the *phenotype information* (provided with `--pheno` and `--keep` commands), the *response variable* (provided with `--pheno-name`) and the *VCF file* (command `--vcf`), here using the SNPs annotations for the HDAC9 gene[^4].
-3.  GWAS model options: `--glm` is the general linear model, which uses by default a *logistic regression* for categorical variables, and a *standard linear Gaussian model*, equivalent to `lm` for continuous variables. `--covar` is the covariate file, here storing the principal components resulting from PCA computation described with `--covar-name` option, and computation reported in ... . PCAs are used to describe the population structure in an unsupervised manner; and avoid and detect latent subgroups. Finally, `--maf` guarantees removal of really infrequent SNPs, often associated with low statistical power.
+3.  GWAS model options: `--glm` is the general linear model, which uses by default a *logistic regression* for categorical variables, and a *standard linear Gaussian model*, equivalent to `lm` for continuous variables^[The `hide-covar` option runs GLM, but doesn't output covariate results. Besides, note that --covar passes *quantitative covariates* (e.g., age, PCs), while `--ide-covar` passes *categorical covariates*]. `--covar` is the covariate file, with relevant explanatory variables to integrate reported with `--covar-name` (see @ for details). PCAs are used to describe the population structure in an unsupervised manner; and avoid and detect latent subgroups. 
 4.  The output GWAS folder, with `--out` command. Stored for now in `/mnt/projects_tn01/Cartagene/analyses/association`.
 
 [^4]: `dosage=HDS`, for Hard Dosage, provides the instruction describing genotype uncertainties for enhanced statistical power. It's particularly useful when working as here with **imputed genotypes**, where part of the SNPs were inferred using reference panels.
+
+:::
 
 -   **Remark 1**: you may come up with `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high`. In this case, you may try removing completely covariates (with `--glm allow-no-covars`), or/and increase variance inflation threshold (`--vif number_vif` option). **Note that a VIF factor above 10 is considered problematic as it can significantly distort regression estimates.** [Discussion and visualisations on [*VIF influence*](https://www.linkedin.com/feed/update/urn:li:activity:7308463515432833026/). Briefly, VIF quantifies the degree of similarity among predictor variables. Indeed, the GLM-family usually assumes independence between explanatory variables. My premise here is that the whole pipeline described in @sec-preprocessing-redundancy is only used to compute the PCA eigen vectors, and not for GWAS differential downstream analyses. As such, strongly correlated SNPs are kept, inducing logically an inflation of the VIF factor.]{fg="red"}
 
@@ -655,9 +701,62 @@ flextable(hla_coords) |>
 
 -   [**Remark 3**: Add phenotype covariates, such as `SEX` or `AGE` in the regression framework, which can play a strong leverage on the impact of SNPs. [`GENESIS`](https://www.bioconductor.org/packages/devel/bioc/vignettes/GENESIS/inst/doc/assoc_test.html#mixed-model-association-testing) is a R package mixing environmental and genetic factors in a *fixed linear model* approach.]{fg="red"}
 
--   [**Remark 4**: `DMOTSCORE_mod` is a strictly positive score, so rather irrelevant to use a standard linear model to predict it. Ensure explicitly that the GLM runs logistic regression on binary outcomes, and linear regression otherwise.]{fg="red"}
+-   [**Remark 4**: `DMOTSCORE_mod` is a strictly positive score, so rather irrelevant to use a standard linear model to predict it. Ensure explicitly that the GLM runs logistic regression on binary outcomes, and linear regression otherwise.]{fg="red"}.
 
-#### ii) Multiple test correction 
+- **Remark 5**: we provide below an alternative and more compact syntax to call `plink2`, assuming binary and compressed files: 
+
+``` bash
+plink2 --bfile mydata \
+  --pheno phenotype.txt \
+  --covar covar.txt --covar-name age \
+  --ide-covar covar.txt --covar-name sex,cohort \
+  --glm hide-covar
+```
+
+
+---
+
+``` bash
+
+plink2 --double-id \
+  --vcf ./data/variants/chr6.HLA-A.vcf dosage=HDS \
+  --pheno ./data/phenotypes/merge_phenos_PCs.txt \
+  --pheno-name DMOTSCORE_mod \
+  --covar ./data/phenotypes/merge_phenos_PCs.txt \
+  --covar-name PC1-PC10 \
+  --glm hide-covar \
+  --out tables/DMOTSCORE_mod
+
+  
+```
+
+``` bash
+plink2 --double-id --vcf ./data/variants/chr6.HLA-A.vcf dosage=HDS --pheno ./data/phenotypes/merge_phenos_PCs.txt --pheno-name DMOTSCORE --glm allow-no-covars --out tables/HLA-A 
+
+```
+
+#### ii) Visualisations: Manhattan plots
+
+- More customisation available in [Manhattan plot in R: a review](https://r-graph-gallery.com/101_Manhattan_plot.html)
+
+```{r}
+gwas_hla <- readr::read_delim("./tables/HLA-A.DMOTSCORE.glm.linear",
+                              delim = "\t",
+                              show_col_types = FALSE) |> 
+  dplyr::rename(CHR="#CHROM") |> 
+  dplyr::mutate(SNP=paste0("rs", dplyr::row_number()))
+
+qqman::manhattan(gwas_hla,
+                 chr="CHR", bp="POS", p="P", snp = "SNP", 
+                 annotatePval = 0.01)
+
+qqman::qq(gwas_hla$P)
+```
+
+
+
+
+#### iii) Multiple test correction 
 
 In total, **7 phenotypes, 2613 variants tested, and $18291$ pairwise tests** were performed, implying to correct for multiple test. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value).
 
@@ -713,6 +812,14 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 - @zhao2025bib implements [`SC-VAR`: a computational tool for interpreting polygenic disease risks using single-cell epigenomic data](https://academic.oup.com/bib/article/26/2/bbaf123/8092303?searchresult=1&login=false), a novel computational tool avalaible as a GitHub repo and Python application: [`SC-VAR` GitHub](https://github.com/gefeiZ/SC_VAR). `SC-VAR` uses single-cell *epigenomic* data to predict functional outcomes of the identified disease-associated *GWAS variants*, enhancing their interpretability. Under the hood, relies on [`MAGMA` linear modelling framework](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004219), developped by @leeuw2015pcb.
 
 # Appendix {.appendix}
+
+## Deal with large files
+
+``` bash 
+
+python3 bin/git-filter-repo --path data/variants/chr6.HLA-complex.vcf --invert-paths
+
+```
 
 ## Load CLI `bcftools` and `plink2`
 
