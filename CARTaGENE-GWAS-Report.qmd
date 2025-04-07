@@ -82,6 +82,10 @@ Besides, use Git + GitLab to version the code, work in a R project to compartmen
 
 # Analyses
 
+- [File Naming Convention, waiting for True Database configuration, is detailed in the two following LinkedIn posts: [here](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-hardest-part-of-bioinformatics-naming-activity-7295090463894589441-Ra-j), and [there](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_stop-losing-track-of-your-analysis-files-activity-7311382817110708225-Kl3A). Add date, file type and extension, along with model organism or study name + details General File Organisation.]{fg="red"}
+
+- [Consider adding *symbolic links* to encapsulate the whole project, see [`ln -s` Post](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-most-underrated-unix-command-for-bioinformatics-activity-7287842704753848321-qhe) for details.]{fg="red}
+
 - Bash configuration
 
 ```{bash}
@@ -90,7 +94,7 @@ export PATH=./bin/plink2:$PATH
 
 # create symbolic links to organise everythin within the same folder
 # warning: if original content is deleted, everything broke!!!!!!
-ln -s ./data/genotypages/ /mnt/projects_tn01/Cartagene/cartagene-gwas/data/genotypages
+ln -s ./data/genotypages/ /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged
 ```
 
 - R configuration:
@@ -103,6 +107,7 @@ library(haven)
 library(flextable)
 library(dplyr)
 library(ggplot2)
+library(VennDiagram)
 # Required for code linking
 library(downlit)
 library(xml2)
@@ -290,10 +295,20 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 ## Step 4: Phenotype feature extraction {#sec-phenotype-extraction}
 
 Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`.
+Variables of interest are listed in:
 
-- [File Naming Convention, waiting for True Database configuration, is detailed in the two following LinkedIn posts: [here](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-hardest-part-of-bioinformatics-naming-activity-7295090463894589441-Ra-j), and [there](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_stop-losing-track-of-your-analysis-files-activity-7311382817110708225-Kl3A). Add date, file type and extension, along with model organism or study name + details General File Organisation.]{fg="red"}
+```{r}
+#| label: tbl-cartage-pheno-features
+#| tbl-cap: Features of interest, and response variables, to predict in `CarTaGene`.
 
-- [Consider adding *symbolic links* to encapsulate the whole project, see [`ln -s` Post](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-most-underrated-unix-command-for-bioinformatics-activity-7287842704753848321-qhe) for details.]{fg="red}
+library(readxl)
+cartagene_response_variables <- readxl::read_excel("data/phenotypes/cartagene_response_variables.xlsx")
+
+flextable(cartagene_response_variables) |> 
+  bold(part="header")
+
+```
+
 
 ### i) Merge genotype IDs, phenotypes and PCAs values
 
@@ -380,8 +395,8 @@ cartagene_phenodata <- cartagene_phenodata |>
                                               .default = NA),
                 OSTEOPOROSIS = dplyr::case_when(DMOTSCORE_mod < -2.5 ~ 1, 
                                               DMOTSCORE_mod >= -2.5 ~ 0, 
-                                              .default = NA)) |> 
-  dplyr::mutate(across(all_of(c("OSTEOPONIA", "OSTEOPOROSIS")), as.logical))
+                                              .default = NA)) 
+  
 
 flextable::proc_freq(cartagene_phenodata, 
                      "OSTEOPONIA", "OSTEOPOROSIS")
@@ -389,9 +404,10 @@ flextable::proc_freq(cartagene_phenodata,
 ```
 
 
-- **Fracture events**[Advise to code binary event variables as Boolean, rather than numeric.]{fg="red"}
+- **Fracture events**:
+
   1. We merge `FXALL_PRE5` (any fracture occurring within the five years prior to recruitment) with `FXALL_POST` (all fractures occurring during follow-up) into variable `FXALL`, being positive if an event fracture occured prior or posterior. [Which variable between `FXALL_PRE5` and `FXALL_PRE1` should be considered? Variables differ by `{r} length(which(cartagene_phenodata$FXALL_PRE5!=cartagene_phenodata$FXALL_PRE1)/nrow(cartagene_phenodata))` $\%$ overall!!]{fg="red"}
-  2. `FXMOF_POST` (only osteoporotic fractures during follow-up)^[For both `FXMOF_POST` and `FXALL_POST`, the dates of occurrence and censoring dates are available in `FXALL_POSTDATE` and `FXMOF_POSTDATE` respectively.] [In contrast with labelling, osteoporotic events, as stored in `FXMOF_POST`, contain both pre-, and posterior fracture events, report to Venn Diagram @fig-venn-osteo for details, which can be further improved with [`ggVennDiagram` package](https://gaospecial.github.io/ggVennDiagram/articles/using-ggVennDiagram.html)]{fg="red"} 
+  2. `FXMOF_POST` (only osteoporotic fractures during follow-up)^[For both `FXMOF_POST` and `FXALL_POST`, the dates of occurrence and censoring dates are available in `FXALL_POSTDATE` and `FXMOF_POSTDATE` respectively.] [In contrast with labelling, osteoporotic events, as stored in `FXMOF_POST`, contain both pre-, and posterior fracture events, report to Venn Diagram @fig-venn-osteo for details. Venn Diagrams could be improved with [`ggVennDiagram` package](https://gaospecial.github.io/ggVennDiagram/articles/using-ggVennDiagram.html)]{fg="red"} 
   
 ```{r}
 #| label: tbl-fracture-computation
@@ -404,9 +420,7 @@ flextable::proc_freq(cartagene_phenodata,
 #| layout-ncol: 2
 
 cartagene_phenodata <- cartagene_phenodata |> 
-  mutate(across(.cols = all_of(c("FXALL_POST", "FXALL_PRE1", "FXMOF_POST")),
-                as.logical), 
-         FXALL = FXALL_POST | FXALL_PRE1)
+  mutate(FXALL = dplyr::if_else(FXALL_POST == 1L | FXALL_PRE1 ==1L, 1L, 0L))
 
 flextable::proc_freq(cartagene_phenodata, 
                      "FXALL", "FXMOF_POST")
@@ -420,11 +434,11 @@ flextable::proc_freq(cartagene_phenodata,
 #| label: fig-venn-osteo
 #| fig-cap: "Venn Diagrams of fracture events."
 
-labels_OSTEO <- list(`post fracture` = as.character(cartagene_phenodata$IID[cartagene_phenodata$FXALL_POST==1]), 
-                          `pre facture` = as.character(cartagene_phenodata$IID[cartagene_phenodata$FXALL_PRE1==1]), 
-                          `osteoporotic fracture` = as.character(cartagene_phenodata$IID[cartagene_phenodata$FXMOF_POST==1]))
+labels_OSTEO <- list(`post fracture` = cartagene_phenodata$IID[cartagene_phenodata$FXALL_POST==1], 
+                          `pre facture` = cartagene_phenodata$IID[cartagene_phenodata$FXALL_PRE1==1], 
+                          `osteoporotic fracture` = cartagene_phenodata$IID[cartagene_phenodata$FXMOF_POST==1])
 # Chart
-venn.diagram(
+VennDiagram::venn.diagram(
         x = labels_OSTEO,
         filename = 'figures/venn_diagramm_fractures.png',
         output=TRUE,
@@ -454,6 +468,9 @@ venn.diagram(
 
 knitr::include_graphics("figures/venn_diagramm_fractures.png")
 
+# final cleaning
+file.remove(list.files(path = "./figures", pattern = "\\.log$", full.names = TRUE))
+
 ```
 
 
@@ -478,30 +495,26 @@ Contingency tables of both pre-, and post-, cardiovascular events are reported i
 #|   - "MCASGLOBAL_PRE_M vs AVCGLOBAL_PRE_M"
 #| layout-ncol: 2
 
-cartagene_phenodata <- cartagene_phenodata |> 
-  mutate(across(.cols = all_of(c("CVALL_POST", "CVMACE_POST", "MCASGLOBAL_PRE_M", "AVCGLOBAL_PRE_M")),
-                as.logical))
-
 flextable::proc_freq(cartagene_phenodata, 
                      "CVALL_POST", "CVMACE_POST")
 flextable::proc_freq(cartagene_phenodata, 
                      "MCASGLOBAL_PRE_M", "AVCGLOBAL_PRE_M")
 ```
 
-```{r}
-
-test_cartagene_phenodata <- cartagene_phenodata |> 
-  dplyr::mutate(CVMACE_POST=dplyr::if_else(as.numeric(CVMACE_POST)==0, 1, 2))
-
-readr::write_tsv(test_cartagene_phenodata, 
-                 "./data/phenotypes/merge_phenos_PCs_test.txt")
-```
-
-
 Finally, you can save the global phenotype dataset, merging PCs, phenotype and genotype IDs along with metric computation, using `readr::write_csv`:
 
 ```{r}
 #| label: save-global-phenotype
+#| lst-label: lst-cartagene-plink2-prep
+#| lst-cap:  Turns out that newest versions of `plink2` impose explicit encoding of categorical variables, denoting as 1 'controls', and 2 as 'case'. 
+
+# define Boolean categorical variables
+categorical_variables <- cartagene_response_variables$Features[cartagene_response_variables$Type=="Boolean"]
+
+cartagene_phenodata <- cartagene_phenodata |>
+  dplyr::mutate(dplyr::across(dplyr::all_of(categorical_variables),
+                              \(x) dplyr::if_else(x == 0L, 1L, 2L, missing=NA)))
+
 readr::write_tsv(cartagene_phenodata, 
                  file="data/phenotypes/merge_phenos_PCs.txt")
 
@@ -594,6 +607,7 @@ flextable(hdac_coords) |>
 bcftools filter --regions chr7:18086825-19002414 --include 'MAF[0] > 0.01' ./data/genotypages/chr7.merged.clean.noMono.vcf.gz -o ./data/variants/chr7.HDAC9.vcf
 ```
 
+bcftools filter --regions chr7:19002000-19002414 --include 'MAF[0] > 0.01' ./data/genotypages/chr7.merged.clean.noMono.vcf.gz -o ./data/variants/chr7.test.vcf
 
 - **Remark:** `--maf` guarantees removal of highly recessive SNPs, present in less than $1\%$ of cases with respect to the dominant form. Such SNPs are indeed associated with low statistical power.
 
@@ -688,7 +702,6 @@ bcftools filter --regions chr6:29942470-32666657 --include 'MAF[0] > 0.01' ./dat
 ``` bash
 
 plink2 \
-  --1 \ # <1>
   --double-id \ # <1>
   --pheno ./phenotypes/merge_phenos_PCs.txt \ # <2>
   --keep /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <2>
@@ -698,7 +711,6 @@ plink2 \
   --covar /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <3>
   --covar-name PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \ # <3>
   --out HDAC9_OSTEOPONIA # <4>
-  
 ```
 1.  `--1` ensure independent GWAS analyses per individual, aka the *single-sample mode*. Indeed, `PLINK` usually assumes samples are structured in a family-based format (FID IID pairs), while `--double-id` details the FID/IID format for uniquely identifying a given individual.
 2.  **GWAS inputs**: We need the *phenotype information* (provided with `--pheno` and `--keep` commands), the *response variable* (provided with `--pheno-name`) and the *VCF file* (command `--vcf`), here using the SNPs annotations for the HDAC9 gene[^4].
@@ -715,9 +727,9 @@ plink2 \
 
 -   [**Remark 3**: Add phenotype covariates, such as `SEX` or `AGE` in the regression framework, which can play a strong leverage on the impact of SNPs. [`GENESIS`](https://www.bioconductor.org/packages/devel/bioc/vignettes/GENESIS/inst/doc/assoc_test.html#mixed-model-association-testing) is a R package mixing environmental and genetic factors in a *fixed linear model* approach.]{fg="red"}
 
--   [**Remark 4**: `DMOTSCORE_mod` is a strictly positive score, so rather irrelevant to use a standard linear model to predict it. Ensure explicitly that the GLM runs logistic regression on binary outcomes, and linear regression otherwise.]{fg="red"}.
+- **Remark 4**: we provide in @lst-plink2-efficient the recommended and computationally efficient `plink2` calling, assuming as inputs already compressed binary files. 
 
-- **Remark 5**: we provide below an alternative and more compact syntax to call `plink2`, assuming binary and compressed files: 
+::: {#lst-plink2-efficient}
 
 ``` bash
 plink2 --bfile mydata \
@@ -727,10 +739,12 @@ plink2 --bfile mydata \
   --glm hide-covar
 ```
 
+:::
+
 #### ii) Visualisations: Manhattan plots
 
 - More customisation available in [Manhattan plot in R: a review](https://r-graph-gallery.com/101_Manhattan_plot.html)
-- [How to interpret a p-value histogram](https://varianceexplained.org/statistics/interpreting-pvalue-histogram/)
+- [How to interpret a $p$-value histogram](https://varianceexplained.org/statistics/interpreting-pvalue-histogram/)
 
 ```{r}
 gwas_hla <- readr::read_delim("./tables/HDAC-9/HDAC-9_CVMACE_POST.CVMACE_POST.glm.logistic.hybrid",
@@ -745,8 +759,7 @@ qqman::manhattan(gwas_hla,
 
 qqman::qq(gwas_hla$P)
 
-
-# Histogram faceted by contrast
+# Histogram of p-values distribution
 ggplot(gwas_hla) +
   geom_histogram(aes(x = P, y = after_stat(count / sum(count))), 
                  breaks = seq(0, 1, 0.05),
