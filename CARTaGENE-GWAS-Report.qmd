@@ -78,7 +78,7 @@ Besides, use Git + GitLab to version the code, work in a R project to compartmen
 -   [Why starting from BAM/BED/BIM pre-processed files in @sec-white-selection, instead of `FASTQ` files available in `/mnt/projects_tn01/Cartagene/data/merged`? For DSL workflows [@sec-DSL-Nextflow], you may directly provide raw sequences in the pipeline. Related question: we use the `BAM/BED/BIM` files stored in folder `/mnt/projects_tn01/Cartagene/analyses/QC` for PCA computation in @sec-preprocessing-redundancy, but VCF files stored in `/mnt/projects_tn01/Cartagene/analyses/variants_extraction` for running the GWAS analyses, for which reason?]{fg="red"}
 -   [Why use a biased *gene-centric approach*, instead of true GWAS (further discussed in @sec-post-GWAS)?]{fg="red"} 
 - **(Optional:1)** use approved **human phenotype ontologies (HPO)** in @sec-phenotype-extraction to definite phenotype features of interest.
-- (**Optional 2**): consider using BCF files instead of VCF files, the former being binary and compressed versions of the latter.
+- (**Optional 2**): consider using BCF files instead of VCF files, the former being binary and compressed versions of the latter
 
 # Analyses
 

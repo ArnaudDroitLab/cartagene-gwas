@@ -3,7 +3,7 @@
 # ======= DEFAULT CONFIGURATION ========
 VCF_FILE="./data/variants/chr7.HDAC9.vcf"
 GENENAME="HDAC-9"
-PHENO_FILE="./data/phenotypes/merge_phenos_PCs_test.txt"
+PHENO_FILE="./data/phenotypes/merge_phenos_PCs.txt"
 COVARS="PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10"
 OUTPUT_DIR="./tables"
 PHENO_LIST=("CVMACE_POST")
