@@ -7,3 +7,6 @@
 old_reports/
 *temp*
 *.log
+
+# large data files
+data/variants/

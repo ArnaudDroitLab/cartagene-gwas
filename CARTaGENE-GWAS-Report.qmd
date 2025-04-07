@@ -87,6 +87,10 @@ Besides, use Git + GitLab to version the code, work in a R project to compartmen
 ```{bash}
 export PATH=./bin/bcftools/bin:$PATH
 export PATH=./bin/plink2:$PATH
+
+# create symbolic links to organise everythin within the same folder
+# warning: if original content is deleted, everything broke!!!!!!
+ln -s ./data/genotypages/ /mnt/projects_tn01/Cartagene/cartagene-gwas/data/genotypages
 ```
 
 - R configuration:
@@ -98,7 +102,7 @@ export PATH=./bin/plink2:$PATH
 library(haven)
 library(flextable)
 library(dplyr)
-
+library(ggplot2)
 # Required for code linking
 library(downlit)
 library(xml2)
@@ -344,7 +348,7 @@ PCA vectors computed in @sec-PCA are subsequently merged with phenotype data in 
 #| lst-label: lst-join-phenotype-PCA
 #| lst-cap: Inner join between phenotypes IDs and first 10 PCA eigen vectors.
 
-PCs <- readr::read_delim("data/genotypes/PCA_eigenvec",
+PCs <- readr::read_delim("data/PCAs/PCA_eigenvec",
                         col_names = c("FID", "geno_id", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10"), 
                         delim = " ",
                         show_col_types = FALSE)
@@ -356,31 +360,31 @@ cartagene_phenodata <- PCs |>
 
 ### iii) Bone damage: osteoporosis and fractures
 
-- The response variables `osteopenia` and `osteoporosis` have been computed following these rules [@lst-osteopenie-computation], with the resulting contingency tables reported in @tbl-osteopenie-computation.
+- The response variables `OSTEOPONIA` and `OSTEOPOROSIS` have been computed following these rules [@lst-OSTEOPONIA-computation], with the resulting contingency tables reported in @tbl-OSTEOPONIA-computation.
 
 
   1.  Exclude patients with `osteosecondaire==1`.^[Currently done by assigning all corresponding observations a missing value. To be replaced by extracting patients with `osteosecondaire` and subsequently use `--remove` option when running `glm + plink2`.]{fg="red"}
-  2.  `osteopenia` is `case: 1` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere^[`DMOTSCORE_mod` represents the measurement of bone mineral density at the calcaneus. While no universally accepted threshold exists for the diagnosis of osteopenia or osteoporosis, we adopt the conventional cut-off of `-1.5`.].
-  3.  `osteoporosis` is `case: 1` if `DMOTSCORE_mod < -2.5` and `control` elsewhere. [`DMOTSCORE_mod` has been likely Gaussian standardised + lacks of evidence supporting clear multi-modal distributions.]{fg="red"}.
+  2.  `OSTEOPONIA` is `case: 1` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere^[`DMOTSCORE_mod` represents the measurement of bone mineral density at the calcaneus. While no universally accepted threshold exists for the diagnosis of osteopenia or osteoporosis, we adopt the conventional cut-off of `-1.5`.].
+  3.  `OSTEOPOROSIS` is `case: 1` if `DMOTSCORE_mod < -2.5` and `control` elsewhere. [`DMOTSCORE_mod` has been likely Gaussian standardised + lacks of evidence supporting clear multi-modal distributions.]{fg="red"}.
 
 ```{r}
-#| label: tbl-osteopenie-computation
-#| lst-label: lst-osteopenie-computation
+#| label: tbl-OSTEOPONIA-computation
+#| lst-label: lst-OSTEOPONIA-computation
 #| lst-cap: Generate scores of interest.
-#| tbl-cap: osteoporose is considered as more severe than `osteopenie`, hence the striclty lower number of individuals affected by the disease. 
+#| tbl-cap: `OSTEOPOROSIS` is considered as more severe than `OSTEOPONIA`, hence the striclty lower number of individuals affected by the disease. 
 # NA values treated in the LHS conditions as FALSE, assigning them the .default value. 
 cartagene_phenodata <- cartagene_phenodata |> 
   dplyr::mutate(DMOTSCORE_mod = dplyr::if_else(OSTEOSECONDAIRE ==1, NA, DMOTSCORE), 
-                osteopenie = dplyr::case_when(DMOTSCORE_mod <= -1.5 ~ 1, 
+                OSTEOPONIA = dplyr::case_when(DMOTSCORE_mod <= -1.5 ~ 1, 
                                               DMOTSCORE_mod > -1.5 ~ 0, 
                                               .default = NA),
-                osteoporose = dplyr::case_when(DMOTSCORE_mod < -2.5 ~ 1, 
+                OSTEOPOROSIS = dplyr::case_when(DMOTSCORE_mod < -2.5 ~ 1, 
                                               DMOTSCORE_mod >= -2.5 ~ 0, 
-                                              .default = NA), 
-                FXMOF_POST_mod = dplyr::if_else(OSTEOSECONDAIRE ==1, NA, OSTEOSECONDAIRE))
+                                              .default = NA)) |> 
+  dplyr::mutate(across(all_of(c("OSTEOPONIA", "OSTEOPOROSIS")), as.logical))
 
 flextable::proc_freq(cartagene_phenodata, 
-                     "osteopenie", "osteoporose")
+                     "OSTEOPONIA", "OSTEOPOROSIS")
 
 ```
 
@@ -484,12 +488,24 @@ flextable::proc_freq(cartagene_phenodata,
                      "MCASGLOBAL_PRE_M", "AVCGLOBAL_PRE_M")
 ```
 
+```{r}
+
+test_cartagene_phenodata <- cartagene_phenodata |> 
+  dplyr::mutate(CVMACE_POST=dplyr::if_else(as.numeric(CVMACE_POST)==0, 1, 2))
+
+readr::write_tsv(test_cartagene_phenodata, 
+                 "./data/phenotypes/merge_phenos_PCs_test.txt")
+```
+
+
 Finally, you can save the global phenotype dataset, merging PCs, phenotype and genotype IDs along with metric computation, using `readr::write_csv`:
 
 ```{r}
 #| label: save-global-phenotype
 readr::write_tsv(cartagene_phenodata, 
                  file="data/phenotypes/merge_phenos_PCs.txt")
+
+# cartagene_phenodata <- readr::read_tsv("data/phenotypes/merge_phenos_PCs.txt")
 ```
 
 ## Step 5: Variants extraction {#sec-variant-extraction}
@@ -534,7 +550,7 @@ hdac_entrez_ids <- tibble::tibble(
   GENEID = hdac_entrez_ids)
 
 # retrieve start and end positions of hdac chromosoms
-txdb <- AnnotationDbi::loadDb("data/genome_builds/txdb_human_gencode_v42.sqlite")
+txdb <- AnnotationDbi::loadDb("data/genome_builds/human_gencode_v42.sqlite")
 hdac_coords <- AnnotationDbi::select(txdb,
                      keys = hdac_entrez_ids$GENEID,
                      columns = c("TXCHROM", "TXSTART", "TXEND"),
@@ -542,7 +558,6 @@ hdac_coords <- AnnotationDbi::select(txdb,
 
 # take the min and max positions for all chromosomes
 hdac_coords <- hdac_coords |>
-  dplyr::filter(TXCHROM=="chr6") |>
   dplyr::group_by(GENEID, TXCHROM) |>
   dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |>
   dplyr::ungroup() |>
@@ -552,8 +567,8 @@ hdac_coords <- hdac_coords |>
 readr::write_csv(hdac_coords,
                  "data/gene_positions/hdac_coords.csv")
 
-hdac_coords <- readr::read_csv("data/gene_positions/hdac_coords.csv", 
-                              show_col_types = FALSE)
+# hdac_coords <- readr::read_csv("data/gene_positions/hdac_coords.csv", 
+#                               show_col_types = FALSE)
 flextable(hdac_coords) |> 
   bold(bold = TRUE, part = "header")
 ```
@@ -563,20 +578,20 @@ flextable(hdac_coords) |>
 ##### ii) Extract SNPs corresponding to provided HDAC gene
 
 -   **Inputs**:
-    -   Cleaned **VCF** file of the chromosome 7 (where `HDAC-9` is present): `chr7.merged.clean.noMono.vcf.gz`^[All VCF files per chromosome are stored in `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/` folder.]. 
+    -   Cleaned **VCF** file of the chromosome 7 (where `HDAC-9` is present)^[All curated VCF files per chromosome are stored in `./data/genotypages/` (symbolly linked with `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged`).]. 
     
 -   **Outputs**:
     -   `chr7.HDAC9.vcf`: VCF file, restrained to HDAC9 region with affiliated SNPs.
     
 -   **Objective**: Extract annotated SNPs within `HDAC9` boundaries, as defined by the `hg38` reference genome. **Details**:
-    -   Filter variants based on **Minor Allele Frequency (MAF)** $> 0.01$ (in other words, the SNP must be present in at least $1\%$ of the samples).
-    -   SNPs were extracted using `bcftools view`. [**Alternative**: `plink2 --bfile your_dataset --chr 7 --from-bp 18086825 --to-bp 19002416`, but requires BIM files as input.]{fg="red"}.
+    -   Discard variants with **Minor Allele Frequency (MAF)** $< 0.01$ (in other words, the SNP must be present in at least $1\%$ of the samples).
+    -   SNPs were extracted using `bcftools view`. [**Alternative**: `plink2 --bfile your_dataset --chr 7 --from-bp 18086825 --to-bp 19002414`, but requires BIM files as input.]{fg="red"}.
 
 
 -   **Bash command**:
 
 ``` bash
-bcftools filter --regions chr6:29942470-29945884 --include 'MAF[0] > 0.01' /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr6.merged.clean.noMono.vcf.gz -o ./data/variants/chr6.HLA-A.vcf
+bcftools filter --regions chr7:18086825-19002414 --include 'MAF[0] > 0.01' ./data/genotypages/chr7.merged.clean.noMono.vcf.gz -o ./data/variants/chr7.HDAC9.vcf
 ```
 
 
@@ -596,7 +611,6 @@ chromosome_vcf6_content <- readr::read_lines(chromosome_vcf6_file, n_max = 30)
 cat(chromosome_vcf6_content |> 
       stringr::str_subset("^##"), sep = "\n")
 ```
-
 
 
 <!-- #### b) HLA-family {#sec-HLA} -->
@@ -650,16 +664,16 @@ cat(chromosome_vcf6_content |>
 <!-- ``` -->
 
 
-<!-- ``` bash -->
-<!-- bcftools filter --regions chr6:29942470-32666657 --include 'MAF[0] > 0.01' /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged/chr6.merged.clean.noMono.vcf.gz -o ./data/variants/chr6.HLA-complex.vcf -->
-<!-- ``` -->
+``` bash
+bcftools filter --regions chr6:29942470-32666657 --include 'MAF[0] > 0.01' ./data/genotypages/chr6.merged.clean.noMono.vcf.gz -o ./data/variants/chr6.HLA-complex.vcf
+```
 
 ## Step 6: GWAS
 
 #### i) GLM and GWAS {#sec-GWAS}
 
 -   **Objective**: Use of `PLINK2 + glm` with the first 10 principal components as covariates, see @lst-glm-bash.
-    -   **Osteo analysis**: `osteoporosis`, `osteopenia` and `fractures` using logistic regression + `DMOTSCORE_mod` was analysed using `lm`.
+    -   **Osteo analysis**: `OSTEOPOROSIS`, `OSTEOPONIA` and `fractures` using logistic regression + `DMOTSCORE_mod` was analysed using `lm`.
     -   **Cardiovascular association analyses**:  using logistic regression.
     
 -   **Input**:
@@ -678,12 +692,12 @@ plink2 \
   --double-id \ # <1>
   --pheno ./phenotypes/merge_phenos_PCs.txt \ # <2>
   --keep /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <2>
-  --pheno-name osteopenie \ # <2>
+  --pheno-name OSTEOPONIA \ # <2>
   --vcf /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf dosage=HDS # <2>
   --glm hide-covar \ # <3>
   --covar /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <3>
   --covar-name PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \ # <3>
-  --out HDAC9_osteopenie # <4>
+  --out HDAC9_OSTEOPONIA # <4>
   
 ```
 1.  `--1` ensure independent GWAS analyses per individual, aka the *single-sample mode*. Indeed, `PLINK` usually assumes samples are structured in a family-based format (FID IID pairs), while `--double-id` details the FID/IID format for uniquely identifying a given individual.
@@ -708,39 +722,18 @@ plink2 \
 ``` bash
 plink2 --bfile mydata \
   --pheno phenotype.txt \
-  --covar covar.txt --covar-name age \
+  --covar covar.txt --covar-name PC1-PC10 \
   --ide-covar covar.txt --covar-name sex,cohort \
   --glm hide-covar
-```
-
-
----
-
-``` bash
-
-plink2 --double-id \
-  --vcf ./data/variants/chr6.HLA-A.vcf dosage=HDS \
-  --pheno ./data/phenotypes/merge_phenos_PCs.txt \
-  --pheno-name DMOTSCORE_mod \
-  --covar ./data/phenotypes/merge_phenos_PCs.txt \
-  --covar-name PC1-PC10 \
-  --glm hide-covar \
-  --out tables/DMOTSCORE_mod
-
-  
-```
-
-``` bash
-plink2 --double-id --vcf ./data/variants/chr6.HLA-A.vcf dosage=HDS --pheno ./data/phenotypes/merge_phenos_PCs.txt --pheno-name DMOTSCORE --glm allow-no-covars --out tables/HLA-A 
-
 ```
 
 #### ii) Visualisations: Manhattan plots
 
 - More customisation available in [Manhattan plot in R: a review](https://r-graph-gallery.com/101_Manhattan_plot.html)
+- [How to interpret a p-value histogram](https://varianceexplained.org/statistics/interpreting-pvalue-histogram/)
 
 ```{r}
-gwas_hla <- readr::read_delim("./tables/HLA-A.DMOTSCORE.glm.linear",
+gwas_hla <- readr::read_delim("./tables/HDAC-9/HDAC-9_CVMACE_POST.CVMACE_POST.glm.logistic.hybrid",
                               delim = "\t",
                               show_col_types = FALSE) |> 
   dplyr::rename(CHR="#CHROM") |> 
@@ -751,6 +744,20 @@ qqman::manhattan(gwas_hla,
                  annotatePval = 0.01)
 
 qqman::qq(gwas_hla$P)
+
+
+# Histogram faceted by contrast
+ggplot(gwas_hla) +
+  geom_histogram(aes(x = P, y = after_stat(count / sum(count))), 
+                 breaks = seq(0, 1, 0.05),
+                 color = "black",
+                 fill = "grey") +
+  scale_y_continuous(name = "Relative Frequency") +
+  geom_hline(yintercept = 0.05, color = "red")+
+  labs(title = "Distribution of P-values",
+    x = "P-value")+
+  # facet_wrap(vars(contrast)) +
+  theme_bw()
 ```
 
 
@@ -791,7 +798,7 @@ This analysis is not formally a GWAS study, but rather a *gene-centric* study, p
 Alternatively, we could consider a data-driven, and more agnostic approach, to refine the selection of gene candidates. Several approaches to that end have been implemented:
 
 - @gnanaolivu2025bb proposed in [A clinical knowledge graph-based framework to prioritize candidate genes for facilitating diagnosis of Mendelian diseases and rare genetic conditions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06096-2), the `phenotype prioritization and analysis for rare diseases, PPAR` algorithm to rank genes based on *human phenotype ontology (HPO)* terms.[^5]. In details, `PPAR` combines embeddings from the *human knowledge graph*, incorporating genes, HPO terms, and gene ontology annotations connections. For each input HPO term, a prioritized list of genes is returned based on their relevance and similarity to the HPO term.
-- @bridges2025bb developped in [Towards a standard benchmark for phenotype-driven variant and gene prioritisation algorithms: `PhEval`, Phenotypic inference Evaluation framework](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06105-4) a unified benchmarking platform to clean inputs for *phenotype-driven VGPAs*. Variant and Gene Prioritisation Algorithms integrate complex and multi-modal datasets, such as ontologies and gene-to-phenotype associations, to predict the most influential and promising gene targets controlling the evolution of rare diseases. Model is avalaible as GitHub Repo [`PhEval`](https://github.com/monarch-initiative/pheval).
+- @bridges2025bb developped in [Towards a standard benchmark for phenotype-driven variant and gene prioritisation algorithms: `PhEval`, Phenotypic inference Evaluation framework](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06105-4) a unified benchmarking platform to clean inputs for *phenotype-driven VGPAs*. Variant and Gene Prioritisation Algorithms integrate complex and multi-modal datasets, such as ontologies and gene-to-phenotype associations, to predict the most influential and promising gene targets controlling the evolution of rare diseases. Model is available as GitHub Repo [`PhEval`](https://github.com/monarch-initiative/pheval).
 
 [^5]: Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.
 
@@ -809,11 +816,11 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 
 ## Multimodal integration
 
-- @zhao2025bib implements [`SC-VAR`: a computational tool for interpreting polygenic disease risks using single-cell epigenomic data](https://academic.oup.com/bib/article/26/2/bbaf123/8092303?searchresult=1&login=false), a novel computational tool avalaible as a GitHub repo and Python application: [`SC-VAR` GitHub](https://github.com/gefeiZ/SC_VAR). `SC-VAR` uses single-cell *epigenomic* data to predict functional outcomes of the identified disease-associated *GWAS variants*, enhancing their interpretability. Under the hood, relies on [`MAGMA` linear modelling framework](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004219), developped by @leeuw2015pcb.
+- @zhao2025bib implements [`SC-VAR`: a computational tool for interpreting polygenic disease risks using single-cell epigenomic data](https://academic.oup.com/bib/article/26/2/bbaf123/8092303?searchresult=1&login=false), a novel computational tool available as a GitHub repo and Python application: [`SC-VAR` GitHub](https://github.com/gefeiZ/SC_VAR). `SC-VAR` uses single-cell *epigenomic* data to predict functional outcomes of the identified disease-associated *GWAS variants*, enhancing their interpretability. Under the hood, relies on [`MAGMA` linear modelling framework](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004219), developed by @leeuw2015pcb.
 
 # Appendix {.appendix}
 
-## Deal with large files
+## Deal with large files committed unwillingly
 
 ``` bash 
 
