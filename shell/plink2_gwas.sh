@@ -6,9 +6,9 @@ GENENAME="HDAC-9"
 PHENO_FILE="./data/phenotypes/merge_phenos_PCs.txt"
 COVARS="PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10"
 OUTPUT_DIR="./tables"
-# PHENO_LIST=("DMOTSCORE_mod" "OSTEOPONIA" "OSTEOPOROSIS" "FXALL" "FXMOF_POST" \
-#             "CVALL_POST" "CVMACE_POST" "MCASGLOBAL_PRE_M" "AVCGLOBAL_PRE_M")
-PHENO_LIST=("DMOTSCORE_mod")
+PHENO_LIST=("DMOTSCORE_mod" "OSTEOPONIA" "OSTEOPOROSIS" "FXALL" "FXMOF_POST" \
+            "CVALL_POST" "CVMACE_POST" "MCASGLOBAL_PRE_M" "AVCGLOBAL_PRE_M")
+# PHENO_LIST=("DMOTSCORE_mod")
 
 # =====================================
 
@@ -37,9 +37,8 @@ done
 mkdir -p "$OUTPUT_DIR/${GENENAME}"
 
 # ========== MAIN LOOP =================
-AGG_LOG="$OUTPUT_DIR/${GENENAME}/GENERAL_${GENENAME}_$(date +%F).log"
 for PHENO in "${PHENO_LIST[@]}"; do
-  echo "Running GWAS for phenotype: {$PHENO}, with Covars: {$COVARS}, and Gene: {$GENENAME}"
+  echo "Running GWAS for phenotype: {$PHENO}, with Covars: {$COVARS}, and Gene: {$GENENAME}."
 
   plink2 \
     --double-id \
@@ -50,14 +49,6 @@ for PHENO in "${PHENO_LIST[@]}"; do
     --covar-name $COVARS \
     --glm hide-covar \
     --out "$OUTPUT_DIR/${GENENAME}/${GENENAME}_${PHENO}_$(date +%F)"
-
-  #### print in log file.
-  echo "🔬 PHENOTYPE: $PHENO" >> "$AGG_LOG"
-  echo "==============================================" >> "$AGG_LOG"
-  find "$OUTPUT_DIR/${GENENAME}/" -name "${GENENAME}_${PHENO}_$(date +%F)*.log" -print0 | \
-  tee >(xargs -0 cat >> "$AGG_LOG") | \
-  xargs -0 rm -f # clean log file pheno-specific
-  echo -e "\n\n" >> "$AGG_LOG"
 
   echo "Finished GWAS for phenotype: $PHENO"
   echo ""
