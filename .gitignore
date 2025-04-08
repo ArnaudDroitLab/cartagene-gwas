@@ -6,6 +6,7 @@
 # irrelevant files
 old_reports/
 *temp*
+*test*
 *.log
 
 # large data files

@@ -5,10 +5,12 @@ editor: source
 engine: knitr
 ---
 
-## Bash commands to install `plink2` in the `tools` folder
+### Bash commands to install `plink2`
 
 
 ```{bash download-plink2}
+#| echo: true
+#| eval: false
 # Step 1: Download the latest PLINK2 binary
 wget -O ./bin/plink2.zip "https://s3.amazonaws.com/plink2-assets/alpha6/plink2_linux_x86_64_20250129.zip" 
 
@@ -22,10 +24,11 @@ chmod 777 ./bin/plink2
 
 ```
 
-## Bash commands to install `bcftools` in the `tools` folder
+### Bash commands to install `bcftools`
 
 ```{bash download-bcftools}
-
+#| echo: true
+#| eval: false
 wget -O ./bin/bcftools-1.21.tar.bz2 "https://github.com/samtools/bcftools/releases/download/1.21/bcftools-1.21.tar.bz2" 
 
 tar -xjvf ./bin/bcftools-1.21.tar.bz2 -C ./bin/ && rm ./bin/bcftools-1.21.tar.bz2
@@ -38,12 +41,20 @@ make install
 
 rm -rf ./bin/bcftools-1.21
 
+```
+
+### Bash commands to save path executions
+
+```{bash}
+#| echo: true
+#| eval: false
 # Temporary (Current Shell Session Only)
 export PATH=./bin/bcftools/bin:$PATH  
 
 # Semi temporary (for a given user)
 echo 'export PATH=./bin/bcftools/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
-
 ```
+
+
 
