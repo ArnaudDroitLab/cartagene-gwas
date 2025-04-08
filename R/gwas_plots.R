@@ -1,4 +1,4 @@
-generate_gwas_per_phenotype <- function(genename, pheno_label, filedate) {
+generate_gwas_per_phenotype <- function(genename, pheno_label, filedate, pval_threshold = 0.01) {
 
   #### Prepare GWAS datasets ----
 
@@ -22,13 +22,14 @@ generate_gwas_per_phenotype <- function(genename, pheno_label, filedate) {
     # Calculate cumulative position of each chromosome
     dplyr::mutate(tot=cumsum(chr_len)-chr_len)
 
+  log_pval_threshold <- -log10(pval_threshold)
   manhattan_plot_data <- gwas_data |>
     dplyr::left_join(manhattan_plot_data, by="CHR") |>
     # Add a cumulative position of each SNP
     dplyr::arrange(CHR, POS) |>
     dplyr::mutate( BPcum=POS+tot) |>
     # Add highlight and annotation information
-    dplyr::mutate(is_annotate=dplyr::if_else(-log10(P)>2.5, "yes", "no"))
+    dplyr::mutate(is_annotate=dplyr::if_else(-log10(P)>log_pval_threshold, "yes", "no"))
 
   ## Prepare x-axis special labelling
   axisdf <- manhattan_plot_data |>
@@ -41,9 +42,18 @@ generate_gwas_per_phenotype <- function(genename, pheno_label, filedate) {
     scale_color_manual(values = rep(c("grey", "skyblue"), 22 )) +
     # custom X axis:
     scale_x_continuous( label = axisdf$CHR, breaks= axisdf$center ) +
+    # Add p-values thresholds
+    geom_hline(yintercept = -log10(0.05), color = "blue")+
+    annotate("text", x = max(manhattan_plot_data$BPcum) - 1, y = -log10(0.05) + 0.15,
+             label = paste("Before p-value adjustment"), color = "blue",
+             hjust = 2, size=3) +
+    geom_hline(yintercept = log_pval_threshold, color = "red")+
+    annotate("text", x = max(manhattan_plot_data$BPcum) - 1, y = log_pval_threshold + 0.15,
+             label = paste("After p-value adjustment"), color = "red",
+             hjust = 2, size=3) +
     # Add label using ggrepel to avoid overlapping
     ggrepel::geom_label_repel(data=subset(manhattan_plot_data, is_annotate=="yes"),
-                              aes(label=ID), size=1) +
+                              aes(label=ID), size=5) +
     labs(x="Chromosome", y=expression(-log[10](p)))+
     # minimalist theme
     theme_bw() +
@@ -76,7 +86,6 @@ generate_gwas_per_phenotype <- function(genename, pheno_label, filedate) {
                    color = "black",
                    fill = "grey") +
     scale_y_continuous(name = "Relative Frequency") +
-    geom_hline(yintercept = 0.05, color = "red")+
     labs(title = "Distribution of P-values",
          x = "P-value")+
     # facet_wrap(vars(contrast)) +
