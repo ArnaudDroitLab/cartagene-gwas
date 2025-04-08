@@ -6,8 +6,9 @@ GENENAME="HDAC-9"
 PHENO_FILE="./data/phenotypes/merge_phenos_PCs.txt"
 COVARS="PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10"
 OUTPUT_DIR="./tables"
-PHENO_LIST=("OSTEOPONIA" "OSTEOPOROSIS" "FXALL" "FXMOF_POST" \
-            "CVALL_POST" "CVMACE_POST" "MCASGLOBAL_PRE_M" "AVCGLOBAL_PRE_M")
+# PHENO_LIST=("DMOTSCORE_mod" "OSTEOPONIA" "OSTEOPOROSIS" "FXALL" "FXMOF_POST" \
+#             "CVALL_POST" "CVMACE_POST" "MCASGLOBAL_PRE_M" "AVCGLOBAL_PRE_M")
+PHENO_LIST=("DMOTSCORE_mod")
 
 # =====================================
 
@@ -51,18 +52,15 @@ for PHENO in "${PHENO_LIST[@]}"; do
     --out "$OUTPUT_DIR/${GENENAME}/${GENENAME}_${PHENO}_$(date +%F)"
 
   #### print in log file.
-  echo "Analysis date is: $(date +%F)"
   echo "🔬 PHENOTYPE: $PHENO" >> "$AGG_LOG"
   echo "==============================================" >> "$AGG_LOG"
   find "$OUTPUT_DIR/${GENENAME}/" -name "${GENENAME}_${PHENO}_$(date +%F)*.log" -print0 | \
-    xargs -0 cat >> "$AGG_LOG"
+  tee >(xargs -0 cat >> "$AGG_LOG") | \
+  xargs -0 rm -f # clean log file pheno-specific
   echo -e "\n\n" >> "$AGG_LOG"
 
   echo "Finished GWAS for phenotype: $PHENO"
   echo ""
 done
-
-
-# ========== FINAL CLEANING =================
 
 

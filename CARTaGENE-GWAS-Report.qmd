@@ -113,12 +113,10 @@ library(downlit)
 library(xml2)
 
 # Retrieve gene positions
-# renv::install(packages = c("bioc::AnnotationDbi",
-#                           "bioc::org.Hs.eg.db",
-#                          "bioc::GenomicFeatures"))
-# library(AnnotationDbi)
 library(org.Hs.eg.db)  # Provides gene symbol to Entrez ID mapping
-# library(GenomicFeatures)
+
+# for generating nice visualisations
+source("R/gwas_plots.R")
 ```
 
 ## Step 1: Merge genotype arrays {#sec-white-selection}
@@ -301,7 +299,6 @@ Variables of interest are listed in:
 #| label: tbl-cartage-pheno-features
 #| tbl-cap: Features of interest, and response variables, to predict in `CarTaGene`.
 
-library(readxl)
 cartagene_response_variables <- readxl::read_excel("data/phenotypes/cartagene_response_variables.xlsx")
 
 flextable(cartagene_response_variables) |> 
@@ -604,10 +601,8 @@ flextable(hdac_coords) |>
 -   **Bash command**:
 
 ``` bash
-bcftools filter --regions chr7:18086825-19002414 --include 'MAF[0] > 0.01' ./data/genotypages/chr7.merged.clean.noMono.vcf.gz -o ./data/variants/chr7.HDAC9.vcf
+nohup ./shell/extract_variants.sh > shell/extract_variants.log 2>&1 &
 ```
-
-bcftools filter --regions chr7:19002000-19002414 --include 'MAF[0] > 0.01' ./data/genotypages/chr7.merged.clean.noMono.vcf.gz -o ./data/variants/chr7.test.vcf
 
 - **Remark:** `--maf` guarantees removal of highly recessive SNPs, present in less than $1\%$ of cases with respect to the dominant form. Such SNPs are indeed associated with low statistical power.
 
@@ -748,118 +743,17 @@ plink2 --bfile mydata \
 
 ```{r}
 #| label: gwas-visu-preparation
+# cartagene_response_variables$Features
+gwas_plots_hdac <- lapply(cartagene_response_variables$Features, 
+                          function(feature_label) generate_gwas_per_phenotype (genename = "HDAC-9",
+                                                                               pheno_label = feature_label, filedate="2025-04-07")) 
 
-gwas_hla <- readr::read_delim("./tables/HDAC-9/HDAC-9_CVMACE_POST_2025-04-07.CVMACE_POST.glm.logistic.hybrid",
-                              delim = "\t",
-                              show_col_types = FALSE) |> 
-  dplyr::rename(CHR="#CHROM") |> 
-  dplyr::mutate(SNP=paste0("rs", dplyr::row_number()))
+gwas_plots_hdac <- gridExtra::marrangeGrob(gwas_plots_hdac, nrow=1, ncol=1)
 
-
-manhattan_plot_data <- gwas_hla |>  
-  # Compute chromosome size
-  dplyr::group_by(CHR) |>  
-  dplyr::summarise(chr_len=max(POS)) |>  
-  # Calculate cumulative position of each chromosome
-  dplyr::mutate(tot=cumsum(chr_len)-chr_len) 
-
-manhattan_plot_data <- gwas_hla |> 
-  dplyr::left_join(manhattan_plot_data, by="CHR") |> 
-  # Add a cumulative position of each SNP
-  dplyr::arrange(CHR, POS) |> 
-  dplyr::mutate( BPcum=POS+tot) |> 
-  # Add highlight and annotation information
-  dplyr::mutate(is_annotate=dplyr::if_else(-log10(P)>2.5, "yes", "no")) 
-
-## Prepare x-axis special labelling
-axisdf <- manhattan_plot_data |> 
-  dplyr::group_by(CHR) |> 
-  dplyr::summarize(center=( max(BPcum) + min(BPcum) ) / 2 )
+ggsave("figures/gwas_HDAC9.pdf",
+       gwas_plots_hdac, dpi = 600,
+       width = 8, height = 12) 
 ```
-
-```{r}
-manhattan_plot <- ggplot(manhattan_plot_data, aes(x=BPcum, y=-log10(P))) +
-    # Show all points
-    geom_point( aes(color=as.factor(CHR)), alpha=0.8, size=1.3) +
-    scale_color_manual(values = rep(c("grey", "skyblue"), 22 )) +
-    # custom X axis:
-    scale_x_continuous( label = axisdf$CHR, breaks= axisdf$center ) +
-     # Add label using ggrepel to avoid overlapping
-    ggrepel::geom_label_repel(data=subset(manhattan_plot_data, is_annotate=="yes"),
-                              aes(label=ID), size=1) +
-    labs(x="Chromosome", y=expression(-log[10](p)))+
-    # minimalist theme
-    theme_bw() +
-    theme( 
-      legend.position="none",
-      panel.border = element_blank(),
-      panel.grid = element_blank())
-```
-
-
-```{r}
-#| label: gwas-qqplot
-
-# define distribution: under H0, assume Unif[0,1]
-params_unif <- list(min = 0, max = 1)
-
-# visualise qqplots
-qqplot_pvalues <- ggplot(gwas_hla, mapping = aes(sample = P)) +
-  ggplot2::stat_qq(distribution = qunif, dparams = params_unif) +
-  ggplot2::stat_qq_line(distribution = qunif, dparams = params_unif, colour="red", lwd=1) +
-  # Minimalist them
-  labs(x = "Theoretical Quantiles", y = "Sample Quantiles") +
-  theme_bw() +
-  theme( 
-    legend.position="none",
-    panel.border = element_blank(),
-    panel.grid = element_blank())
-```
-
-
-```{r}
-#| label: gwas-histogram-visu
-
-# Histogram of p-values distribution
-histogram_pvalue <- ggplot(gwas_hla) +
-  geom_histogram(aes(x = P, y = after_stat(count / sum(count))), 
-                 breaks = seq(0, 1, 0.05),
-                 color = "black",
-                 fill = "grey") +
-  scale_y_continuous(name = "Relative Frequency") +
-  geom_hline(yintercept = 0.05, color = "red")+
-  labs(title = "Distribution of P-values",
-    x = "P-value")+
-  # facet_wrap(vars(contrast)) +
-  theme_bw()
-```
-
-```{r}
-#| label: visu-gwas-global
-
-# Create bottom row layout (plot2 and plot3 side by side)
-bottom_row <- cowplot::plot_grid(qqplot_pvalues,
-                                 histogram_pvalue, 
-                                 labels = c("b", "c"))
-
-# Combine top and bottom row
-combined_plot <- cowplot::plot_grid(manhattan_plot, bottom_row, 
-                                    ncol = 1,  
-                                    labels = c("a", ""), label_size = 14)
-
-# Add title using ggdraw and draw_label
-title_plot <- cowplot::ggdraw() + 
-  cowplot::draw_label("GWAS visualisations", 
-                      fontface = "bold", x = 0.4, hjust = 0, size=20)
-
-cowplot::plot_grid(title_plot, combined_plot,
-  ncol = 1,rel_heights = c(0.2, 1))
-
-```
-
-
-
-
 
 #### iii) Multiple test correction 
 

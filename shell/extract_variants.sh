@@ -18,13 +18,13 @@ do
     TXSTART=$(echo "$TXSTART" | xargs)
     TXEND=$(echo "$TXEND" | xargs)
 
-    # Find matching VCF file
-    VCF_FILE=$(find "$VCF_DIR" -type f | grep -i "${TXCHROM}.*\.vcf\.gz" | head -n 1)
-    echo "🔹 VCF File is: $VCF_FILE
+    # Find matching VCF file (remember we use symbolic links!!)
+    VCF_FILE=$(find -L "$VCF_DIR" -type f | grep "${TXCHROM}\..*\.vcf\.gz$")
+    echo $VCF_FILE
 
     # Check if VCF was found
     if [[ -z "$VCF_FILE" ]]; then
-        echo "⚠️  Skipping $HGNC_SYMBOL - VCF for $TXCHROM file not found."
+        echo "⚠️  Skipping $HGNC_SYMBOL - VCF for $TXCHROM not found."
         continue
     fi
 
@@ -36,10 +36,9 @@ do
 
     # Echo metadata and command
     echo "🔹 Processing: $HGNC_SYMBOL | $TXCHROM:$TXSTART-$TXEND"
-    echo "🔧 Command: $CMD"
     echo "---------------------------------------------"
-
     # Run the command
-    # eval "$CMD"
+    eval "$CMD"
+    echo "File saved in $OUT_FILE."
 
 done
