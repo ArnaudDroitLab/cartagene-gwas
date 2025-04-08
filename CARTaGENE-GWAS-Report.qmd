@@ -3,6 +3,7 @@ title: "GWAS Analyses utilising the CARTaGENE database"
 author: "Bastien CHASSAGNOL and Marie-Pier and Clément and Fabrice"
 date: last-modified	
 number-sections: true
+engine: knitr
 toc: true
 toc-depth: 4
 lang: en-GB
@@ -45,58 +46,63 @@ editor: source
 
 # Reproduce the pipeline and questions to address
 
-## Two-step pipeline 
+## Two-step pipeline
 
 Assuming PCA components have already been computed (report to @sec-white-selection and @sec-preprocessing-redundancy for details), follow this two-step protocol:
 
-  i.  Retrieve all known variants associated with your genes of interest in @sec-variant-extraction, and generate the corresponding `VCF` file.
-  ii. Change the response variable to predict in @lst-glm-bash (with option `--glm`, the model applied should adjust automatically whether the outcome is binary or continuous).
-  
+i.  Retrieve all known variants associated with your genes of interest in @sec-variant-extraction, and generate the corresponding `VCF` file.
+ii. Change the response variable to predict in @lst-glm-bash (with option `--glm`, the model applied should adjust automatically whether the outcome is binary or continuous).
+
 ## Scalability with `Nextflow` {#sec-DSL-Nextflow}
 
 Lots of intermediate files are not required for downstream analyses, hence it would be relevant to rely on an existing *Nextflow* or *Snakemake* DSL workflows:
 
--   [`nf-GWAS` 'Nextflow pipeline'](https://genepi.github.io/nf-gwas/), from from @schonherr2024, is actively maintained by Curie Bioinformatics Team, and includes the latest `plink2` facilities.
-
+-   [`nf-GWAS` 'Nextflow pipeline'](https://genepi.github.io/nf-gwas/), from @schonherr2024, is actively maintained by Curie Bioinformatics Team, and includes the latest `plink2` facilities.
 
 -   [`PopGLen` 'Snakemake' pipeline](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf105/8069456), from @nolen2025b. [Not for running GWAS analyses, but rather for evaluating the quality and impact of preprocessing and quality mapping at the population-level genome starting from `FASTQ` files.]{fg="red"}
-
 
 ## Reproducibility
 
 Two command-lines tools are needed for reproducing the analyses and/or delivering new outcomes:
 
--   Core tool: `plink2` for running most of the SNPs analyses, currently in two locations: `/home/galgen01/programs/plink` and `/usr/bin/plink2`.
--   `bcftools` for extracting variants of interest in a given genomic region: `/home/galgen01/programs/bcftools/bin/bcftools` and `/mnt/software/is1/commonSoftware/bcftools/bcftools-1.3.1/bin/bcftools`.
-- `GitHub` to version the code
-- R project + activate `renv()` to create a reproducible and standalone computational environment.
+-   Core tool: `plink2` for running most of the SNPs analyses.
+-   `bcftools` for extracting variants of interest in a given genomic region.
+-   `GitHub` to version the code
+-   R project + activate `renv()` to create a reproducible and standalone computational environment.
 
 ## Important Questions to Address!! {#sec-questions}
 
 -   [Check Human reference genome assembly, see @sec-HDAC9. Indeed, among the five genome arrays assembled in @sec-white-selection, at least one turns out to have been mapped against `GRCh37 (hg19)` older reference instead of recent `hg38 (GRCh38, 2013)`.]{fg="red"}
 -   [Why starting from BAM/BED/BIM pre-processed files in @sec-white-selection, instead of `FASTQ` files available in `/mnt/projects_tn01/Cartagene/data/merged`? Related question: we use the `BAM/BED/BIM` files stored in folder `/mnt/projects_tn01/Cartagene/analyses/QC` for PCA computation in @sec-preprocessing-redundancy, but `VCF` files stored in `/mnt/projects_tn01/Cartagene/analyses/variants_extraction` for running the GWAS analyses, for which reason?]{fg="red"}
--   [Why use a biased *gene-centric approach*, instead of true GWAS (further discussed in @sec-post-GWAS)?]{fg="red"} 
+-   [Why use a biased *gene-centric approach*, instead of true GWAS (further discussed in @sec-post-GWAS)?]{fg="red"}
 
 # Analyses
 
-## Setup enviroment 
+## Setup enviroment
 
-- Bash configuration^[We use *symbolic links* to encapsulate the whole project, see [`ln -s` Post](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-most-underrated-unix-command-for-bioinformatics-activity-7287842704753848321-qhe) for details.]
+-   Bash configuration[^1]
+
+[^1]: We use *symbolic links* to encapsulate the whole project, see [`ln -s` Post](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-most-underrated-unix-command-for-bioinformatics-activity-7287842704753848321-qhe) for details.
 
 ```{bash}
+# Render executive files findable
 export PATH=./bin/bcftools/bin:$PATH
 export PATH=./bin/plink2:$PATH
 
-# create symbolic links to organise everythin within the same folder
+# Check versions
+plink2 --version
+echo -e "\n"
+bcftools --version
+
+# Create symbolic links to organise everythin within the same folder
 # warning: if original content is deleted, everything broke!!!!!!
-# ln -s ./data/genotypages/ /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged
+echo ln -s ./data/genotypages/ /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged
 ```
 
-- R configuration:
+-   R configuration:
 
 ```{r}
 #| label: setup
-#| include: false
 # data wrangling and visualisations
 library(haven)
 library(flextable)
@@ -130,8 +136,8 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
 -   **Inputs**:
 
-    -   **Phenotype IDs of white individuals**: `eur_only/cartagene_self_reported_EUR.plink_format.txt`
-    -   **BIM/BED/FAM/hh** folder generated with `--make-bed` command: `analyses/QC/merge_5_datasets`. [It seems that among the 5 genotype arrays concatenated, at least one genotype, namely `gsa.17k.final.hg19.bim,` has been mapped thanks to `GRCh37 (hg19)` reference instead of more recent `hg38 (GRCh38, 2013)` version.]{fg="red"}]
+    -   **Phenotype Ids of white individuals**: `eur_only/cartagene_self_reported_EUR.plink_format.txt`
+    -   **BIM/BED/FAM/hh** folder generated with `--make-bed` command: `analyses/QC/merge_5_datasets`. [It seems that among the 5 genotype arrays concatenated, at least one genotype, namely `gsa.17k.final.hg19.bim,` has been mapped thanks to `GRCh37 (hg19)` reference instead of more recent `hg38 (GRCh38, 2013)` version.]{fg="red"}\]
 
 -   **Objective**: Keep white individuals and remove SNPs variants with genotyping rate $<0.95$. The **genotyping rate** measures the proportion of successfully genotyped markers and indicates how complete the genotype data is. Removing SNPs with low Genotyping Rate increases Missing Data imputation performance, and overall maintains higher statistical power.
 
@@ -140,7 +146,7 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 -   **Bash command**:
 
 ``` bash
-/home/galgen01/programs/plink \
+plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/merge_5_datasets \
   --geno 0.05 \
   --keep /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/cartagene_self_reported_EUR.plink_format.txt \
@@ -161,7 +167,7 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 -   **Bash command**:
 
 ``` bash
-/home/galgen01/programs/plink \
+plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095 \
   --hwe 1e-6 \
   --make-bed \
@@ -176,9 +182,9 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
     -   **BIM/BED/FAM/hh (Homozygous-Haplotype)** files `/merge_5_datasets.eur_only.geno095.hwe1e0` generated from previous HWD SNP trimming, see @sec-HWD.
 
--   **Objective**: Remove SNPs variants associated with strong **linkage disequilibrium**. In an ideal population under random mating, allele combinations should be independent ($r^2=0$). However, due to factors such as genetic drift, or physical proximity, certain alleles tend to be inherited together more often than expected. In GWAS, LD pruning avoids **Overfitting** (SNPs in high LD carry redundant information), avoiding spurious inflation of GWAS association signals.
+-   **Objective**: Remove SNPs variants associated with strong **linkage disequilibrium**. In an ideal population under random mating, allele combinations should be independent ($r^2=0$). However, due to factors such as genetic drift, or physical proximity, certain alleles tend to be inherited together more often than expected. In GWAS, LD pruning avoids **overfitting** (SNPs in high LD carry redundant information), avoiding spurious inflation of GWAS association signals.
 
--   [**Remark**: Report the Number of SNPs Before and After Pruning, usually more sringent $R^2$ is considered.]{fg="red"}
+-   [**Remark**: Report the Number of SNPs Before and After Pruning, usually more stringent $R^2$ is considered.]{fg="red"}
 
 -   **Tool**: `plink --indep-pairwise 50 5 0.5` will discard SNPs with a correlation coefficient above $0.5$ (given that a $R^2$ score of 1 indicates a perfect correlation), on a *rolling window* of $50$ SNPs (focus on local zones) and step $5$ by $5$.
 
@@ -186,13 +192,13 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
 ``` bash
 # identify SNPs with low LD
-/home/galgen01/programs/plink \
+plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06 \
   --indep-pairwise 50 5 0.5 \
   --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps
   
 # save pruned SNPs associated with low LD
-/home/galgen01/programs/plink \
+plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06 \
   --extract /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.prune.in \
   --make-bed \
@@ -205,15 +211,18 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
     -   **BIM/BED/FAM/hh (Homozygous-Haplotype)** files `merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile` generated from previous local LD trimming, see @sec-local-LD.
 
--   **Objective**: Remove SNPs variants associated with strong **linkage disequilibrium** using prior expert knowledge, see [here](http://dougspeed.com/wp-content/uploads/highld.txt) for details.[^1]
+-   **Objective**: Remove SNPs variants associated with strong **linkage disequilibrium** using prior expert knowledge, see [here](http://dougspeed.com/wp-content/uploads/highld.txt) for details.[^2]
 
-[^1]: Notably includes MHC, lactase region, and known inversions `8p23` and `17q21.31`. **Haplotypes**?
+[^2]: Notably includes MHC, lactase region, and known inversions `8p23` and `17q21.31`. **Haplotypes**?
 
+```{=html}
+<!-- -->
+```
 -   **Bash command**:
 
 ``` bash
 
-/home/galgen01/programs/plink \
+plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile \
   --exclude range /mnt/projects_tn01/Cartagene/analyses/QC/high_ld_regions.plink_format.txt \
   --make-bed \
@@ -230,17 +239,17 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
 -   **Details**: A two-step, more stringent IBD filtering strategy has been chosen, eliminating *first* the most problematic individuals, and the *second* ensuring the remaining related individuals are properly filtered (for each correlated pair, prune randomly one of them). The Bash instructions are reported [here](/mnt/projects_tn01/Cartagene/analyses/QC/eur_only/related_ids/Readme.txt).
 
--   [**Remarks**: Choice of a heuristic threshold of $n=68$ affiliated patients removal to be further discussed. Current score of `PI_HAT` score of $0.2$ is surprising, as common thresholds are either $0.25$ for discarding grandparent-grandchild, or $0.125$ or lower for only keeping the most distant relatives. Starting from `PLINK 2.0`, the recommended approach is now utilizing the `--king-cutoff` command, over the older `--rel-cutoff` and `--genome --min` + aggregates all subsequent steps simultaneously, especially in heterogeneous populations]{fg="red"}[^2].
+-   [**Remarks**: Choice of a heuristic threshold of $n=68$ affiliated patients removal to be further discussed. Current score of `PI_HAT` score of $0.2$ is surprising, as common thresholds are either $0.25$ for discarding grandparent-grandchild, or $0.125$ or lower for only keeping the most distant relatives. Starting from `PLINK 2.0`, the recommended approach is now utilizing the `--king-cutoff` command, over the older `--rel-cutoff` and `--genome --min` + aggregates all subsequent steps simultaneously, especially in heterogeneous populations]{fg="red"}[^3].
 
 -   **Bash command**:
 
-[^2]: [`--king-cutoff 0.0884` corresponds to `PI_HAT = 0.125`, see details [here](http://biostars.org/p/434832/#434898)]{fg="red"}
+[^3]: [`--king-cutoff 0.0884` corresponds to `PI_HAT = 0.125`, see details [here](http://biostars.org/p/434832/#434898)]{fg="red"}
 
 ``` bash
 
 # Calculate IBD, select individuals with IBD above 0.2 for further pruning
 
-/home/galgen01/programs/plink \
+plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile \
   --genome \
   --memory 12006 \
@@ -250,14 +259,14 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
 # Remove related individuals, in a two-stage process
 
-/home/galgen01/programs/plink \
+plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile \
   --make-bed \
   --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_1_of_2 \
   --remove /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/related_ids/IBD.genome.iids.merged.sorted.count.reverse.ids_related_to_2_individuals.ids_only.FID_IID_format
 
 
-/home/galgen01/programs/plink \
+plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_1_of_2 \
   --make-bed \
   --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_2_of_2 \
@@ -279,7 +288,7 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 
 ``` bash
 
-/home/galgen01/programs/plink \
+plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.high_LD_excluded \ 
   --keep merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_2_of_2.fam \
   --memory 12006 \
@@ -303,7 +312,6 @@ flextable(cartagene_response_variables) |>
   bold(part="header")
 
 ```
-
 
 #### i) Merge genotype IDs, phenotypes and PCAs values
 
@@ -364,22 +372,23 @@ cartagene_phenodata <- PCs |>
 
 ```
 
-- [**Remark**: Avoid using French CSV settings, switch to universal convention, where delimiter is a comma: `,`]{fg="red"}
+-   [**Remark**: Avoid using French CSV settings, switch to universal convention, where delimiter is a comma: `,`]{fg="red"}
 
 #### ii) Bone damage: osteoporosis and fractures
 
-- The response variables `OSTEOPONIA` and `OSTEOPOROSIS` have been computed following these rules [@lst-OSTEOPONIA-computation], with the resulting contingency tables reported in @tbl-OSTEOPONIA-computation.
+-   The response variables `OSTEOPONIA` and `OSTEOPOROSIS` have been computed following these rules [@lst-OSTEOPONIA-computation], with the resulting contingency tables reported in @tbl-OSTEOPONIA-computation.
 
+    1.  Exclude patients with `osteosecondaire==1`.
+    2.  `OSTEOPONIA` is `case: 1` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere[^4].
+    3.  `OSTEOPOROSIS` is `case: 1` if `DMOTSCORE_mod < -2.5` and `control` elsewhere. [`DMOTSCORE_mod` has been likely Gaussian standardised + lacks of evidence supporting clear multi-modal distributions. Is there a reporting of the pre-processing operations?]{fg="red"}.
 
-  1.  Exclude patients with `osteosecondaire==1`.
-  2.  `OSTEOPONIA` is `case: 1` if `DMOTSCORE_mod <= -1.5` and `control` elsewhere^[`DMOTSCORE_mod` represents the measurement of bone mineral density at the calcaneus. While no universally accepted threshold exists for the diagnosis of osteopenia or osteoporosis, we adopt the conventional cut-off of `-1.5`.].
-  3.  `OSTEOPOROSIS` is `case: 1` if `DMOTSCORE_mod < -2.5` and `control` elsewhere. [`DMOTSCORE_mod` has been likely Gaussian standardised + lacks of evidence supporting clear multi-modal distributions. Is there a reporting of the pre-processing operations?]{fg="red"}.
+[^4]: `DMOTSCORE_mod` represents the measurement of bone mineral density at the calcaneus. While no universally accepted threshold exists for the diagnosis of osteopenia or osteoporosis, we adopt the conventional cut-off of `-1.5`.
 
 ```{r}
 #| label: tbl-OSTEOPONIA-computation
 #| lst-label: lst-OSTEOPONIA-computation
 #| lst-cap: Generate scores of interest.
-#| tbl-cap: `OSTEOPOROSIS` is considered as more severe than `OSTEOPONIA`, hence the striclty lower number of individuals affected by the disease. 
+#| tbl-cap: OSTEOPOROSIS is considered as more severe than `OSTEOPONIA`, hence the striclty lower number of individuals affected by the disease. 
 
 cartagene_phenodata <- cartagene_phenodata |> 
   dplyr::mutate(DMOTSCORE_mod = dplyr::if_else(OSTEOSECONDAIRE ==1, NA, DMOTSCORE), 
@@ -396,16 +405,15 @@ flextable::proc_freq(cartagene_phenodata,
 
 ```
 
+-   **Fracture events**:
 
-- **Fracture events**:
+    1.  We merge `FXALL_PRE5` (any fracture occurring within the five years prior to recruitment) with `FXALL_POST` (all fractures occurring during follow-up) into variable `FXALL`, being positive if an event fracture occured prior or posterior. [Which variable between `FXALL_PRE5` and `FXALL_PRE1` should be considered? Variables differ by `{r} length(which(cartagene_phenodata$FXALL_PRE5!=cartagene_phenodata$FXALL_PRE1)/nrow(cartagene_phenodata))` $\%$ overall!!]{fg="red"}
+    2.  `FXMOF_POST` (only osteoporotic fractures during follow-up)[^5] [In contrast with labelling, osteoporotic events, as stored in `FXMOF_POST`, contain both pre-, and posterior fracture events, as shown by @fig-venn-osteo.]{fg="red"}
 
-  1. We merge `FXALL_PRE5` (any fracture occurring within the five years prior to recruitment) with `FXALL_POST` (all fractures occurring during follow-up) into variable `FXALL`, being positive if an event fracture occured prior or posterior. [Which variable between `FXALL_PRE5` and `FXALL_PRE1` should be considered? Variables differ by `{r} length(which(cartagene_phenodata$FXALL_PRE5!=cartagene_phenodata$FXALL_PRE1)/nrow(cartagene_phenodata))` $\%$ overall!!]{fg="red"}
-  2. `FXMOF_POST` (only osteoporotic fractures during follow-up)^[For both `FXMOF_POST` and `FXALL_POST`, the dates of occurrence and censoring dates are available in `FXALL_POSTDATE` and `FXMOF_POSTDATE` respectively.] [In contrast with labelling, osteoporotic events, as stored in `FXMOF_POST`, contain both pre-, and posterior fracture events, as shown by @fig-venn-osteo.]{fg="red"} 
-  
+[^5]: For both `FXMOF_POST` and `FXALL_POST`, the dates of occurrence and censoring dates are available in `FXALL_POSTDATE` and `FXMOF_POSTDATE` respectively.
+
 ```{r}
 #| label: tbl-fracture-computation
-#| lst-label: lst-fracture-computation
-#| lst-cap: Aggregate all fracture events into a single one (pre- and post- operation).
 #| tbl-cap: Description of fracture events.
 #| tbl-subcap:
 #|   - "All fractures vs osteporotic fractures"
@@ -422,10 +430,10 @@ flextable::proc_freq(cartagene_phenodata,
                      "FXALL_POST", "FXALL_PRE1")
 ```
 
-  
 ```{r}
 #| label: fig-venn-osteo
 #| fig-cap: "Venn Diagrams of fracture events."
+#| echo: false
 
 labels_OSTEO <- list(`post fracture` = cartagene_phenodata$IID[cartagene_phenodata$FXALL_POST==1], 
                           `pre facture` = cartagene_phenodata$IID[cartagene_phenodata$FXALL_PRE1==1], 
@@ -434,7 +442,7 @@ labels_OSTEO <- list(`post fracture` = cartagene_phenodata$IID[cartagene_phenoda
 VennDiagram::venn.diagram(
         x = labels_OSTEO,
         filename = 'figures/venn_diagramm_fractures.png',
-        output=TRUE,
+        output=FALSE,
         # Output features
         imagetype="png" ,
         height = 480 , 
@@ -466,19 +474,17 @@ file.remove(list.files(path = "./figures", pattern = "\\.log$", full.names = TRU
 
 ```
 
-
 #### iii) Cardiovascular diseases
 
 <!-- - The variable `PWV1`, newly included in the dataset, represents an algorithmic estimation of pulse wave velocity. It is a continuous measure positively correlated with arterial stiffness. -->
 
-- The variables `CVALL_POST` and `CVMACE_POST` correspond to the occurrence of any cardiovascular event and **major adverse cardiovascular events** (MACE), including myocardial infarction, stroke, or cardiovascular death events, is the cognate subset of the most life-threatening heart conditions. [An extended follow-up dataset is available for `CVALL_POST`; however, it is not currently accessible.]{fg="red"}
+-   The variables `CVALL_POST` and `CVMACE_POST` correspond to the occurrence of any cardiovascular event and **major adverse cardiovascular events** (MACE), including myocardial infarction, stroke, or cardiovascular death events, is the cognate subset of the most life-threatening heart conditions. [An extended follow-up dataset is available for `CVALL_POST`; however, it is not currently accessible.]{fg="red"}
 
-- The variable `MCASGLOBAL_PRE_M` captures ischemic heart disease events, at baseline.
+-   The variable `MCASGLOBAL_PRE_M` captures ischemic heart disease events, at baseline.
 
-- The variable `AVCGLOBAL_PRE_M` represents the history of stroke events.
+-   The variable `AVCGLOBAL_PRE_M` represents the history of stroke events.
 
-Contingency tables of both pre-, and post-, cardiovascular events are reported in @tbl-cardiovascular-diseases. 
-
+Contingency tables of both pre-, and post-, cardiovascular events are reported in @tbl-cardiovascular-diseases.
 
 ```{r}
 #| label: tbl-cardiovascular-diseases
@@ -516,21 +522,22 @@ readr::write_tsv(cartagene_phenodata,
 
 ## Step 2: Variants extraction {#sec-variant-extraction}
 
-All the curated `VCF` files have been downloaded and processed by [Email Cartagene](mailto:access@cartagene.qc.ca). Preprocessing details are reported [here](https://cartagene.qc.ca/files/documents/other/Info_GeneticData3juillet2023.pdf)[^3]
+All the curated `VCF` files have been downloaded and processed by [Email Cartagene](mailto:access@cartagene.qc.ca). Preprocessing details are reported [here](https://cartagene.qc.ca/files/documents/other/Info_GeneticData3juillet2023.pdf)[^6]
 
-[^3]: Use of dnaseq `Genpipes` pipelines, run on Compute Canada Clusters, version 3.1.5.
+[^6]: Use of dnaseq `Genpipes` pipelines, run on Compute Canada Clusters, version 3.1.5.
 
 ### a) HDAC-family {#sec-HDAC9}
 
-
 #### i) Retrieve HDAC positions
 
--   **Objective**: extract the annotated VCF, for the 6 HDAC genes identified of interest, on chromosome 7 (see @sec-HDAC9 for Bash commands). 
+-   **Objective**: extract the annotated VCF, for the 6 HDAC genes identified of interest, on chromosome 7 (see @sec-HDAC9 for Bash commands).
 
--   **Methods**: 
+-   **Methods**:
 
-  1. We retrieve positions of the `HDAC` genes (HDAC 4, 5, 6, 7, 9 and 10) on the latest `Hg38` Genome Build with script @lst-hdac-positions. HDAC positions are reported in @tbl-hdac-positions^[Avoid using `BiomarT` package a tall costs: it's not anymore maintained, and leveraged out-of-date `Hg37` Human Genome Build. Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) for details.] 
-  2. When several start and end positions were reported for the same gene, we consider the overall `min` starting position, and the `max` end position, respectively.
+1.  We retrieve positions of the `HDAC` genes (HDAC 4, 5, 6, 7, 9 and 10) on the latest `Hg38` Genome Build with script @lst-hdac-positions. HDAC positions are reported in @tbl-hdac-positions[^7]
+2.  When several start and end positions were reported for the same gene, we consider the overall `min` starting position, and the `max` end position, respectively.
+
+[^7]: Avoid using `BiomarT` package a tall costs: it's not anymore maintained, and leveraged out-of-date `Hg37` Human Genome Build. Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) for details.
 
 ```{r}
 #| label: build human database reference
@@ -539,7 +546,6 @@ All the curated `VCF` files have been downloaded and processed by [Email Cartage
 txdb <- GenomicFeatures::makeTxDbFromUCSC(genome = "hg38", tablename = "refGene")
 AnnotationDbi::saveDb(txdb, "./data/genome_builds/human_gencode_v42.sqlite")
 ```
-
 
 ```{r}
 #| label: tbl-hdac-positions
@@ -582,31 +588,34 @@ flextable(hdac_coords) |>
   bold(bold = TRUE, part = "header")
 ```
 
-- [**Remark**: Instead of fetching start and end locations automatically, add an `INFO/GENE` field directly within the `VCF` files.]{fg="red"}
+-   [**Remark**: Instead of fetching start and end locations automatically, add an `INFO/GENE` field directly within the `VCF` files.]{fg="red"}
 
 #### ii) Extract SNPs corresponding to provided HDAC gene
 
 -   **Inputs**:
-    -   Cleaned **VCF** file of the chromosome 7 (where `HDAC-9` is present)^[All curated VCF files per chromosome are stored in `./data/genotypages/` (symbolly linked with `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged`).]. 
-    
+    -   Cleaned **VCF** file of the chromosome 7 (where `HDAC-9` is present)[^8].
 -   **Outputs**:
     -   `chr7.HDAC9.vcf`: VCF file, restrained to HDAC9 region with affiliated SNPs.
-    
 -   **Objective**: Extract annotated SNPs within `HDAC9` boundaries, as defined by the `hg38` reference genome. **Details**:
     -   Discard variants with **Minor Allele Frequency (MAF)** $< 0.01$ (in other words, the SNP must be present in at least $1\%$ of the samples).
-    -   SNPs were extracted using `bcftools view`, with shell script [extract_variants.sh](./shell/extract_variants.sh)^[`nohup` option combined with `&` character enables running variants extraction in the background, even with terminal disrupting and closing.]: 
+    -   SNPs were extracted using `bcftools view`, with shell script [extract_variants.sh](./shell/extract_variants.sh)[^9]:
+
+[^8]: All curated VCF files per chromosome are stored in `./data/genotypages/` (symbolly linked with `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged`).
+
+[^9]: `nohup` option combined with `&` character enables running variants extraction in the background, even with terminal disrupting and closing.
 
 ``` bash
 nohup ./shell/extract_variants.sh > shell/extract_variants.log 2>&1 &
 ```
 
-- **Remark:** `--maf` guarantees removal of highly recessive SNPs, present in less than $1\%$ of cases with respect to the dominant form: infrequent SNPs are indeed associated with lower statistical power.
+-   **Remark:** `--maf` guarantees removal of highly recessive SNPs, present in less than $1\%$ of cases with respect to the dominant form: infrequent SNPs are indeed associated with lower statistical power.
 
 ```{r}
 #| lst-label: lst-vcf-header
 #| lst-cap: Header lines, marked by `##` symbol, on top of VCF files. This metadata can prove useful to know exactly how SNPs were extracted in a given region.
 #| label: vcf-header
 #| echo: false
+#| eval: false
 
 
 chromosome_vcf6_file <- "../genotypage/imputation/imputation_merged/chr6.merged.clean.noMono.vcf.gz"
@@ -617,74 +626,103 @@ cat(chromosome_vcf6_content |>
       stringr::str_subset("^##"), sep = "\n")
 ```
 
-
 <!-- #### b) HLA-family {#sec-HLA} -->
 
 <!-- HLA genes are usually classified into **Class I (HLA-A, HLA-B, HLA-C)** and **Class II (HLA-DRB1, HLA-DQA1, HLA-DQB1)**, amounting in total to six main genes within the human organism. -->
 
 <!-- To retrieve their positions on the latest `Hg38` Genome Build in an automated fashion, see @lst-hla-positions. HLA positions are reported in @tbl-hla-positions. [Do not use the `BiomarT` package: it's not anymore maintained, and can only be used with out-of-date `Hg37` Human Genome Build. Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) for details. Besides, note that when several start and end positions were assigned to the same gene, we consider each time the minimal starting position, and the maximal end position.]{fg="red"} -->
 
-
-
 <!-- ```{r} -->
+
 <!-- #| label: tbl-hla-positions -->
+
 <!-- #| lst-label: lst-hla-positions -->
+
 <!-- #| lst-cap:  Use `AnnotationDBI` to fetch and retrieve automatically start and end positions of the HLA family.  -->
+
 <!-- #| tbl-cap: "HLA Gene Positions" -->
+
 <!-- # renv::install(packages = c("bioc::AnnotationDbi", "bioc::org.Hs.eg.db")) -->
 
 <!-- # retrieve latest human genome assembly -->
+
 <!-- # hla_genes <- c("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1") -->
+
 <!-- # # Convert HGNC symbols to Entrez IDs with org.Hs.eg.db -->
+
 <!-- # # 1-1 mapping, great!! -->
+
 <!-- # hla_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hla_genes,  -->
+
 <!-- #                      column = "ENTREZID", keytype = "SYMBOL", multiVals = "first") -->
+
 <!-- # hla_entrez_ids <- tibble::tibble( -->
+
 <!-- #   HGNC_SYMBOL = names(hla_entrez_ids), -->
+
 <!-- #   GENEID = hla_entrez_ids) -->
+
 <!-- #  -->
+
 <!-- # # retrieve start and end positions of HLA chromosoms -->
+
 <!-- # txdb <- AnnotationDbi::loadDb("data/genome_builds/txdb_human_gencode_v42.sqlite") -->
+
 <!-- # hla_coords <- AnnotationDbi::select(txdb,  -->
+
 <!-- #                      keys = hla_entrez_ids$GENEID,  -->
+
 <!-- #                      columns = c("TXCHROM", "TXSTART", "TXEND"),  -->
+
 <!-- #                      keytype = "GENEID") -->
+
 <!-- #  -->
+
 <!-- # # take the min and max positions for all chromosomes -->
+
 <!-- # hla_coords <- hla_coords |>  -->
+
 <!-- #   dplyr::filter(TXCHROM=="chr6") |>  -->
+
 <!-- #   dplyr::group_by(GENEID, TXCHROM) |>  -->
+
 <!-- #   dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |>  -->
+
 <!-- #   dplyr::ungroup() |>  -->
+
 <!-- #   dplyr::inner_join(hla_entrez_ids, by = "GENEID") |>  -->
+
 <!-- #   dplyr::arrange(GENEID) |>  -->
+
 <!-- #   relocate(HGNC_SYMBOL) -->
+
 <!-- # readr::write_csv(hla_coords,  -->
+
 <!-- #                  "data/gene_positions/hla_coords.csv") -->
 
 <!-- hla_coords <- readr::read_csv("data/gene_positions/hla_coords.csv",  -->
+
 <!--                               show_col_types = FALSE) -->
+
 <!-- flextable(hla_coords) |>  -->
+
 <!--   bold(bold = TRUE, part = "header") -->
+
 <!-- ``` -->
-
-
 
 ## Step 3: GWAS Analyses
 
-#### i) GLM and GWAS {#sec-GWAS}
+### i) GLM and GWAS {#sec-GWAS}
 
 -   **Objective**: Use of `PLINK2 + glm` with the first 10 principal components as covariates, see @lst-glm-bash.
     -   **Fractures analysis**: `OSTEOPOROSIS`, `OSTEOPONIA` and `fractures` using logistic regression + `DMOTSCORE_mod` was analysed using `lm`.
-    -   **Cardiovascular association analyses**:  using logistic regression.
-    
+    -   **Cardiovascular association analyses**: using logistic regression.
 -   **Input**:
     -   VCF file on the region/gene of interest
     -   Phenotypes, with individual patient IDs.
     -   Explanatory variable to predict, provided with `--pheno-name <response_variable>`.
 
 ::: {#lst-glm-bash}
-
 **Template GLM instruction for GWAS studies:**
 
 ``` bash
@@ -692,7 +730,6 @@ cat(chromosome_vcf6_content |>
 plink2 \
   --double-id \ # <1>
   --pheno ./phenotypes/merge_phenos_PCs.txt \ # <2>
-  --keep /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <2>
   --pheno-name OSTEOPONIA \ # <2>
   --vcf /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf dosage=HDS # <2>
   --glm hide-covar \ # <3>
@@ -700,21 +737,24 @@ plink2 \
   --covar-name PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \ # <3>
   --out HDAC9_OSTEOPONIA # <4>
 ```
-1.  `--1` ensure independent GWAS analyses per individual, aka the *single-sample mode*. Indeed, `PLINK` usually assumes samples are structured in a family-based format (FID IID pairs), while `--double-id` details the FID/IID format for uniquely identifying a given individual.
-2.  **GWAS inputs**: We need the *phenotype information* (provided with `--pheno` and `--keep` commands), the *response variable* (provided with `--pheno-name`) and the *VCF file* (command `--vcf`), here using the SNPs annotations for the HDAC9 gene[^4].
-3.  GWAS model options: `--glm` is the general linear model, which uses by default a *logistic regression* for categorical variables, and a *standard linear Gaussian model*, equivalent to `lm` for continuous variables^[The `hide-covar` option runs GLM, but doesn't output covariate results. Besides, note that --covar passes *quantitative covariates* (e.g., age, PCs), while `--ide-covar` passes *categorical covariates*]. `--covar` is the covariate file, with relevant explanatory variables to integrate reported with `--covar-name` (see @ for details). PCAs are used to describe the population structure in an unsupervised manner; and avoid and detect latent subgroups. 
+
+1.  The `--double-id` option ensures independent GWAS analyses per individual, aka the *single-sample mode*, stating explicitly that the `VCF` file follows a *family-based format* (FID/IID pairs).
+2.  **GWAS inputs**: We need the *phenotype information* (provided with `--pheno` and `--keep` commands), the *variable to predict* (provided with `--pheno-name`) and the *VCF file* (command `--vcf`), here using the SNPs annotations for the HDAC9 gene[^10].
+3.  GWAS model options: `--glm` is the general linear model, which uses by default a *logistic regression* for categorical variables, and a *standard linear Gaussian model*, equivalent to `lm` for continuous variables[^11]. `--covar` is the covariate file, with relevant explanatory variables to integrate reported with `--covar-name` (see \@ for details). PCAs are used to describe the population structure in an unsupervised manner; and avoid and detect latent subgroups.
 4.  The output GWAS folder, with `--out` command. Stored for now in `/mnt/projects_tn01/Cartagene/analyses/association`.
-
-[^4]: `dosage=HDS`, for Hard Dosage, provides the instruction describing genotype uncertainties for enhanced statistical power. It's particularly useful when working as here with **imputed genotypes**, where part of the SNPs were inferred using reference panels.
-
 :::
 
--   **Remark 1**: you may come up with `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high`. In this case, you may try removing completely covariates (with `--glm allow-no-covars`), or/and increase variance inflation threshold (`--vif number_vif` option)^[**Note that a VIF factor above 10 is considered problematic as it can significantly distort regression estimates.** Discussion and visualisations on [*VIF influence*](https://www.linkedin.com/feed/update/urn:li:activity:7308463515432833026/). Briefly, VIF quantifies the degree of similarity across predictor variables, as the GLM-family usually assumes independence between explanatory variables. When VIF is significant, independence assumption is discarded, which might be explained by the fact that preprocessing in  @sec-preprocessing-redundancy for removing correlated SNps and individuals are not used in subsequent GWAS differential downstream analyses.]
+[^10]: `dosage=HDS`, for Hard Dosage, provides the instruction describing genotype uncertainties for enhanced statistical power. It's particularly useful when working as here with **imputed genotypes**, where part of the SNPs were inferred using reference panels.
+
+[^11]: The `hide-covar` option runs GLM, but doesn't output covariate results. Besides, note that --covar passes *quantitative covariates* (e.g., age, PCs), while `--ide-covar` passes *categorical covariates*
+
+-   **Remark 1**: you may come up with `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high`. In this case, you may try removing completely covariates (with `--glm allow-no-covars`), or/and increase variance inflation threshold (`--vif number_vif` option)[^12]
 
 -   [**Remark 2**: All the pre-processing operations detailed in @sec-preprocessing-redundancy are only used for the computation of the PCA components, but not subsequently used in the `glm` regression for trimming strongly correlated features.]{fg="red"}
 
 -   [**Remark 3**: Add phenotype covariates, such as `SEX` or `AGE` in the regression framework, which can play a strong leverage on the impact of SNPs. [`GENESIS`](https://www.bioconductor.org/packages/devel/bioc/vignettes/GENESIS/inst/doc/assoc_test.html#mixed-model-association-testing) is a R package mixing environmental and genetic factors in a *fixed linear model* approach.]{fg="red"}
 
+[^12]: **Note that a VIF factor above 10 is considered problematic as it can significantly distort regression estimates.** Discussion and visualisations on [*VIF influence*](https://www.linkedin.com/feed/update/urn:li:activity:7308463515432833026/). Briefly, VIF quantifies the degree of similarity across predictor variables, as the GLM-family usually assumes independence between explanatory variables. When VIF is significant, independence assumption is discarded, which might be explained by the fact that preprocessing in @sec-preprocessing-redundancy for removing correlated SNps and individuals are not used in subsequent GWAS differential downstream analyses.
 
 ```{r}
 #| label: clean-logs
@@ -742,10 +782,15 @@ file.remove(log_files)
 }
 ```
 
+### ii) GWAS Visualisations
 
-#### ii) GWAS Visualisations
+For each gene-phenotype pair, we generate cognate **Manhattan plots**[^13], and $p$-values distributions, using *histograms*[^14], and **QQplots**[^15]. Core function for generating these 3 GWAS visualisations is [`generate_gwas_per_phenotype`](./R/gwas_plots.R). An example for gene `HDAC-9` is provided in @fig-GWAS-HDAC9.
 
-For each gene-phenotype pair, we generate cognate **Manhattan plots**^[More customisation available in [Manhattan plot in R: a review](https://r-graph-gallery.com/101_Manhattan_plot.html)], and  $p$-values distributions, using *histograms*^[[How to interpret a $p$-value histogram](https://varianceexplained.org/statistics/interpreting-pvalue-histogram/)], and **QQplots**^[[How I Make QQ Plots Using `ggplot2`?](https://danielroelfs.com/blog/how-i-make-qq-plots-using-ggplot/)].
+[^13]: More customisation available in [Manhattan plot in R: a review](https://r-graph-gallery.com/101_Manhattan_plot.html)
+
+[^14]: [How to interpret a $p$-value histogram](https://varianceexplained.org/statistics/interpreting-pvalue-histogram/)
+
+[^15]: [How I Make QQ Plots Using `ggplot2`?](https://danielroelfs.com/blog/how-i-make-qq-plots-using-ggplot/)
 
 ```{r}
 #| label: gwas-visu-preparation
@@ -761,28 +806,33 @@ ggsave("figures/gwas_HDAC9.pdf",
        width = 8, height = 12) 
 ```
 
-#### iii) Multiple test correction 
+::: {#fig-GWAS-HDAC9}
 
-In total, **7 phenotypes, 2613 variants tested, and $18291$ pairwise tests** were performed, imposing the need for multiple test correction. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value), relying on standard FWER correction.
+{{< pdf ./figures/gwas_HDAC9.pdf width=80% height=800 >}}
 
-- **Perspectives**: 
+:::
 
-  - [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z). 
-  - [Multiple Comparisons Using R](https://www.taylorfrancis.com/books/mono/10.1201/9781420010909/multiple-comparisons-using-frank-bretz-torsten-hothorn-peter-westfall), comprehensive resource of distinct R package strategies for correcting for multiplicity of $p$-values, from @bretz2016. Report also to @nte-MTC for an overview of existing approaches. 
+### iii) Multiple test correction
+
+In total, **7 phenotypes, 2613 variants tested, and** $18291$ pairwise tests were performed, imposing the need for multiple test correction. A significance threshold of $2.7 \times 10^{-6}$ is suggested (for the raw $p-$ value), relying on standard FWER correction.
+
+-   **Perspectives**:
+
+    -   [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z).
+    -   [Multiple Comparisons Using R](https://www.taylorfrancis.com/books/mono/10.1201/9781420010909/multiple-comparisons-using-frank-bretz-torsten-hothorn-peter-westfall), comprehensive resource of distinct R package strategies for correcting for multiplicity of $p$-values, from @bretz2016. Report also to @nte-MTC for an overview of existing approaches.
 
 ::: {#nte-MTC .callout-note title = "Classes of Multiple Test correction approaches" collapse = "true"}
 
 **Multiple comparison procedures** (MCPs) can be classified into the following adjustment methods:
 
-1. *Fixed sequential*: no adjustment as long as H0s are rejected. One non-rejection and it stops testing with all others non-rejected.
+1.  *Fixed sequential*: no adjustment as long as H0s are rejected. One non-rejection and it stops testing with all others non-rejected.
 
-2. *Fallback*: significance level (e.g. 0.05) is split between all hypotheses (can be further weighted). With rejection of the subsequent H0s, their fractions of significance level is accumulated and passed to the next comparison. 
+2.  *Callback*: significance level (e.g. 0.05) is split between all hypotheses (can be further weighted). With rejection of the subsequent H0s, their fractions of significance level is accumulated and passed to the next comparison.
 
-3. *Gatekeeper*: serial, parallel & combined trees, collecting hypotheses into families. Groups of testing can be interpreted as *gatekeepers*: only if any $H_0$ in a family is rejected that the significance is propagated to the next family. The approach is the most versatile, and can be flexibly implemented in R package [`gMCPLite`](https://merck.github.io/gMCPLite). See also [Graphical Approaches
-to Multiple Test Problems](https://baselbiometrics.github.io/home/docs/talks/20220329/2_Glimm_Bretz_Xi.pdf), for additional details.
+3.  *Gatekeeper*: serial, parallel & combined trees, collecting hypotheses into families. Groups of testing can be interpreted as *gatekeepers*: only if any $H_0$ in a family is rejected that the significance is propagated to the next family. The approach is the most versatile, and can be flexibly implemented in R package [`gMCPLite`](https://merck.github.io/gMCPLite). See also [Graphical Approaches to Multiple Test Problems](https://baselbiometrics.github.io/home/docs/talks/20220329/2_Glimm_Bretz_Xi.pdf), for additional details.
 
 :::
-  
+
 # Perspectives
 
 ## Beyond GWAS analyses: retrieve automatically variants of interest {#sec-post-GWAS}
@@ -791,10 +841,10 @@ This analysis is not formally a GWAS study, but rather a *gene-centric* study, p
 
 Alternatively, we could consider a data-driven, and more agnostic approach, to refine the selection of gene candidates. Several approaches to that end have been implemented:
 
-- @gnanaolivu2025bb proposed in [A clinical knowledge graph-based framework to prioritize candidate genes for facilitating diagnosis of Mendelian diseases and rare genetic conditions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06096-2), the `phenotype prioritization and analysis for rare diseases, PPAR` algorithm to rank genes based on *human phenotype ontology (HPO)* terms.[^5]. In details, `PPAR` combines embeddings from the *human knowledge graph*, incorporating genes, HPO terms, and gene ontology annotations connections. For each input HPO term, a prioritized list of genes is returned based on their relevance and similarity to the HPO term.
-- @bridges2025bb developped in [Towards a standard benchmark for phenotype-driven variant and gene prioritisation algorithms: `PhEval`, Phenotypic inference Evaluation framework](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06105-4) a unified benchmarking platform to clean inputs for *phenotype-driven VGPAs*. Variant and Gene Prioritisation Algorithms integrate complex and multi-modal datasets, such as ontologies and gene-to-phenotype associations, to predict the most influential and promising gene targets controlling the evolution of rare diseases. Model is available as GitHub Repo [`PhEval`](https://github.com/monarch-initiative/pheval).
+-   @gnanaolivu2025bb proposed in [A clinical knowledge graph-based framework to prioritize candidate genes for facilitating diagnosis of Mendelian diseases and rare genetic conditions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06096-2), the `phenotype prioritization and analysis for rare diseases, PPAR` algorithm to rank genes based on *human phenotype ontology (HPO)* terms.[^16]. In details, `PPAR` combines embeddings from the *human knowledge graph*, incorporating genes, HPO terms, and gene ontology annotations connections. For each input HPO term, a prioritized list of genes is returned based on their relevance and similarity to the HPO term.
+-   @bridges2025bb developped in [Towards a standard benchmark for phenotype-driven variant and gene prioritisation algorithms: `PhEval`, Phenotypic inference Evaluation framework](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06105-4) a unified benchmarking platform to clean inputs for *phenotype-driven VGPAs*. Variant and Gene Prioritisation Algorithms integrate complex and multi-modal datasets, such as ontologies and gene-to-phenotype associations, to predict the most influential and promising gene targets controlling the evolution of rare diseases. Model is available as GitHub Repo [`PhEval`](https://github.com/monarch-initiative/pheval).
 
-[^5]: Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.
+[^16]: Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.
 
 ## Incorporation of familial pedigrees and/or environmental factors
 
@@ -804,35 +854,25 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 
 ## Inference of polygenic scores
 
-- [`XPRS`: A Tool for Interpretable and Explainable Polygenic Risk Score](10.1093/bioinformatics/btaf143), from @kim2025b, is a R package for inferring the *polygenic risk score* for assessing genetic susceptibility to diseases, providing additional interpretation and visualisation tools.  PRSs are further split and classified into genes and single nucleotide polymorphism (SNP) contribution scores via *Shapley additive explanations* (SHAPs), visualised as **Manhattan plots**, **LocusZoom-like** plots and tables at the population and individual levels.
+-   [`XPRS`: A Tool for Interpretable and Explainable Polygenic Risk Score](10.1093/bioinformatics/btaf143), from @kim2025b, is a R package for inferring the *polygenic risk score* for assessing genetic susceptibility to diseases, providing additional interpretation and visualisation tools. PRSs are further split and classified into genes and single nucleotide polymorphism (SNP) contribution scores via *Shapley additive explanations* (SHAPs), visualised as **Manhattan plots**, **LocusZoom-like** plots and tables at the population and individual levels.
 
 -   [`PNL`: a software to build polygenic risk scores using a Super Learner approach based on `PairNet`, a Convolutional Neural Network](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf071/8015614), from @chen2025b.
 
-## Multimodal integration
+## Multi-modal integration
 
-- @zhao2025bib implements [`SC-VAR`: a computational tool for interpreting polygenic disease risks using single-cell epigenomic data](https://academic.oup.com/bib/article/26/2/bbaf123/8092303?searchresult=1&login=false), a novel computational tool available as a GitHub repo and Python application: [`SC-VAR` GitHub](https://github.com/gefeiZ/SC_VAR). `SC-VAR` uses single-cell *epigenomic* data to predict functional outcomes of the identified disease-associated *GWAS variants*, enhancing their interpretability. Under the hood, relies on [`MAGMA` linear modelling framework](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004219), developed by @leeuw2015pcb.
+-   @zhao2025bib implements [`SC-VAR`: a computational tool for interpreting polygenic disease risks using single-cell epigenomic data](https://academic.oup.com/bib/article/26/2/bbaf123/8092303?searchresult=1&login=false), a novel computational tool available as a GitHub repo and Python application: [`SC-VAR` GitHub](https://github.com/gefeiZ/SC_VAR). `SC-VAR` uses single-cell *epigenomic* data to predict functional outcomes of the identified disease-associated *GWAS variants*, enhancing their interpretability. Under the hood, relies on [`MAGMA` linear modelling framework](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004219), developed by @leeuw2015pcb.
 
 # Appendix {.appendix}
 
-## Deal with large files committed unwillingly
+## Clean Git History
 
-``` bash 
+``` bash
 
 python3 bin/git-filter-repo --path data/variants/chr6.HLA-complex.vcf --invert-paths
 
 ```
 
-
-
 ## Bibliographic References {.appendix}
 
 ::: {#refs}
 :::
-
-<!-- ## Bash commands to retrieve files' content matching a string pattern, and files extensions {.appendix} -->
-
-<!-- ``` bash -->
-<!-- find . -type f \( -iname "*.sh" -o -iname "*.py" -o -iname "*.Rmd" -o -iname "*.qmd" -o -iname "*.txt" \) -exec grep -Hn "genotypage" {} \; -->
-
-<!-- find . -type f -name "*.sas7bdat" -->
-<!-- ``` -->
