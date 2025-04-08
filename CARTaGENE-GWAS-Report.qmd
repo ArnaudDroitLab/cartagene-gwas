@@ -897,7 +897,7 @@ Lots of intermediate files are not required for downstream analyses, hence it wo
 
 ## Tools Installation {#sec-tools-install}
 
-{{< include tools_installation.qmd >}}
+# {{< include tools_installation.qmd >}}
 
 ## Clean Git History
 
