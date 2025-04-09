@@ -68,9 +68,43 @@ The code, main results (figures and tables), along with reports, are versioned i
 
 ## Important Questions to Address!! {#sec-questions}
 
--   [Check Human reference genome assembly, see @sec-HDAC9. Indeed, among the five genome arrays assembled in @sec-white-selection, at least one turns out to have been mapped against `GRCh37 (hg19)` older reference instead of recent `hg38 (GRCh38, 2013)`.]{fg="red"}
+-   [Check Human reference genome assembly, see @sec-HDAC9. Indeed, among the five genome arrays assembled in @sec-white-selection, most have been mapped against `GRCh37 (hg19)`, but at least one has been mapped against the recent `hg38 (GRCh38, 2013)` versio, report to page 38 in @pelletier2022.]{fg="red"} 
+- We definitely do not have the most recent version of `CarTaGene` (in the paper, around $30000$ samples mentioned, against $20000$ in my database + )
 -   [Why starting from BAM/BED/BIM pre-processed files in @sec-white-selection, instead of `FASTQ` files available in `/mnt/projects_tn01/Cartagene/data/merged`? Related question: we use the `BAM/BED/BIM` files stored in folder `/mnt/projects_tn01/Cartagene/analyses/QC` for PCA computation in @sec-preprocessing-redundancy, but `VCF` files stored in `/mnt/projects_tn01/Cartagene/analyses/variants_extraction` for running the GWAS analyses, for which reason?]{fg="red"}
--   [Why use a biased *gene-centric approach*, instead of true GWAS (further discussed in @sec-post-GWAS)?]{fg="red"}
+-   [Why use a biased *gene-centric approach*, instead of true GWAS (further discussed in @sec-post-GWAS)?]{fg="red"}. Specifically, in constrast with the conclusions of this limited study on a single gene, namely `HDAC-9`, running a whole GWAS analysis on CarTaGene revealed promising and significant SNPs, as illustrated in @fig-gwas-global. 
+    - An alternative to *candidate gene* association studies relies on the *linkage analysis approach*, which leverages familial kinships to map genetic variants underlying common human diseasess. **This strategy requires both genetic data and detailed family pedigrees.**, report to for details.
+
+- Address intrinsic heteoreigninity of the sampled population, see [A benchmark study on current GWAS models in admixed populations](https://doi.org/10.1093/bib/bbad437), from @yang2024bib. 
+
+[**GWAS of `CarTaGene` SNPs using TOPMed Merge-Impute (first, merge all genotype arrays, then impute SNPs) strategy**.  obtained through genotyping and imputation using the TOPMed Imputation Server under two analytic workflows: Impute-Merge and Merge-Impute. Manhattan plots depict the genome-wide association study (GWAS) results for variants (*Single nucleotide polymorphisms* and *insertion-deletion*), before and after imputation. The $y$-axis represents the $–\log_{10}(p)$ for the association of each variant. [Variants with $p$-values equal to zero are highlighted in green]{fg="green"}, while the [horizontal red line indicates the genome-wide *significance threshold*.]{fg="red"}. The total sample consisted of $27,422$ individuals.](./figures/global-GWAS.png){#fig-gwas-global}
+
+
+# Introduction
+
+## GWAS analyses: Concepts
+
+- Fundamental paper, aka [Genome-wide association studies: theoretical and practical concerns](https://www.nature.com/articles/nrg1522), from @wang2005nrg.
+
+- Book reviewing pros and cons of statistical GWAS approaches, from [Overview of Statistical Methods for Genome-Wide Association Studies](https://doi.org/10.1007/978-1-62703-447-0_6), from @hayes2013gasagp.
+
+- [Genome-wide association studies](https://www.nature.com/articles/s43586-021-00056-9), from @uffelmann2021nrmp.
+
+## Original design
+
+- [Cohort profile of the `CARTaGENE` study: Quebec’s population-based biobank for public health and personalized genomics](https://doi.org/10.1093/ije/dys160), from @awadalla2013ijoe. 
+
+## Impute unobserved GWAS in `CARTaGENE` 
+
+- Most of the `CARTaGENE` samples are *WES* (whole exome sequencing), instead of most complete *WGS* (whole genome sequencing).
+
+- [Évaluation de l’imputation des données génétiques Canadiennes-Françaises](https://umontreal.scholaris.ca/bitstreams/83d64aa1-da20-4a6f-8ae0-9dcb0165417d/download), from @pelletier2022. **Key points**:
+  - **Introduction section**: presents the most critical issues when dealing with GWAS information: linkage disequilibrium, 
+  - Paper, corresponding to Chapter 3, named "Evaluation of genetic imputation in the French-Canadian founder population", pages 54-93. Details the underlying imputation strategy, derived from TOPMed (for Trans-Omics for Precision Medicine). 
+  - Page 61: Describes the imputation strategy, along with the preprocessing steps. Code for reproducing the analyses is [FC-imputation](https://github.com/JustinPelletier/FC-imputation), kinda messy I must admit. **Imputation performance** is much lower for SNPs exhibiting `MAF<0.01`, strongly promoting early discarding.  
+  - **Page 99**: Strong polymorphism in some regions, such as `HLA`.
+  - [Reach out [Julie Hussin](mailto:julie.hussin@umontreal.ca), or [LinkedIn profile](https://www.linkedin.com/in/hussinju/)
+, who actually ran the PCA computations and global GWAS analyses.]{fg="red"}
+
 
 # Analyses
 
@@ -852,13 +886,21 @@ To compute the adjusted *significance threshold*, we applied a `FWER`-like appro
 
 :::
 
-# Perspectives
+# Perspectives, aka post GWAS
 
-## Explore non-coding regions
+## Explore non-coding, regulatory regions (from WES to WGS)
 
 - Paper [Systematic differences in discovery of genetic effects on gene expression and complex traits](https://www.nature.com/articles/s41588-023-01529-1), from @mostafavi2023ng, suggest extending extraction of genomic regions of interest beyond coding sequences (report to @sec-variant-extraction for current approach). Indeed, the article demonstrates that most of identified signals originate from nearby gene regulatory sites. 
 
-## Beyond GWAS analyses: retrieve automatically variants of interest {#sec-post-GWAS}
+- [`EPInformer`: a scalable deep learning framework for gene expression prediction by integrating promoter-enhancer sequences with multimodal epigenomic data](https://www.biorxiv.org/content/10.1101/2024.08.01.606099v1), from @lin2024. Avalaible as a [GH package](https://github.com/pinellolab/EPInformer). Can infer and predict gene expression from promoter and enhancer sequences paired with epigenomic signals; identify the most significant enhancers; and identify *regulatory sequences* and *transcription factor binding motifs*.
+
+## Post-GWAS: Explore other types of genetic variations
+
+- [Genome-wide association testing beyond SNPs](https://www.nature.com/articles/s41576-024-00778-y), from @harris2025nrg
+
+- [Benchmarking post-GWAS analysis tools in major depression: Challenges and implications](https://www.frontiersin.org/journals/genetics/articles/10.3389/fgene.2022.1006903/full), from @perez-granado2022fg.
+
+## Post-GWAS: Retrieve automatically variants of interest {#sec-post-GWAS}
 
 This analysis is not formally a GWAS study, but rather a *gene-centric* study, pre-selecting genes based on prior knowledge and/or intuition.
 
@@ -869,21 +911,29 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 
 [^16]: Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.
 
-## Incorporation of familial pedigrees and/or environmental factors
+## Post-GWAS: Incorporate familial pedigrees
 
 -   [Genome-wide association study of fat content and fatty acid composition of shea tree.](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-025-11344-z), from @attikora2025bg. Under the hood, relies on the `mrMLM` R package to include both the *population structure matrix* and the *kinship matrix*. Provides a complete GWAS pipeline, including a number of meaningful illustrations.
 
 -   [`BHCox`: Bayesian heredity-constrained Cox proportional hazards models for detecting gene-environment interactions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06077-5), from @sun2025bb. Under the hood, relies on the `brms` R package.
 
-## Inference of polygenic scores
+## Post-GWAS: Polygenic risk scores
+
+- [Optimizing and benchmarking polygenic risk scores with GWAS summary statistics](https://doi.org/10.1186/s13059-024-03400-w), from @zhao2024gb.
 
 -   [`XPRS`: A Tool for Interpretable and Explainable Polygenic Risk Score](10.1093/bioinformatics/btaf143), from @kim2025b, is a R package for inferring the *polygenic risk score* for assessing genetic susceptibility to diseases, providing additional interpretation and visualisation tools. PRSs are further split and classified into genes and single nucleotide polymorphism (SNP) contribution scores via *Shapley additive explanations* (SHAPs), visualised as **Manhattan plots**, **LocusZoom-like** plots and tables at the population and individual levels.
 
 -   [`PNL`: a software to build polygenic risk scores using a Super Learner approach based on `PairNet`, a Convolutional Neural Network](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf071/8015614), from @chen2025b.
 
-## Multi-modal integration
+## Post-GWAS: Orthogonal integration
+
+### Epigenomic
 
 -   @zhao2025bib implements [`SC-VAR`: a computational tool for interpreting polygenic disease risks using single-cell epigenomic data](https://academic.oup.com/bib/article/26/2/bbaf123/8092303?searchresult=1&login=false), a novel computational tool available as a GitHub repo and Python application: [`SC-VAR` GitHub](https://github.com/gefeiZ/SC_VAR). `SC-VAR` uses single-cell *epigenomic* data to predict functional outcomes of the identified disease-associated *GWAS variants*, enhancing their interpretability. Under the hood, relies on [`MAGMA` linear modelling framework](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004219), developed by @leeuw2015pcb.
+
+### eQTL (quantitative expression)
+
+- [`FIVEx`](https://github.com/statgen/fivex) is a web-based interface to explore `CarTaGene` to visualize and query eQTL (quantitative trait loci) data in various ways. **Would need a stringent maintainance!!**
 
 # Appendix {.appendix}
 
@@ -897,7 +947,7 @@ Lots of intermediate files are not required for downstream analyses, hence it wo
 
 ## Tools Installation {#sec-tools-install}
 
-# {{< include tools_installation.qmd >}}
+ {{< include tools_installation.qmd >}}
 
 ## Clean Git History
 
