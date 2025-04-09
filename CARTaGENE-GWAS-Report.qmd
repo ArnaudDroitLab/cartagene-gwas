@@ -68,15 +68,15 @@ The code, main results (figures and tables), along with reports, are versioned i
 
 ## Important Questions to Address!! {#sec-questions}
 
--   [Check Human reference genome assembly, see @sec-HDAC9. Indeed, among the five genome arrays assembled in @sec-white-selection, most have been mapped against `GRCh37 (hg19)`, but at least one has been mapped against the recent `hg38 (GRCh38, 2013)` versio, report to page 38 in @pelletier2022.]{fg="red"} 
+-   [Check Human reference genome assembly, see @sec-HDAC9. Indeed, among the five genome arrays assembled in @sec-white-selection, most have been mapped against `GRCh37 (hg19)`, but at least one has been mapped against the recent `hg38 (GRCh38, 2013)` version, report to page 38 in @pelletier2022.]{fg="red"} 
 - We definitely do not have the most recent version of `CarTaGene` (in the paper, around $30000$ samples mentioned, against $20000$ in my database + )
 -   [Why starting from BAM/BED/BIM pre-processed files in @sec-white-selection, instead of `FASTQ` files available in `/mnt/projects_tn01/Cartagene/data/merged`? Related question: we use the `BAM/BED/BIM` files stored in folder `/mnt/projects_tn01/Cartagene/analyses/QC` for PCA computation in @sec-preprocessing-redundancy, but `VCF` files stored in `/mnt/projects_tn01/Cartagene/analyses/variants_extraction` for running the GWAS analyses, for which reason?]{fg="red"}
--   [Why use a biased *gene-centric approach*, instead of true GWAS (further discussed in @sec-post-GWAS)?]{fg="red"}. Specifically, in constrast with the conclusions of this limited study on a single gene, namely `HDAC-9`, running a whole GWAS analysis on CarTaGene revealed promising and significant SNPs, as illustrated in @fig-gwas-global. 
-    - An alternative to *candidate gene* association studies relies on the *linkage analysis approach*, which leverages familial kinships to map genetic variants underlying common human diseasess. **This strategy requires both genetic data and detailed family pedigrees.**, report to for details.
+-   [Why use a biased *gene-centric approach*, instead of true GWAS (further discussed in @sec-post-GWAS)?]{fg="red"}. Specifically, in contrast with the conclusions of this limited study on a single gene, namely `HDAC-9`, running a whole GWAS analysis on `CarTaGene` revealed promising and significant SNPs, as illustrated in @fig-gwas-global. 
+    - An alternative to *candidate gene* association studies relies on the *linkage analysis approach*, which uses familial pedigrees to map genetic variants underlying common human diseases. **This strategy requires both genetic data and detailed family pedigrees.**, report to for details.
 
-- Address intrinsic heteoreigninity of the sampled population, see [A benchmark study on current GWAS models in admixed populations](https://doi.org/10.1093/bib/bbad437), from @yang2024bib. 
+- Address intrinsic heterogeneity of the sampled population, see [A benchmark study on current GWAS models in admixed populations](https://doi.org/10.1093/bib/bbad437), from @yang2024bib. 
 
-[**GWAS of `CarTaGene` SNPs using TOPMed Merge-Impute (first, merge all genotype arrays, then impute SNPs) strategy**.  obtained through genotyping and imputation using the TOPMed Imputation Server under two analytic workflows: Impute-Merge and Merge-Impute. Manhattan plots depict the genome-wide association study (GWAS) results for variants (*Single nucleotide polymorphisms* and *insertion-deletion*), before and after imputation. The $y$-axis represents the $–\log_{10}(p)$ for the association of each variant. [Variants with $p$-values equal to zero are highlighted in green]{fg="green"}, while the [horizontal red line indicates the genome-wide *significance threshold*.]{fg="red"}. The total sample consisted of $27,422$ individuals.](./figures/global-GWAS.png){#fig-gwas-global}
+![**GWAS of `CarTaGene` SNPs using `TOPMed` Merge-Impute (first, merge all genotype arrays, then impute SNPs) strategy**.  obtained through genotyping and imputation using the `TOPMed` Imputation Server under two analytic workflows: Impute-Merge and Merge-Impute. Manhattan plots depict the genome-wide association study (GWAS) results for variants (*Single nucleotide polymorphisms* and *insertion-deletion*), before and after imputation. The $y$-axis represents the $–\log_{10}(p)$ for the association of each variant. [Variants with $p$-values equal to zero are highlighted in green]{fg="green"}, while the [horizontal red line indicates the genome-wide *significance threshold*.]{fg="red"}. The total sample consisted of $27,422$ individuals.](./figures/global-GWAS.png){#fig-gwas-global}
 
 
 # Introduction
@@ -99,11 +99,10 @@ The code, main results (figures and tables), along with reports, are versioned i
 
 - [Évaluation de l’imputation des données génétiques Canadiennes-Françaises](https://umontreal.scholaris.ca/bitstreams/83d64aa1-da20-4a6f-8ae0-9dcb0165417d/download), from @pelletier2022. **Key points**:
   - **Introduction section**: presents the most critical issues when dealing with GWAS information: linkage disequilibrium, 
-  - Paper, corresponding to Chapter 3, named "Evaluation of genetic imputation in the French-Canadian founder population", pages 54-93. Details the underlying imputation strategy, derived from TOPMed (for Trans-Omics for Precision Medicine). 
+  - Paper, corresponding to Chapter 3, named "Evaluation of genetic imputation in the French-Canadian founder population", pages 54-93. Details the underlying imputation strategy, derived from `TOPMed` (for Trans-Omics for Precision Medicine). 
   - Page 61: Describes the imputation strategy, along with the preprocessing steps. Code for reproducing the analyses is [FC-imputation](https://github.com/JustinPelletier/FC-imputation), kinda messy I must admit. **Imputation performance** is much lower for SNPs exhibiting `MAF<0.01`, strongly promoting early discarding.  
   - **Page 99**: Strong polymorphism in some regions, such as `HLA`.
-  - [Reach out [Julie Hussin](mailto:julie.hussin@umontreal.ca), or [LinkedIn profile](https://www.linkedin.com/in/hussinju/)
-, who actually ran the PCA computations and global GWAS analyses.]{fg="red"}
+  - Reach out [Julie Hussin](mailto:julie.hussin@umontreal.ca), or [LinkedIn profile](https://www.linkedin.com/in/hussinju/), who actually ran the PCA computations and global GWAS analyses.]{fg="red"}
 
 
 # Analyses
@@ -792,7 +791,7 @@ nohup ./shell/plink2_gwas.sh > shell/plink2_gwas.log 2>&1 &
 
 [^10]: `dosage=HDS`, for Hard Dosage, provides the instruction describing genotype uncertainties for enhanced statistical power. It's particularly useful when working as here with **imputed genotypes**, where part of the SNPs were inferred using reference panels.
 
-[^11]: The `hide-covar` option runs GLM, but doesn't output covariate results. Besides, note that --covar passes *quantitative covariates* (e.g., age, PCs), while `--ide-covar` passes *categorical covariates*
+[^11]: The `hide-covar` option runs GLM, but doesn't output covariate results. Besides, note that `--covar` passes *quantitative covariates* (e.g., age, PCs), while `--ide-covar` passes *categorical covariates*
 
 -   **Remark 1**: you may come up with `Error: Cannot proceed with --glm regression on phenotype 'TACAIX', since variance inflation factor for covariate 'PC2' is too high`. In this case, you may try removing completely covariates (with `--glm allow-no-covars`), or/and increase variance inflation threshold (`--vif number_vif` option)[^12]
 
@@ -907,7 +906,8 @@ This analysis is not formally a GWAS study, but rather a *gene-centric* study, p
 Alternatively, we could consider a data-driven, and more agnostic approach, to refine the selection of gene candidates. Several approaches to that end have been implemented:
 
 -   @gnanaolivu2025bb proposed in [A clinical knowledge graph-based framework to prioritize candidate genes for facilitating diagnosis of Mendelian diseases and rare genetic conditions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06096-2), the `phenotype prioritization and analysis for rare diseases, PPAR` algorithm to rank genes based on *human phenotype ontology (HPO)* terms.[^16]. In details, `PPAR` combines embeddings from the *human knowledge graph*, incorporating genes, HPO terms, and gene ontology annotations connections. For each input HPO term, a prioritized list of genes is returned based on their relevance and similarity to the HPO term.
--   @bridges2025bb developped in [Towards a standard benchmark for phenotype-driven variant and gene prioritisation algorithms: `PhEval`, Phenotypic inference Evaluation framework](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06105-4) a unified benchmarking platform to clean inputs for *phenotype-driven VGPAs*. Variant and Gene Prioritisation Algorithms integrate complex and multi-modal datasets, such as ontologies and gene-to-phenotype associations, to predict the most influential and promising gene targets controlling the evolution of rare diseases. Model is available as GitHub Repo [`PhEval`](https://github.com/monarch-initiative/pheval).
+
+-   @bridges2025bb developed in [Towards a standard benchmark for phenotype-driven variant and gene prioritisation algorithms: `PhEval`, Phenotypic inference Evaluation framework](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06105-4) a unified benchmarking platform to clean inputs for *phenotype-driven VGPAs*. Variant and Gene Prioritisation Algorithms integrate complex and multi-modal datasets, such as ontologies and gene-to-phenotype associations, to predict the most influential and promising gene targets controlling the evolution of rare diseases. Model is available as GitHub Repo [`PhEval`](https://github.com/monarch-initiative/pheval).
 
 [^16]: Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.
 
@@ -933,7 +933,7 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 
 ### eQTL (quantitative expression)
 
-- [`FIVEx`](https://github.com/statgen/fivex) is a web-based interface to explore `CarTaGene` to visualize and query eQTL (quantitative trait loci) data in various ways. **Would need a stringent maintainance!!**
+- [`FIVEx`](https://github.com/statgen/fivex) is a web-based interface to explore `CarTaGene` to visualize and query eQTL (quantitative trait loci) data in various ways. **Would need a stringent maintenance!!**
 
 # Appendix {.appendix}
 
@@ -947,7 +947,7 @@ Lots of intermediate files are not required for downstream analyses, hence it wo
 
 ## Tools Installation {#sec-tools-install}
 
- {{< include tools_installation.qmd >}}
+ <!-- {{< include tools_installation.qmd >}} -->
 
 ## Clean Git History
 
