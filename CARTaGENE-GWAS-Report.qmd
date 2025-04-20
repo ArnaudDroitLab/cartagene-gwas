@@ -603,7 +603,6 @@ AnnotationDbi::saveDb(txdb, "./data/genome_builds/human_gencode_v42.sqlite")
 #| lst-label: lst-hdac-positions
 #| lst-cap:  Use `AnnotationDBI` to fetch and retrieve automatically start and end positions of the HDAC family. 
 #| tbl-cap: "HDAC Gene Positions"
-#| cache: true
 
 hdac_genes <- c("HDAC4", "HDAC5", "HDAC6", "HDAC7", "HDAC9", "HDAC10")
 

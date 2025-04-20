@@ -1,1 +1,1 @@
-Sitemap: https://ArnaudDroitLab.github.io/cartagene-gwas/sitemap.xml
+Sitemap: https://arnauddroitlab.github.io/cartagene-gwas/sitemap.xml

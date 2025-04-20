@@ -5,6 +5,7 @@ project:
 book:
   title: "GWAS Analyses utilising the CARTaGENE database"
   author: "Bastien CHASSAGNOL and Marie-Pier SCOT-KELLY and Clément and Fabrice"
+  reader-mode: true
   date: last-modified
   chapters:
     - index.qmd
@@ -13,10 +14,11 @@ book:
     - tools_installation.qmd
     - references.qmd
   repo-url: https://github.com/ArnaudDroitLab/cartagene-gwas
-  site-url: https://ArnaudDroitLab.github.io/cartagene-gwas
+  site-url: https://arnauddroitlab.github.io/cartagene-gwas/
   repo-branch: master
   repo-actions: [edit, issue, source]
   open-graph: true
+  downloads: [docx]
   back-to-top-navigation: true
   search:
     location: sidebar
@@ -58,7 +60,7 @@ execute:
   error: false
   eval: true
   echo: true
-  freeze: true # avoid re-running R script analyses when publishing them on GH
+  freeze: auto # avoid re-running R script analyses when publishing them on GH
 tbl-cap-location: bottom
 editor: source
 

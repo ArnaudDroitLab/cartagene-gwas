@@ -43,8 +43,8 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-9a023c9ade86a60361e96e3e3f11bc54.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-9396e5f8af4bbe0cc15f56e48a6dfa77.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-d8920ef85e07a689f57392d84d1886da.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-0f9470d4953b37d849ae37bce3f66ad5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-614f1822cc30897a01453187531b1033.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -74,6 +74,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<style>html{ scroll-behavior: smooth; }</style>
 <script async="" src="https://hypothes.is/embed.js"></script>
 <script>
   window.document.addEventListener("DOMContentLoaded", function (_event) {
@@ -84,7 +85,7 @@ ul.task-list li input[type="checkbox"] {
 
 <meta property="og:title" content="GWAS Analyses utilising the CARTaGENE database">
 <meta property="og:description" content="">
-<meta property="og:image" content="https://ArnaudDroitLab.github.io/cartagene-gwas/assets/cover.png">
+<meta property="og:image" content="https://arnauddroitlab.github.io/cartagene-gwas/assets/cover.png">
 <meta property="og:site_name" content="GWAS Analyses utilising the CARTaGENE database">
 <meta property="og:image:height" content="474">
 <meta property="og:image:width" content="600">
@@ -115,9 +116,15 @@ ul.task-list li input[type="checkbox"] {
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">GWAS and CartaGene</a> 
-        <div class="sidebar-tools-main">
+        <div class="sidebar-tools-main tools-wide">
     <a href="https://github.com/ArnaudDroitLab/cartagene-gwas" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="./GWAS-Analyses-utilising-the-CARTaGENE-database.docx" title="Download Docx" class="quarto-navigation-tool px-1" aria-label="Download Docx"><i class="bi bi-file-word"></i></a>
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
 </div>
     </div>
       </div>
@@ -214,6 +221,7 @@ ul.task-list li input[type="checkbox"] {
 <p><a href="assets/cover.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="assets/cover.png" title="GWAS Analyses utilising the CARTaGENE database" class="quarto-cover-image img-fluid"></a></p>
 <section id="welcome" class="level1 unnumbered">
 <h1 class="unnumbered">Welcome</h1>
+<a class="github-button" href="https://github.com/ArnaudDroitLab/cartagene-gwas" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star this website on Github">Star this website on Github</a><script async="" defer="" src="https://buttons.github.io/buttons.js"></script>
 <p>This is the online book for running and reproducing: <strong>GWAS Analyses utilising the <code>CARTaGENE</code> database</strong>.</p>
 
 
@@ -454,7 +462,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/ArnaudDroitLab\.github\.io\/cartagene-gwas");
+      var filterRegex = new RegExp("https:\/\/arnauddroitlab\.github\.io\/cartagene-gwas\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -886,4 +894,5 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

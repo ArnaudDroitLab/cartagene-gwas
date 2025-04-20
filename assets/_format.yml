@@ -12,7 +12,9 @@ format:
     code-fold: show
     code-link: true
     code-annotations: hover
+    code-overflow: wrap
+    smooth-scroll: true
     page-layout: full
     from: markdown+emoji
-  # docx:
-  #   toc-title: Contents
+  docx:
+    toc-title: Contents
