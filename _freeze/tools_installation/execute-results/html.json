@@ -1,0 +1,15 @@
+{
+  "hash": "ea9a105c364fa8737b6a7a8c43cc9bbb",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Tools installation\"\nformat: html\neditor: source\nengine: knitr\n---\n\n\n\n\n## Build from scratch command-line GWAS tools {#sec-tools-install}\n\n### Bash commands to install `plink2`\n\n\n\n\n\n::: {.cell layout-align=\"center\"}\n\n```{.bash .cell-code}\n# Step 1: Download the latest PLINK2 binary\nwget -O ./bin/plink2.zip \"https://s3.amazonaws.com/plink2-assets/alpha6/plink2_linux_x86_64_20250129.zip\" \n\nunzip -d ./bin/plink2 ./bin/plink2.zip && rm ./bin/plink2.zip\n\n# Step 4: Ensure the binary is executable\nchmod 777 ./bin/plink2\n\n# Step 5: Verify installation\n./bin/plink2 --version\n\n```\n:::\n\n\n\n\n### Bash commands to install `bcftools`\n\n\n\n\n::: {.cell layout-align=\"center\"}\n\n```{.bash .cell-code}\nwget -O ./bin/bcftools-1.21.tar.bz2 \"https://github.com/samtools/bcftools/releases/download/1.21/bcftools-1.21.tar.bz2\" \n\ntar -xjvf ./bin/bcftools-1.21.tar.bz2 -C ./bin/ && rm ./bin/bcftools-1.21.tar.bz2\n\ncd ./bin/bcftools-1.21\n./configure --prefix=/mnt/projects_tn01/Cartagene/cartagene-gwas/bin/bcftools\n\nmake\nmake install\n\nrm -rf ./bin/bcftools-1.21\n\n```\n:::\n\n\n\n\n### Bash commands to save path executions\n\n\n\n\n::: {.cell layout-align=\"center\"}\n\n```{.bash .cell-code}\n# Temporary (Current Shell Session Only)\nexport PATH=./bin/bcftools/bin:$PATH  \n\n# Semi temporary (for a given user)\necho 'export PATH=./bin/bcftools/bin:$PATH' >> ~/.bashrc\nsource ~/.bashrc\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

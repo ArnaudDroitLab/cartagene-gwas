@@ -9,9 +9,6 @@ haven
 flextable
 dplyr
 ggplot2
-grid
-futile.logger
-VennDiagram
 downlit
 xml2
 stats4
