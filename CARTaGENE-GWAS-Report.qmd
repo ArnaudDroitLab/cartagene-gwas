@@ -146,11 +146,16 @@ library(ggplot2)
 library(downlit)
 library(xml2)
 
+# Avoid warning "Replace previous import ‘utils::findMatches’ by ‘S4Vectors::findMatches’ when loading ‘AnnotationDbi’"
+library(conflicted)
+conflicted::conflict_prefer("findMatches", "S4Vectors")
+conflicted::conflicts_prefer(base::setdiff, base::intersect, 
+                             base::setequal, base::union)
+conflicted::conflicts_prefer(dplyr::select, dplyr::filter)
+
+
 ## Retrieve gene positions
 library(org.Hs.eg.db)  ## Provides gene symbol to Entrez ID mapping
-# avoid warning "Replace previous import ‘utils::findMatches’ by ‘S4Vectors::findMatches’ when loading ‘AnnotationDbi’"
-conflicted::conflict_prefer("findMatches", "S4Vectors")
-
 
 ## for generating nice visualisations
 source("R/gwas_plots.R")
