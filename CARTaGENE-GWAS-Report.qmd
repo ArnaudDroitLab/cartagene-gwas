@@ -100,10 +100,57 @@ The code, main results (figures and tables), along with reports, are versioned i
 - [Évaluation de l’imputation des données génétiques Canadiennes-Françaises](https://umontreal.scholaris.ca/bitstreams/83d64aa1-da20-4a6f-8ae0-9dcb0165417d/download), from @pelletier2022. **Key points**:
   - **Introduction section**: presents the most critical issues when dealing with GWAS information: linkage disequilibrium, 
   - Paper, corresponding to Chapter 3, named "Evaluation of genetic imputation in the French-Canadian founder population", pages 54-93. Details the underlying imputation strategy, derived from `TOPMed` (for Trans-Omics for Precision Medicine). 
-  - Page 61: Describes the imputation strategy, along with the preprocessing steps. Code for reproducing the analyses is [FC-imputation](https://github.com/JustinPelletier/FC-imputation), kinda messy I must admit. **Imputation performance** is much lower for SNPs exhibiting `MAF<0.01`, strongly promoting early discarding.  
+  - **Page 61**: Describes the imputation strategy, along with the preprocessing steps. Code for reproducing the analyses is [FC-imputation](https://github.com/JustinPelletier/FC-imputation), kinda messy I must admit. **Imputation performance** is much lower for SNPs exhibiting `MAF<0.01`, strongly promoting early discarding.  
   - **Page 99**: Strong polymorphism in some regions, such as `HLA`.
   - Reach out [Julie Hussin](mailto:julie.hussin@umontreal.ca), or [LinkedIn profile](https://www.linkedin.com/in/hussinju/), who actually ran the PCA computations and global GWAS analyses.]{fg="red"}
 
+## Sample Size Calculation
+
+- Should be carried out prior to collecting GWAS samples.
+- [Sample Size Calculation in Genetic Association Studies: A Practical Approach](https://pmc.ncbi.nlm.nih.gov/articles/PMC9863799/#sec5-life-13-00235), from @politi2023l, notably listing the following tools:
+  - [`GENPWR`: Power and Sample Size Calculations for Genetic Association Studies in the Presence of Genetic Model Mis-Specification](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7666027/), from @moore2019hh and avalaible as a [R package](https://cran.r-project.org/web/packages/genpwr/vignettes/vignette.html), is able to compute the sample size for dichotomous or continuous outcomes in gene-only studies, implementing additive, dominant and recessive models (see @tip-genetic-model for details).
+  - [`PGA`: Power for Genetic Association](https://pmc.ncbi.nlm.nih.gov/articles/PMC2387159/), from @menashe2008bg is able to adjust for **multiple comparisons**, in contrast with `GENPWR`, and LD between the marker and the disease allele. [Seems not avalaible anymore]{fg="red"}
+  
+::: {#tip-genetic-model .callout-tip title="Genetic models"}
+
+- **Genotype**: At a given SNP with alleles **A** (major) and **a** (minor), the genotypes are:
+  - **AA** (homozygous *major*)
+  - **Aa** (*heterozygous*)
+  - **aa** (homozygous *minor*)
+
+- **Phenotype**: A continuous or binary outcome (e.g., height, disease status)
+
+- **Notations**: $Y$: phenotype, $G$: genotype, $\beta$: effect size, $X$: covariates (e.g., age, sex, PCs) and $\epsilon$: error term.
+
+--- 
+
+🧬 Genetic Models in GWAS
+
+- **Additive model**: in @eq-genetic-model, 'gene cat' is converted as `AA = 0`, `Aa = 1` and `aa = 2`. Each additional copy of the minor allele increases the trait linearly.
+
+- **Dominant model**: in @eq-genetic-model, 'gene cat' is converted as `AA = 0`, `Aa = 1` and `aa = 1`. Presence of **at least one** minor allele confers full effect (no dose response).
+
+- **Recessive model**: in @eq-genetic-model, 'gene cat' is converted as `AA = 0`, `Aa = 0` and `aa = 1`. Only **homozygous minor** genotype has an effect.
+
+$$
+Y = \beta_0 + \beta_1 G_{\text{gene cat}} + \beta_2 X + \epsilon
+$$ {#eq-genetic-model}
+
+---
+
+| Model     | Coding        | Assumes effect from        | Pros                                | Cons                                |
+|-----------|---------------|-----------------------------|-------------------------------------|-------------------------------------|
+| Additive  | 0 / 1 / 2     | Per additional allele       | High power, interpretable           | May miss non-linear effects         |
+| Dominant  | 0 / 1 / 1     | Any copy of minor allele    | Fits some Mendelian patterns        | Oversimplifies if dose-response     |
+| Recessive | 0 / 0 / 1     | Two copies of minor allele  | Fits true recessive traits          | Low power with rare alleles         |
+
+: Main Genetic Models. In conclusion, use **additive** by default (most comprehensive), and explore **dominant/recessive** in **post-GWAS** or when you have strong biological priors (e.g., loss-of-function){#tbl-genetic-model}
+
+---
+
+Other less Frequent Models include **Overdominant**, in which the effect only occurs in **heterozygotes**. Rarely used in GWAS, but relevant for **heterozygote advantage** scenarios (e.g., sickle cell and malaria).
+
+:::
 
 # Analyses
 
@@ -165,7 +212,7 @@ The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of
 -   **Inputs**:
 
     -   **Phenotype Ids of white individuals**: `eur_only/cartagene_self_reported_EUR.plink_format.txt`
-    -   **BIM/BED/FAM/hh** folder generated with `--make-bed` command: `analyses/QC/merge_5_datasets`. [It seems that among the 5 genotype arrays concatenated, at least one genotype, namely `gsa.17k.final.hg19.bim,` has been mapped thanks to `GRCh37 (hg19)` reference instead of more recent `hg38 (GRCh38, 2013)` version.]{fg="red"}\]
+    -   **BIM/BED/FAM/hh** folder generated with `--make-bed` command: `analyses/QC/merge_5_datasets`. [It seems that among the 5 genotype arrays concatenated, at least one genotype, namely `gsa.17k.final.hg19.bim,` has been mapped thanks to `GRCh37 (hg19)` reference instead of more recent `hg38 (GRCh38, 2013)` version.]{fg="red"}$$
 
 -   **Objective**: Keep white individuals and remove SNPs variants with genotyping rate $<0.95$. The **genotyping rate** measures the proportion of successfully genotyped markers and indicates how complete the genotype data is. Removing SNPs with low Genotyping Rate increases Missing Data imputation performance, and overall maintains higher statistical power.
 
@@ -887,6 +934,10 @@ To compute the adjusted *significance threshold*, we applied a `FWER`-like appro
 
 # Perspectives, aka post GWAS
 
+## Post-hoc GWAS
+
+- [Collect information on variants with LLM-like `VarChat` app](https://varchat.engenome.com/)
+
 ## Explore non-coding, regulatory regions (from WES to WGS)
 
 - Paper [Systematic differences in discovery of genetic effects on gene expression and complex traits](https://www.nature.com/articles/s41588-023-01529-1), from @mostafavi2023ng, suggest extending extraction of genomic regions of interest beyond coding sequences (report to @sec-variant-extraction for current approach). Indeed, the article demonstrates that most of identified signals originate from nearby gene regulatory sites. 
@@ -949,13 +1000,13 @@ Lots of intermediate files are not required for downstream analyses, hence it wo
 
  <!-- {{< include tools_installation.qmd >}} -->
 
-## Clean Git History
+<!-- ## Clean Git History -->
 
-``` bash
+<!-- ``` bash -->
 
-python3 bin/git-filter-repo --path data/variants/chr6.HLA-complex.vcf --invert-paths
+<!-- python3 bin/git-filter-repo --path data/variants/chr6.HLA-complex.vcf --invert-paths -->
 
-```
+<!-- ``` -->
 
 ## Bibliographic References {.appendix}
 
