@@ -5,6 +5,8 @@ editor: source
 engine: knitr
 ---
 
+## Build from scratch command-line GWAS tools {#sec-tools-install}
+
 ### Bash commands to install `plink2`
 
 

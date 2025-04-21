@@ -1,0 +1,70 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "GWAS Analyses utilising the CARTaGENE database"
+  author: "Bastien CHASSAGNOL and Marie-Pier SCOT-KELLY and Clément and Fabrice"
+  reader-mode: true
+  date: last-modified
+  chapters:
+    - index.qmd
+    - CARTaGENE-GWAS-Report.qmd
+    - CARTaGENE-sample-size.qmd
+  appendices:
+    - tools_installation.qmd
+    - references.qmd
+  repo-url: https://github.com/ArnaudDroitLab/cartagene-gwas
+  site-url: https://arnauddroitlab.github.io/cartagene-gwas/
+  repo-branch: master
+  repo-actions: [edit, issue, source]
+  open-graph: true
+  downloads: [docx]
+  back-to-top-navigation: true
+  search:
+    location: sidebar
+  page-footer:
+    background: light
+    center:  |
+       Written by Bastien CHASSAGNOL and Marie-Pier SCOTT-KELLY, with <a href="https://quarto.org/">Quarto</a>.
+    right:
+      - icon: github
+        href: https://github.com/ArnaudDroitLab/cartagene-gwas
+  sidebar:
+    title: "GWAS and CartaGene"
+    style: "docked"
+    background: "light"
+    collapse-level: 4
+  cover-image: assets/cover.png
+  favicon: assets/favicon.png
+
+# Metadata, such as authors information
+metadata-files:
+  - assets/_format.yml
+  - assets/_knitr.yml
+
+# Shared options across output formats
+number-sections: true
+engine: knitr
+toc: true
+toc-depth: 4
+lang: en-GB
+bibliography: assets/Cartagene.bib
+link-citations: true
+highlight-style: github
+filters:
+  - highlight-text
+# code options
+execute:
+  message: false
+  warning: false
+  error: false
+  eval: true
+  echo: true
+  freeze: auto # avoid re-running R script analyses when publishing them on GH
+tbl-cap-location: bottom
+editor: source
+
+
+
+

@@ -1,0 +1,96 @@
+---
+title: "CartaGene Sample Size estimation"
+---
+
+## Setup for statistical power analyses
+
+```{r}
+#| label: setup
+## data wrangling and visualisations
+library(dplyr)
+library(ggplot2)
+library(flextable)
+## Required for code linking
+library(downlit)
+library(xml2)
+
+## Report automated QCs for VCF files
+library(vcfR)
+```
+
+## VCF files Reporting with `vcfR` {#sec-vcfr}
+
+### Load VCF files
+
+```{r}
+#| label: vcf-file-load
+#| cache: true
+#| message: true
+#| warning: true
+
+vcf_file <- "./data/variants/chr17.HDAC5.vcf"
+vcf <- vcfR::read.vcfR(vcf_file)
+
+
+chrom <- vcfR::create.chromR(name = "Supercontig", vcf = vcf) |> 
+  # removing low quality variants, none of these metrics is reported
+  # vcfR::masker(min_QUAL = 0, min_DP = 350, max_DP = 650, 
+  #              min_MQ = 59.5, max_MQ = 60.5) |> 
+  vcfR::proc.chromR(win.size = 1e2)
+
+```
+
+### VCF files QC
+
+```{r}
+#| label: fig-plot-qc-per-chrom
+vcfR::chromoqc(chrom, dp.alpha = 22,
+               xlim = c(min(chrom@var.info$POS), max(chrom@var.info$POS)))
+
+plot(chrom)
+```
+
+- In vcfR we refer to this form of plot as a chromo plot. This plot summarizes data from our three data sources. Annotation data is represented on the lowest plot. Features in the annotation file (e.g., gene models, exons, etc.) are represented as dark red rectangles. Above the annotation track is a sequence track. Here called nucleotides are represented in green while uncalled nucleotides (Ns) appear in red. Depending on the quality of your genome, it may include stretches of uncalled nucleotides. Above the annotation track is a windowing analysis of G/C content. This track includes marginal barplots to summarize its contents, as do the tracks above it. The next track summarizes the number of variants per window. Above that we see dot plots for quality, mapping quality and read depth.
+
+- The raw read depth and mapping quality have been extracted from the INFO column of the VCF data. The quality is from the QUAL column of the VCF data. And the variant count per window was summarized during the windowing analysis performed by proc.chromR(). The raw read depth appears fairly continuous, an observation which appears consistent with the above chromo plots. Mapping quality appears to be predominantly one value (about 60), this may not have been apparent in the chromo plots. The variant count per window summarizes the degree of variability we’ve observed along our chromosome. The peak near zero indicates that many windows lack variants
+
+
+```{r}
+#| label: vcf-tidy-format
+
+vcf_tidy <- vcfR::vcfR2tidy(vcf)
+
+vcfR::vcf_field_names(vcf, tag = "INFO")
+vcfR::vcf_field_names(vcf, tag = "FORMAT")
+
+test <- table(vcf_tidy$fix$TYPED_ONLY)
+
+```
+
+
+
+https://knausb.github.io/vcfR_documentation/visualization_1.html
+
+
+## VCF Files QC with `VariantAnnotation`
+
+- [`VariantAnnotation` provides more comprehensive features with respect to @sec-vcfr, yet, relies on external dependencies such as `bfctools`, and often faces memory limitations.]{fg="red"}
+
+```{r}
+#| label: read-vcf-file
+#| eval: false
+#| echo: true
+
+vcf <- VariantAnnotation::readVcf(file = "./data/variants/chr6.HLA-A.vcf", 
+                                  genome = "hg38")
+
+# General vcf file structure ----
+
+VariantAnnotation::header(vcf)
+VariantAnnotation::samples(VariantAnnotation::header(vcf))
+VariantAnnotation::geno(VariantAnnotation::header(vcf))
+
+# Variant-specific fields, such as alternative allele configurations
+VariantAnnotation::alt(vcf)[1:5]
+```
+

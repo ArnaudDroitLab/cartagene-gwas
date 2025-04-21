@@ -11,3 +11,5 @@ old_reports/
 
 # large data files
 data/variants/
+
+/.quarto/

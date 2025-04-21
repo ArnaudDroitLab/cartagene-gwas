@@ -1,59 +1,17 @@
 ---
-title: "GWAS Analyses utilising the CARTaGENE database"
-author: "Bastien CHASSAGNOL and Marie-Pier and Clément and Fabrice"
-date: last-modified	
-number-sections: true
-engine: knitr
-toc: true
-toc-depth: 4
-lang: en-GB
-bibliography: Cartagene.bib
-link-citations: true
-highlight-style: github
-filters:
-  - highlight-text
-# code options
-execute:
-  message: false
-  warning: false
-  error: false
-  eval: true
-  echo: true
-# Table options
-tbl-cap-location: bottom
-format: 
-  html:
-    embed-resources: true
-    toc-location: left
-    toc-expand: 3
-    theme:
-      light: cosmo
-      dark: cosmo
-    sidebar: true
-    lightbox: true
-    comments: 
-      hypothesis: true
-    # code options
-    code-fold: show
-    code-link: true
-    code-annotations: hover
-    page-layout: full
-    collapse: true
-  docx:
-    toc-title: Contents
-editor: source
+title: "Main GWAS pipeline"
 ---
 
-# Reproduce the pipeline and questions to address
+## Reproduce the pipeline and questions to address
 
-## Two-step pipeline
+### Two-step pipeline
 
 Assuming PCA components have already been computed (report to @sec-white-selection and @sec-preprocessing-redundancy for details), follow this two-step protocol:
 
 i.  Retrieve all known variants associated with your genes of interest in @sec-variant-extraction, and generate the corresponding `VCF` file.
 ii. Change the response variable to predict in @lst-glm-bash (with option `--glm`, the model applied should adjust automatically whether the outcome is binary or continuous).
 
-## Reproducibility
+### Reproducibility
 
 Two command-lines tools are needed for reproducing the analyses and/or delivering new outcomes:
 
@@ -66,7 +24,7 @@ The code, main results (figures and tables), along with reports, are versioned i
 -   [`GitHub` project: `cartagene-gwas`](https://github.com/ArnaudDroitLab/cartagene-gwas) to version the code
 -   R project + `renv()` to create a reproducible and standalone computational environment.
 
-## Important Questions to Address!! {#sec-questions}
+### Important Questions to Address!! {#sec-questions}
 
 -   [Check Human reference genome assembly, see @sec-HDAC9. Indeed, among the five genome arrays assembled in @sec-white-selection, most have been mapped against `GRCh37 (hg19)`, but at least one has been mapped against the recent `hg38 (GRCh38, 2013)` version, report to page 38 in @pelletier2022.]{fg="red"} 
 - We definitely do not have the most recent version of `CarTaGene` (in the paper, around $30000$ samples mentioned, against $20000$ in my database + )
@@ -79,9 +37,9 @@ The code, main results (figures and tables), along with reports, are versioned i
 ![**GWAS of `CarTaGene` SNPs using `TOPMed` Merge-Impute (first, merge all genotype arrays, then impute SNPs) strategy**.  obtained through genotyping and imputation using the `TOPMed` Imputation Server under two analytic workflows: Impute-Merge and Merge-Impute. Manhattan plots depict the genome-wide association study (GWAS) results for variants (*Single nucleotide polymorphisms* and *insertion-deletion*), before and after imputation. The $y$-axis represents the $–\log_{10}(p)$ for the association of each variant. [Variants with $p$-values equal to zero are highlighted in green]{fg="green"}, while the [horizontal red line indicates the genome-wide *significance threshold*.]{fg="red"}. The total sample consisted of $27,422$ individuals.](./figures/global-GWAS.png){#fig-gwas-global}
 
 
-# Introduction
+## Introduction
 
-## GWAS analyses: Concepts
+### GWAS Litterature Review
 
 - Fundamental paper, aka [Genome-wide association studies: theoretical and practical concerns](https://www.nature.com/articles/nrg1522), from @wang2005nrg.
 
@@ -89,11 +47,11 @@ The code, main results (figures and tables), along with reports, are versioned i
 
 - [Genome-wide association studies](https://www.nature.com/articles/s43586-021-00056-9), from @uffelmann2021nrmp.
 
-## Original design
+### Original Design
 
 - [Cohort profile of the `CARTaGENE` study: Quebec’s population-based biobank for public health and personalized genomics](https://doi.org/10.1093/ije/dys160), from @awadalla2013ijoe. 
 
-## Impute unobserved GWAS in `CARTaGENE` 
+### Impute unobserved GWAS in `CARTaGENE` 
 
 - Most of the `CARTaGENE` samples are *WES* (whole exome sequencing), instead of most complete *WGS* (whole genome sequencing).
 
@@ -104,11 +62,11 @@ The code, main results (figures and tables), along with reports, are versioned i
   - **Page 99**: Strong polymorphism in some regions, such as `HLA`.
   - Reach out [Julie Hussin](mailto:julie.hussin@umontreal.ca), or [LinkedIn profile](https://www.linkedin.com/in/hussinju/), who actually ran the PCA computations and global GWAS analyses.]{fg="red"}
 
-## Sample Size Calculation
+### Sample Size Calculation
 
-- Should be carried out prior to collecting GWAS samples.
+- [Should be carried out prior to collecting GWAS samples!!]{fg="red"}
 - [Sample Size Calculation in Genetic Association Studies: A Practical Approach](https://pmc.ncbi.nlm.nih.gov/articles/PMC9863799/#sec5-life-13-00235), from @politi2023l, notably listing the following tools:
-  - [`GENPWR`: Power and Sample Size Calculations for Genetic Association Studies in the Presence of Genetic Model Mis-Specification](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7666027/), from @moore2019hh and avalaible as a [R package](https://cran.r-project.org/web/packages/genpwr/vignettes/vignette.html), is able to compute the sample size for dichotomous or continuous outcomes in gene-only studies, implementing additive, dominant and recessive models (see @tip-genetic-model for details).
+  - [`GENPWR`: Power and Sample Size Calculations for Genetic Association Studies in the Presence of Genetic Model Mis-Specification](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7666027/), from @moore2019hh and available as a [R package](https://cran.r-project.org/web/packages/genpwr/vignettes/vignette.html), is able to compute the sample size for dichotomous or continuous outcomes in gene-only studies, implementing additive, dominant and recessive models (see @tip-genetic-model for details).
   - [`PGA`: Power for Genetic Association](https://pmc.ncbi.nlm.nih.gov/articles/PMC2387159/), from @menashe2008bg is able to adjust for **multiple comparisons**, in contrast with `GENPWR`, and LD between the marker and the disease allele. [Seems not avalaible anymore]{fg="red"}
   
 ::: {#tip-genetic-model .callout-tip title="Genetic models"}
@@ -152,62 +110,70 @@ Other less Frequent Models include **Overdominant**, in which the effect only oc
 
 :::
 
-# Analyses
+## Analyses
 
-## Setup enviroment
+### Setup enviroment
 
-### Bash configuration:
+#### Bash configuration:
 
 We use *symbolic links* to encapsulate the whole project, see [`ln -s` Post](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_the-most-underrated-unix-command-for-bioinformatics-activity-7287842704753848321-qhe) for details:
 
 ```{bash}
-# Render executive files findable
+## Render executive files findable
 export PATH=./bin/bcftools/bin:$PATH
 export PATH=./bin/plink2:$PATH
 
-# Check versions
+## Check versions
 plink2 --version
 echo -e "\n"
 bcftools --version
 
-# Create symbolic links to organise everythin within the same folder
-# warning: if original content is deleted, everything broke!!!!!!
+## Create symbolic links to organise everything within the same folder
+## warning: if original content is deleted, everything broke!!!!!!
 echo ln -s ./data/genotypages/ /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged
 ```
 
-### R configuration:
+#### R configuration:
 
 ```{r}
 #| label: setup
-# data wrangling and visualisations
+## data wrangling and visualisations
 library(haven)
 library(flextable)
 library(dplyr)
 library(ggplot2)
-# Required for code linking
+## Required for code linking
 library(downlit)
 library(xml2)
 
-# Retrieve gene positions
-library(org.Hs.eg.db)  # Provides gene symbol to Entrez ID mapping
+# Avoid warning "Replace previous import ‘utils::findMatches’ by ‘S4Vectors::findMatches’ when loading ‘AnnotationDbi’"
+library(conflicted)
+conflicted::conflict_prefer("findMatches", "S4Vectors")
+conflicted::conflicts_prefer(base::setdiff, base::intersect, 
+                             base::setequal, base::union)
+conflicted::conflicts_prefer(dplyr::select, dplyr::filter)
 
-# for generating nice visualisations
+
+## Retrieve gene positions
+library(org.Hs.eg.db)  ## Provides gene symbol to Entrez ID mapping
+
+## for generating nice visualisations
 source("R/gwas_plots.R")
 ```
 
-## Compute PCA **loadings**
+### Compute PCA **loadings**
 
-### Step 1: Merge genotype arrays {#sec-white-selection}
+#### Step 1: Merge genotype arrays {#sec-white-selection}
 
 Genotypes were split into five different genotyping arrays. Arrays were merged together using Bash script [merge_datasets.sh](/mnt/projects_tn01/Cartagene/analyses/QC/merge_datasets.sh), and command `--bmerge` of tool `plink2`. This command only keeps matching **SNPs** and **alleles** across the 5 arrays.
 
 The resulting `BAM` files (sequence alignments), `BED` files (genomic regions of interest, for viewers), `BIM` (SNP information) and `FAM` (phenotype data, such as individuals and pedigree), are listed in folder `/mnt/projects_tn01/Cartagene/analyses/QC`, with prefix `merge_5_*` (for 5 genotypes concatenated).
 
-### Step 2: Preprocessing for Removing Correlated Features {#sec-preprocessing-redundancy}
+#### Step 2: Preprocessing for Removing Correlated Features {#sec-preprocessing-redundancy}
 
 **Remark**: the prefix `eur_only` stands for Caucasian phenotypes.
 
-#### i) Trim missing SNPs {#sec-missing-SNPs}
+##### i) Trim missing SNPs {#sec-missing-SNPs}
 
 -   **Inputs**:
 
@@ -229,7 +195,7 @@ plink2 \
   --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095
 ```
 
-#### ii) Hardy-Weinberg Disequilibrium {#sec-HWD}
+##### ii) Hardy-Weinberg Disequilibrium {#sec-HWD}
 
 -   **Inputs**:
 
@@ -249,9 +215,9 @@ plink2 \
   --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06
 ```
 
-#### iii) Linkage Disequilibrium {#sec-LD}
+##### iii) Linkage Disequilibrium {#sec-LD}
 
-##### Local LD analysis {#sec-local-LD}
+###### Local LD analysis {#sec-local-LD}
 
 -   **Inputs**:
 
@@ -266,13 +232,13 @@ plink2 \
 -   **Bash command**:
 
 ``` bash
-# identify SNPs with low LD
+## identify SNPs with low LD
 plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06 \
   --indep-pairwise 50 5 0.5 \
   --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps
   
-# save pruned SNPs associated with low LD
+## save pruned SNPs associated with low LD
 plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06 \
   --extract /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.prune.in \
@@ -280,7 +246,7 @@ plink2 \
   --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile
 ```
 
-##### Global LD analysis from prior expert knowledge {#sec-global-LD}
+###### Global LD analysis from prior expert knowledge {#sec-global-LD}
 
 -   **Inputs**:
 
@@ -304,7 +270,7 @@ plink2 \
   --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.high_LD_excluded
 ```
 
-#### iv) Exclude affiliated individuals based on high IBD scores
+##### iv) Exclude affiliated individuals based on high IBD scores
 
 -   **Inputs**:
 
@@ -322,7 +288,7 @@ plink2 \
 
 ``` bash
 
-# Calculate IBD, select individuals with IBD above 0.2 for further pruning
+## Calculate IBD, select individuals with IBD above 0.2 for further pruning
 
 plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile \
@@ -332,7 +298,7 @@ plink2 \
   --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.IBD
 
 
-# Remove related individuals, in a two-stage process
+## Remove related individuals, in a two-stage process
 
 plink2 \
   --bfile /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile \
@@ -348,7 +314,7 @@ plink2 \
   --remove /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/related_ids/IBD.genome2.related_individuals_to_remove.txt 
 ```
 
-### Step 3: PCA {#sec-PCA}
+#### Step 3: PCA Computation and Population Genetic Evaluation {#sec-PCA}
 
 -   **Inputs**:
 
@@ -356,8 +322,6 @@ plink2 \
     -   **phenotype IDs** listed in `merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_2_of_2`, where all affiliated patients have been removed.
 
 -   **Objective**: Compute PCA and keep the 10 first principal components.
-
--   [**Remark**: use visualizations, such as *scree plots*, elbow point or/and *Tracy-Widom Test* to select the final number of PCs, instead of hard threshold, and on the other hand, scatter plots to identify latent structures. See details [here](https://www.linkedin.com/posts/joachim-schork_statistics-research-visualanalytics-activity-7251577056570785795-b6Rk) and [there](https://www.linkedin.com/feed/update/urn:li:activity:730919293617122508)]{fg="red"}.
 
 -   **Bash command**:
 
@@ -371,9 +335,19 @@ plink2 \
   --pca 10
 ```
 
-## Run GWAS analyses
+- **Remarks**:
 
-### Step 1: Phenotype feature extraction {#sec-phenotype-extraction}
+  -   [**Remark 1**: use visualizations, such as *scree plots*, elbow point or/and *Tracy-Widom Test* to select the final number of PCs, instead of hard threshold, and on the other hand, scatter plots to identify latent structures. See details [here](https://www.linkedin.com/posts/joachim-schork_statistics-research-visualanalytics-activity-7251577056570785795-b6Rk) and [there](https://www.linkedin.com/feed/update/urn:li:activity:730919293617122508)]{fg="red"}.
+
+  - **Remark 2**: The [`popgen` *'Calculating Basic Population Genetic Statistics from SNP Data'*](https://popgen.nescent.org/StartSNP.html#genetic-diversity-observed-and-expected-heterozygosity) details how to generate statistics quantifying patterns of genetic diversity, such as LD and Hardy-Weinberg, in a given population. 
+  The [`popgen` *'Calculating genetic differentiation and clustering methods from SNP data'* vignette](https://popgen.nescent.org/DifferentiationSNP.html) describes both unsupervised, PCA-like and discriminatory approaches to identify latent genetic sub-populations.  
+  Finally, the [`popgen` *'Individual Based Genetic Distance for SNP Data'*](https://popgen.nescent.org/2015-05-18-Dist-SNP.html) reports different individual genetic distances, enabling to spot and trim indiviudal outliers with a significant distinct genetic distribution.
+  
+  - **Remark 3**: To evaluate within population diversity, geneticists typically report the level of *heterozygosity* as a general metric, see [`vcfR`'Genetic differentiation' Vignette](https://knausb.github.io/vcfR_documentation/genetic_differentiation.html). 
+
+### Run GWAS analyses
+
+#### Step 1: Phenotype feature extraction {#sec-phenotype-extraction}
 
 Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`. Variables of interest can e downloaded [here](./data/phenotypes/cartagene_response_variables.xlsx):
 
@@ -388,7 +362,7 @@ flextable(cartagene_response_variables) |>
 
 ```
 
-#### i) Merge genotype IDs, phenotypes and PCAs values
+##### i) Merge genotype IDs, phenotypes and PCAs values
 
 General phenotype features are provided in
 
@@ -449,7 +423,7 @@ cartagene_phenodata <- PCs |>
 
 -   [**Remark**: Avoid using French CSV settings, switch to universal convention, where delimiter is a comma: `,`]{fg="red"}
 
-#### ii) Bone damage: osteoporosis and fractures
+##### ii) Bone damage: osteoporosis and fractures
 
 -   The response variables `OSTEOPONIA` and `OSTEOPOROSIS` have been computed following these rules [@lst-OSTEOPONIA-computation], with the resulting contingency tables reported in @tbl-OSTEOPONIA-computation.
 
@@ -523,43 +497,43 @@ ggVennDiagram::ggVennDiagram(labels_OSTEO) +
   scale_fill_distiller(palette = "RdBu") +
   labs(title = "Venn Diagrams of fracture events",
        caption = Sys.Date())
-# Chart
-# VennDiagram::venn.diagram(
-#         x = labels_OSTEO,
-#         filename = 'figures/venn_diagramm_fractures.png',
-#         output=FALSE,
-#         # Output features
-#         imagetype="png" ,
-#         height = 480 , 
-#         width = 480 , 
-#         resolution = 300,
-#         # Circles
-#         lwd = 2,
-#         lty = 'blank',
-#         col=c("#440154ff", '#21908dff', '#fde725ff'),
-#         fill = c(scales::alpha("#440154ff",0.3), scales::alpha('#21908dff',0.3), scales::alpha('#fde725ff',0.3)),
-#         # Numbers
-#         fontface = "bold",
-#         fontfamily = "sans",
-#         # Set names
-#         cex = 0.5,
-#         cat.cex = 0.3,
-#         cat.fontface = "bold",
-#         cat.default.pos = "outer",
-#         cat.pos = c(-27, 27, 135),
-#         cat.dist = c(0.055, 0.055, 0.085),
-#         cat.fontfamily = "sans",
-#         rotation = 1
-# )
+## Chart
+## VennDiagram::venn.diagram(
+##         x = labels_OSTEO,
+##         filename = 'figures/venn_diagramm_fractures.png',
+##         output=FALSE,
+##         ## Output features
+##         imagetype="png" ,
+##         height = 480 , 
+##         width = 480 , 
+##         resolution = 300,
+##         ## Circles
+##         lwd = 2,
+##         lty = 'blank',
+##         col=c("#440154ff", '#21908dff', '#fde725ff'),
+##         fill = c(scales::alpha("#440154ff",0.3), scales::alpha('#21908dff',0.3), scales::alpha('#fde725ff',0.3)),
+##         ## Numbers
+##         fontface = "bold",
+##         fontfamily = "sans",
+##         ## Set names
+##         cex = 0.5,
+##         cat.cex = 0.3,
+##         cat.fontface = "bold",
+##         cat.default.pos = "outer",
+##         cat.pos = c(-27, 27, 135),
+##         cat.dist = c(0.055, 0.055, 0.085),
+##         cat.fontfamily = "sans",
+##         rotation = 1
+## )
 
 knitr::include_graphics("figures/venn_diagramm_fractures.png")
 
-# final cleaning
-# file.remove(list.files(path = "./figures", pattern = "\\.log$", full.names = TRUE))
+## final cleaning
+## file.remove(list.files(path = "./figures", pattern = "\\.log$", full.names = TRUE))
 
 ```
 
-#### iii) Cardiovascular diseases
+##### iii) Cardiovascular diseases
 
 <!-- - The variable `PWV1`, newly included in the dataset, represents an algorithmic estimation of pulse wave velocity. It is a continuous measure positively correlated with arterial stiffness. -->
 
@@ -592,7 +566,7 @@ Finally, we save the updated phenotype dataset as a Tab-separated file, using `r
 #| lst-label: lst-cartagene-plink2-prep
 #| lst-cap:  Turns out that newest versions of `plink2` impose explicit encoding of categorical variables, denoting as 1 'controls', and 2 as 'case'. 
 
-# define Boolean categorical variables
+## define Boolean categorical variables
 categorical_variables <- cartagene_response_variables$Features[cartagene_response_variables$Type=="Boolean"]
 
 cartagene_phenodata <- cartagene_phenodata |>
@@ -602,18 +576,18 @@ cartagene_phenodata <- cartagene_phenodata |>
 readr::write_tsv(cartagene_phenodata, 
                  file="data/phenotypes/merge_phenos_PCs.txt")
 
-# cartagene_phenodata <- readr::read_tsv("data/phenotypes/merge_phenos_PCs.txt")
+## cartagene_phenodata <- readr::read_tsv("data/phenotypes/merge_phenos_PCs.txt")
 ```
 
-## Step 2: Variants extraction {#sec-variant-extraction}
+### Step 2: Variants extraction {#sec-variant-extraction}
 
 All the curated `VCF` files have been downloaded and processed by [Email Cartagene](mailto:access@cartagene.qc.ca). Preprocessing details are reported [here](https://cartagene.qc.ca/files/documents/other/Info_GeneticData3juillet2023.pdf)[^6]
 
 [^6]: Use of dnaseq `Genpipes` pipelines, run on Compute Canada Clusters, version 3.1.5.
 
-### a) HDAC-family {#sec-HDAC9}
+#### a) HDAC-family {#sec-HDAC9}
 
-#### i) Retrieve HDAC positions
+##### i) Retrieve HDAC positions
 
 -   **Objective**: extract the annotated VCF, for the 6 HDAC genes identified of interest, on chromosome 7 (see @sec-HDAC9 for Bash commands).
 
@@ -637,26 +611,25 @@ AnnotationDbi::saveDb(txdb, "./data/genome_builds/human_gencode_v42.sqlite")
 #| lst-label: lst-hdac-positions
 #| lst-cap:  Use `AnnotationDBI` to fetch and retrieve automatically start and end positions of the HDAC family. 
 #| tbl-cap: "HDAC Gene Positions"
-#| cache: true
 
 hdac_genes <- c("HDAC4", "HDAC5", "HDAC6", "HDAC7", "HDAC9", "HDAC10")
 
-# Convert HGNC symbols to Entrez IDs with org.Hs.eg.db
-# 1-1 mapping, great!!
+## Convert HGNC symbols to Entrez IDs with org.Hs.eg.db
+## 1-1 mapping, great!!
 hdac_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hdac_genes,
                      column = "ENTREZID", keytype = "SYMBOL", multiVals = "first")
 hdac_entrez_ids <- tibble::tibble(
   HGNC_SYMBOL = names(hdac_entrez_ids),
   GENEID = hdac_entrez_ids)
 
-# retrieve start and end positions of hdac chromosoms
+## retrieve start and end positions of hdac chromosoms
 txdb <- AnnotationDbi::loadDb("data/genome_builds/human_gencode_v42.sqlite")
 hdac_coords <- AnnotationDbi::select(txdb,
                      keys = hdac_entrez_ids$GENEID,
                      columns = c("TXCHROM", "TXSTART", "TXEND"),
                      keytype = "GENEID")
 
-# take the min and max positions for all chromosomes
+## take the min and max positions for all chromosomes
 hdac_coords <- hdac_coords |>
   dplyr::group_by(GENEID, TXCHROM) |>
   dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |>
@@ -667,15 +640,15 @@ hdac_coords <- hdac_coords |>
 readr::write_csv(hdac_coords,
                  "data/gene_positions/hdac_coords.csv")
 
-# hdac_coords <- readr::read_csv("data/gene_positions/hdac_coords.csv", 
-#                               show_col_types = FALSE)
+## hdac_coords <- readr::read_csv("data/gene_positions/hdac_coords.csv", 
+##                               show_col_types = FALSE)
 flextable(hdac_coords) |> 
   bold(bold = TRUE, part = "header")
 ```
 
 -   [**Remark**: Instead of fetching start and end locations automatically, add an `INFO/GENE` field directly within the `VCF` files.]{fg="red"}
 
-#### ii) Extract SNPs corresponding to provided HDAC gene
+##### ii) Extract SNPs corresponding to provided HDAC gene
 
 -   **Inputs**:
     -   Cleaned **VCF** file of the chromosome 7 (where `HDAC-9` is present)[^8].
@@ -685,7 +658,7 @@ flextable(hdac_coords) |>
     -   Discard variants with **Minor Allele Frequency (MAF)** $< 0.01$ (in other words, the SNP must be present in at least $1\%$ of the samples).
     -   SNPs were extracted using `bcftools view`, with shell script [extract_variants.sh](./shell/extract_variants.sh)[^9]:
 
-[^8]: All curated VCF files per chromosome are stored in `./data/genotypages/` (symbolly linked with `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged`).
+[^8]: All curated VCF files per chromosome are stored in `./data/genotypages/` (linked symbolically with `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged`).
 
 [^9]: `nohup` option combined with `&` character enables running variants extraction in the background, even with terminal disrupting and closing.
 
@@ -706,12 +679,12 @@ nohup ./shell/extract_variants.sh > shell/extract_variants.log 2>&1 &
 chromosome_vcf6_file <- "../genotypage/imputation/imputation_merged/chr6.merged.clean.noMono.vcf.gz"
 chromosome_vcf6_content <- readr::read_lines(chromosome_vcf6_file, n_max = 30)
 
-# show metadata, with tools and information about VCF structure
+## show metadata, with tools and information about VCF structure
 cat(chromosome_vcf6_content |> 
       stringr::str_subset("^##"), sep = "\n")
 ```
 
-<!-- #### b) HLA-family {#sec-HLA} -->
+<!-- ##### b) HLA-family {#sec-HLA} -->
 
 <!-- HLA genes are usually classified into **Class I (HLA-A, HLA-B, HLA-C)** and **Class II (HLA-DRB1, HLA-DQA1, HLA-DQB1)**, amounting in total to six main genes within the human organism. -->
 
@@ -727,63 +700,63 @@ cat(chromosome_vcf6_content |>
 
 <!-- #| tbl-cap: "HLA Gene Positions" -->
 
-<!-- # renv::install(packages = c("bioc::AnnotationDbi", "bioc::org.Hs.eg.db")) -->
+<!-- ## renv::install(packages = c("bioc::AnnotationDbi", "bioc::org.Hs.eg.db")) -->
 
-<!-- # retrieve latest human genome assembly -->
+<!-- ## retrieve latest human genome assembly -->
 
-<!-- # hla_genes <- c("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1") -->
+<!-- ## hla_genes <- c("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1") -->
 
-<!-- # # Convert HGNC symbols to Entrez IDs with org.Hs.eg.db -->
+<!-- ## ## Convert HGNC symbols to Entrez IDs with org.Hs.eg.db -->
 
-<!-- # # 1-1 mapping, great!! -->
+<!-- ## ## 1-1 mapping, great!! -->
 
-<!-- # hla_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hla_genes,  -->
+<!-- ## hla_entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db, keys = hla_genes,  -->
 
-<!-- #                      column = "ENTREZID", keytype = "SYMBOL", multiVals = "first") -->
+<!-- ##                      column = "ENTREZID", keytype = "SYMBOL", multiVals = "first") -->
 
-<!-- # hla_entrez_ids <- tibble::tibble( -->
+<!-- ## hla_entrez_ids <- tibble::tibble( -->
 
-<!-- #   HGNC_SYMBOL = names(hla_entrez_ids), -->
+<!-- ##   HGNC_SYMBOL = names(hla_entrez_ids), -->
 
-<!-- #   GENEID = hla_entrez_ids) -->
+<!-- ##   GENEID = hla_entrez_ids) -->
 
-<!-- #  -->
+<!-- ##  -->
 
-<!-- # # retrieve start and end positions of HLA chromosoms -->
+<!-- ## ## retrieve start and end positions of HLA chromosoms -->
 
-<!-- # txdb <- AnnotationDbi::loadDb("data/genome_builds/txdb_human_gencode_v42.sqlite") -->
+<!-- ## txdb <- AnnotationDbi::loadDb("data/genome_builds/txdb_human_gencode_v42.sqlite") -->
 
-<!-- # hla_coords <- AnnotationDbi::select(txdb,  -->
+<!-- ## hla_coords <- AnnotationDbi::select(txdb,  -->
 
-<!-- #                      keys = hla_entrez_ids$GENEID,  -->
+<!-- ##                      keys = hla_entrez_ids$GENEID,  -->
 
-<!-- #                      columns = c("TXCHROM", "TXSTART", "TXEND"),  -->
+<!-- ##                      columns = c("TXCHROM", "TXSTART", "TXEND"),  -->
 
-<!-- #                      keytype = "GENEID") -->
+<!-- ##                      keytype = "GENEID") -->
 
-<!-- #  -->
+<!-- ##  -->
 
-<!-- # # take the min and max positions for all chromosomes -->
+<!-- ## ## take the min and max positions for all chromosomes -->
 
-<!-- # hla_coords <- hla_coords |>  -->
+<!-- ## hla_coords <- hla_coords |>  -->
 
-<!-- #   dplyr::filter(TXCHROM=="chr6") |>  -->
+<!-- ##   dplyr::filter(TXCHROM=="chr6") |>  -->
 
-<!-- #   dplyr::group_by(GENEID, TXCHROM) |>  -->
+<!-- ##   dplyr::group_by(GENEID, TXCHROM) |>  -->
 
-<!-- #   dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |>  -->
+<!-- ##   dplyr::summarise(TXSTART=min(TXSTART), TXEND=max(TXEND)) |>  -->
 
-<!-- #   dplyr::ungroup() |>  -->
+<!-- ##   dplyr::ungroup() |>  -->
 
-<!-- #   dplyr::inner_join(hla_entrez_ids, by = "GENEID") |>  -->
+<!-- ##   dplyr::inner_join(hla_entrez_ids, by = "GENEID") |>  -->
 
-<!-- #   dplyr::arrange(GENEID) |>  -->
+<!-- ##   dplyr::arrange(GENEID) |>  -->
 
-<!-- #   relocate(HGNC_SYMBOL) -->
+<!-- ##   relocate(HGNC_SYMBOL) -->
 
-<!-- # readr::write_csv(hla_coords,  -->
+<!-- ## readr::write_csv(hla_coords,  -->
 
-<!-- #                  "data/gene_positions/hla_coords.csv") -->
+<!-- ##                  "data/gene_positions/hla_coords.csv") -->
 
 <!-- hla_coords <- readr::read_csv("data/gene_positions/hla_coords.csv",  -->
 
@@ -795,9 +768,9 @@ cat(chromosome_vcf6_content |>
 
 <!-- ``` -->
 
-## Step 3: GWAS Analyses
+### Step 3: GWAS Analyses
 
-### i) GLM and GWAS {#sec-GWAS}
+#### i) GLM and GWAS {#sec-GWAS}
 
 -   **Objective**: Use of `PLINK2 + glm` with the first 10 principal components as covariates, see @lst-glm-bash, using logistic regression for categorical variables, and `lm` for continuous outcomes.
     
@@ -812,14 +785,14 @@ cat(chromosome_vcf6_content |>
 ``` bash
 
 plink2 \
-  --double-id \ # <1>
-  --pheno ./phenotypes/merge_phenos_PCs.txt \ # <2>
-  --pheno-name OSTEOPONIA \ # <2>
-  --vcf /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf dosage=HDS # <2>
-  --glm hide-covar \ # <3>
-  --covar /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ # <3>
-  --covar-name PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \ # <3>
-  --out HDAC9_OSTEOPONIA # <4>
+  --double-id \ ## <1>
+  --pheno ./phenotypes/merge_phenos_PCs.txt \ ## <2>
+  --pheno-name OSTEOPONIA \ ## <2>
+  --vcf /mnt/projects_tn01/Cartagene/analyses/variants_extraction/chr7.merged.clean.noMono.extracted_variants.HDAC9.vcf dosage=HDS ## <2>
+  --glm hide-covar \ ## <3>
+  --covar /mnt/projects_tn01/Cartagene/analyses/phenotypes/merge_phenos_PCs.txt \ ## <3>
+  --covar-name PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \ ## <3>
+  --out HDAC9_OSTEOPONIA ## <4>
 ```
 1.  The `--double-id` option ensures independent GWAS analyses per individual, aka the *single-sample mode*, stating explicitly that the `VCF` file follows a *family-based format* (FID/IID pairs).
 2.  **GWAS inputs**: We need the *phenotype information* (provided with `--pheno` and `--keep` commands), the *variable to predict* (provided with `--pheno-name`) and the *VCF file* (command `--vcf`), here using the SNPs annotations for the HDAC9 gene[^10].
@@ -830,8 +803,8 @@ plink2 \
 In practice, run the [`plink2_gwas.sh`](./shell/plink2_gwas.sh) script in the background (possibility to customise gene name and feature variables to regress on):
 
 ``` bash
-# Run the GWAS pipeline in the background,
-# persist after logout, and log everything.
+## Run the GWAS pipeline in the background,
+## persist after logout, and log everything.
 
 nohup ./shell/plink2_gwas.sh > shell/plink2_gwas.log 2>&1 &
 ```
@@ -863,7 +836,7 @@ if (length(log_files)>0) {
   log_files,
   FUN = function(file) paste(readLines(file, warn = FALSE), collapse = "\n"),
   FUN.VALUE = character(1)) |> 
-  paste(collapse = "\n\n #################################### \n\n\n")
+  paste(collapse = "\n\n ##################################### \n\n\n")
 
 writeLines(log_contents, 
            con = file.path("tables", genename, paste0("GENERAL_", genename, "_", filedate, ".log")))
@@ -873,7 +846,7 @@ file.remove(log_files)
 }
 ```
 
-### ii) GWAS Visualisations
+#### ii) GWAS Visualisations
 
 For each gene-phenotype pair, we generate cognate **Manhattan plots**[^13], and $p$-values distributions, using *histograms*[^14], and **QQplots**[^15]. Core function for generating these 3 GWAS visualisations is [`generate_gwas_per_phenotype`](./R/gwas_plots.R). An example for gene `HDAC-9` is provided in @fig-GWAS-HDAC9.
 
@@ -886,11 +859,11 @@ For each gene-phenotype pair, we generate cognate **Manhattan plots**[^13], and 
 ```{r}
 #| label: gwas-visu-preparation
 
-# p-value adjustment
-# genename <- "HDAC-9"; pheno_label <- "OSTEOPONIA"; filedate <- "2025-04-07"
+## p-value adjustment
+## genename <- "HDAC-9"; pheno_label <- "OSTEOPONIA"; filedate <- "2025-04-07"
 num_variants <- readr::read_csv("./tables/HDAC-9/HDAC-9_AVCGLOBAL_PRE_M_2025-04-07.AVCGLOBAL_PRE_M.glm.logistic.hybrid", show_col_types = FALSE) |> nrow()
 pval_threshold <- 0.05/(num_variants*length(cartagene_response_variables$Features))
-# pval_threshold <- 0.01/num_variants
+## pval_threshold <- 0.01/num_variants
 
 gwas_plots_hdac <- lapply(cartagene_response_variables$Features, 
                           function(feature_label) generate_gwas_per_phenotype (genename = "HDAC-9",
@@ -909,7 +882,7 @@ ggsave("figures/gwas_HDAC9.pdf",
 
 :::
 
-### iii) Multiple test correction
+#### iii) Multiple test correction
 
 To compute the adjusted *significance threshold*, we applied a `FWER`-like approach, conventional in the GWAS field: `{{r}} 0.05/(num_variants*length(cartagene_response_variables$Features))`, in which you divide the pre-defined threshold (standard: `0.05`) by the total number of pairwise tests carried out (number of variants times number of regression variables times). Final threshold is accordingly: `{r} 0.05/(num_variants*length(cartagene_response_variables$Features))`, as `{r} num_variants` variants were extracted, and `{r} length(cartagene_response_variables$Features)` phenotype variables were predicted.
 
@@ -932,25 +905,30 @@ To compute the adjusted *significance threshold*, we applied a `FWER`-like appro
 
 :::
 
-# Perspectives, aka post GWAS
+## Perspectives, aka post GWAS
 
-## Post-hoc GWAS
+### Post-hoc GWAS
 
 - [Collect information on variants with LLM-like `VarChat` app](https://varchat.engenome.com/)
 
-## Explore non-coding, regulatory regions (from WES to WGS)
+### Explore non-coding and regulatory regions (from WES to WGS)
 
 - Paper [Systematic differences in discovery of genetic effects on gene expression and complex traits](https://www.nature.com/articles/s41588-023-01529-1), from @mostafavi2023ng, suggest extending extraction of genomic regions of interest beyond coding sequences (report to @sec-variant-extraction for current approach). Indeed, the article demonstrates that most of identified signals originate from nearby gene regulatory sites. 
 
 - [`EPInformer`: a scalable deep learning framework for gene expression prediction by integrating promoter-enhancer sequences with multimodal epigenomic data](https://www.biorxiv.org/content/10.1101/2024.08.01.606099v1), from @lin2024. Avalaible as a [GH package](https://github.com/pinellolab/EPInformer). Can infer and predict gene expression from promoter and enhancer sequences paired with epigenomic signals; identify the most significant enhancers; and identify *regulatory sequences* and *transcription factor binding motifs*.
 
-## Post-GWAS: Explore other types of genetic variations
+
+- Automatically extract and annotate variants, based on their locations, using [`VariantAnnotation::locateVariants()`](https://www.bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.html#locating-variants-in-and-around-genes) function. Variants annotations notably encompass coding, UTRs, introns and promoters.
+
+### Post-GWAS: Explore other types of genetic variations
 
 - [Genome-wide association testing beyond SNPs](https://www.nature.com/articles/s41576-024-00778-y), from @harris2025nrg
 
 - [Benchmarking post-GWAS analysis tools in major depression: Challenges and implications](https://www.frontiersin.org/journals/genetics/articles/10.3389/fgene.2022.1006903/full), from @perez-granado2022fg.
 
-## Post-GWAS: Retrieve automatically variants of interest {#sec-post-GWAS}
+- The [VariantAnnotation::predictCoding](https://www.bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.html#amino-acid-coding-changes) computes amino acid coding changes for non-synonymous variants, while the [`SIFT` and `PolyPhen`](https://www.bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.html#sift-and-polyphen-databases)  web databases evaluate the impact of SNP substitution, based on the predicted level of changes of the 3D-protein reconfiguration.
+
+### Post-GWAS: Retrieve automatically variants of interest {#sec-post-GWAS}
 
 This analysis is not formally a GWAS study, but rather a *gene-centric* study, pre-selecting genes based on prior knowledge and/or intuition.
 
@@ -962,13 +940,13 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 
 [^16]: Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.
 
-## Post-GWAS: Incorporate familial pedigrees
+### Post-GWAS: Incorporate familial pedigrees
 
 -   [Genome-wide association study of fat content and fatty acid composition of shea tree.](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-025-11344-z), from @attikora2025bg. Under the hood, relies on the `mrMLM` R package to include both the *population structure matrix* and the *kinship matrix*. Provides a complete GWAS pipeline, including a number of meaningful illustrations.
 
 -   [`BHCox`: Bayesian heredity-constrained Cox proportional hazards models for detecting gene-environment interactions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06077-5), from @sun2025bb. Under the hood, relies on the `brms` R package.
 
-## Post-GWAS: Polygenic risk scores
+### Post-GWAS: Polygenic risk scores
 
 - [Optimizing and benchmarking polygenic risk scores with GWAS summary statistics](https://doi.org/10.1186/s13059-024-03400-w), from @zhao2024gb.
 
@@ -976,31 +954,30 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 
 -   [`PNL`: a software to build polygenic risk scores using a Super Learner approach based on `PairNet`, a Convolutional Neural Network](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf071/8015614), from @chen2025b.
 
-## Post-GWAS: Orthogonal integration
+### Post-GWAS: Orthogonal integration
 
-### Epigenomic
+#### Epigenomic
 
 -   @zhao2025bib implements [`SC-VAR`: a computational tool for interpreting polygenic disease risks using single-cell epigenomic data](https://academic.oup.com/bib/article/26/2/bbaf123/8092303?searchresult=1&login=false), a novel computational tool available as a GitHub repo and Python application: [`SC-VAR` GitHub](https://github.com/gefeiZ/SC_VAR). `SC-VAR` uses single-cell *epigenomic* data to predict functional outcomes of the identified disease-associated *GWAS variants*, enhancing their interpretability. Under the hood, relies on [`MAGMA` linear modelling framework](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004219), developed by @leeuw2015pcb.
 
-### eQTL (quantitative expression)
+#### eQTL (quantitative expression)
 
 - [`FIVEx`](https://github.com/statgen/fivex) is a web-based interface to explore `CarTaGene` to visualize and query eQTL (quantitative trait loci) data in various ways. **Would need a stringent maintenance!!**
 
-# Appendix {.appendix}
+## Appendix {.appendix}
 
-## Scalability with `Nextflow` {#sec-DSL-Nextflow}
+### Scalability with `Nextflow` {#sec-DSL-Nextflow}
 
 Lots of intermediate files are not required for downstream analyses, hence it would be relevant to rely on an existing *Nextflow* or *Snakemake* DSL workflows:
 
--   [`nf-GWAS` 'Nextflow pipeline'](https://genepi.github.io/nf-gwas/), from @schonherr2024, is actively maintained by Curie Bioinformatics Team, and includes the latest `plink2` facilities.
+-   [`nf-GWAS` 'Nextflow pipeline'](https://genepi.github.io/nf-gwas/), from @schonherr2024, is actively maintained by Curie Bioinformatics Team, and includes the latest `plink2` facilities. Complementary tools include:
+
+  - The `Nextflow` Seqera [`multiqc`](https://seqera.io/multiqc/) initiative collects within the same repository a variety of command-line tools, such as `bcftools` and `plink2`, with notably the [`vcftools`](https://github.com/MultiQC/MultiQC/tree/main/multiqc/modules/vcftools) and [`multivcfanalyzer`](https://github.com/MultiQC/MultiQC/tree/main/multiqc/modules/multivcfanalyzer) modules. Note however that these tools are optimised in Python.
 
 -   [`PopGLen` 'Snakemake' pipeline](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf105/8069456), from @nolen2025b. [Not for running GWAS analyses, but rather for evaluating the quality and impact of preprocessing and quality mapping at the population-level genome starting from `FASTQ` files.]{fg="red"}
 
-## Tools Installation {#sec-tools-install}
 
- <!-- {{< include tools_installation.qmd >}} -->
-
-<!-- ## Clean Git History -->
+<!-- ### Clean Git History -->
 
 <!-- ``` bash -->
 
@@ -1008,7 +985,4 @@ Lots of intermediate files are not required for downstream analyses, hence it wo
 
 <!-- ``` -->
 
-## Bibliographic References {.appendix}
 
-::: {#refs}
-:::
