@@ -66,7 +66,7 @@ The code, main results (figures and tables), along with reports, are versioned i
 
 - [Should be carried out prior to collecting GWAS samples!!]{fg="red"}
 - [Sample Size Calculation in Genetic Association Studies: A Practical Approach](https://pmc.ncbi.nlm.nih.gov/articles/PMC9863799/#sec5-life-13-00235), from @politi2023l, notably listing the following tools:
-  - [`GENPWR`: Power and Sample Size Calculations for Genetic Association Studies in the Presence of Genetic Model Mis-Specification](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7666027/), from @moore2019hh and avalaible as a [R package](https://cran.r-project.org/web/packages/genpwr/vignettes/vignette.html), is able to compute the sample size for dichotomous or continuous outcomes in gene-only studies, implementing additive, dominant and recessive models (see @tip-genetic-model for details).
+  - [`GENPWR`: Power and Sample Size Calculations for Genetic Association Studies in the Presence of Genetic Model Mis-Specification](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7666027/), from @moore2019hh and available as a [R package](https://cran.r-project.org/web/packages/genpwr/vignettes/vignette.html), is able to compute the sample size for dichotomous or continuous outcomes in gene-only studies, implementing additive, dominant and recessive models (see @tip-genetic-model for details).
   - [`PGA`: Power for Genetic Association](https://pmc.ncbi.nlm.nih.gov/articles/PMC2387159/), from @menashe2008bg is able to adjust for **multiple comparisons**, in contrast with `GENPWR`, and LD between the marker and the disease allele. [Seems not avalaible anymore]{fg="red"}
   
 ::: {#tip-genetic-model .callout-tip title="Genetic models"}
@@ -128,7 +128,7 @@ plink2 --version
 echo -e "\n"
 bcftools --version
 
-## Create symbolic links to organise everythin within the same folder
+## Create symbolic links to organise everything within the same folder
 ## warning: if original content is deleted, everything broke!!!!!!
 echo ln -s ./data/genotypages/ /mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged
 ```
@@ -314,7 +314,7 @@ plink2 \
   --remove /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/related_ids/IBD.genome2.related_individuals_to_remove.txt 
 ```
 
-#### Step 3: PCA {#sec-PCA}
+#### Step 3: PCA Computation and Population Genetic Evaluation {#sec-PCA}
 
 -   **Inputs**:
 
@@ -322,8 +322,6 @@ plink2 \
     -   **phenotype IDs** listed in `merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps_bfile.rem_rel_ind_round_2_of_2`, where all affiliated patients have been removed.
 
 -   **Objective**: Compute PCA and keep the 10 first principal components.
-
--   [**Remark**: use visualizations, such as *scree plots*, elbow point or/and *Tracy-Widom Test* to select the final number of PCs, instead of hard threshold, and on the other hand, scatter plots to identify latent structures. See details [here](https://www.linkedin.com/posts/joachim-schork_statistics-research-visualanalytics-activity-7251577056570785795-b6Rk) and [there](https://www.linkedin.com/feed/update/urn:li:activity:730919293617122508)]{fg="red"}.
 
 -   **Bash command**:
 
@@ -336,6 +334,16 @@ plink2 \
   --out /mnt/projects_tn01/Cartagene/analyses/QC/eur_only/merge_5_datasets.eur_only.geno095.hwe1e06.pruned_snps.high_LD_excluded.unrelated_ind.PCA \
   --pca 10
 ```
+
+- **Remarks**:
+
+  -   [**Remark 1**: use visualizations, such as *scree plots*, elbow point or/and *Tracy-Widom Test* to select the final number of PCs, instead of hard threshold, and on the other hand, scatter plots to identify latent structures. See details [here](https://www.linkedin.com/posts/joachim-schork_statistics-research-visualanalytics-activity-7251577056570785795-b6Rk) and [there](https://www.linkedin.com/feed/update/urn:li:activity:730919293617122508)]{fg="red"}.
+
+  - **Remark 2**: The [`popgen` *'Calculating Basic Population Genetic Statistics from SNP Data'*](https://popgen.nescent.org/StartSNP.html#genetic-diversity-observed-and-expected-heterozygosity) details how to generate statistics quantifying patterns of genetic diversity, such as LD and Hardy-Weinberg, in a given population. 
+  The [`popgen` *'Calculating genetic differentiation and clustering methods from SNP data'* vignette](https://popgen.nescent.org/DifferentiationSNP.html) describes both unsupervised, PCA-like and discriminatory approaches to identify latent genetic sub-populations.  
+  Finally, the [`popgen` *'Individual Based Genetic Distance for SNP Data'*](https://popgen.nescent.org/2015-05-18-Dist-SNP.html) reports different individual genetic distances, enabling to spot and trim indiviudal outliers with a significant distinct genetic distribution.
+  
+  - **Remark 3**: To evaluate within population diversity, geneticists typically report the level of *heterozygosity* as a general metric, see [`vcfR`'Genetic differentiation' Vignette](https://knausb.github.io/vcfR_documentation/genetic_differentiation.html). 
 
 ### Run GWAS analyses
 
@@ -650,7 +658,7 @@ flextable(hdac_coords) |>
     -   Discard variants with **Minor Allele Frequency (MAF)** $< 0.01$ (in other words, the SNP must be present in at least $1\%$ of the samples).
     -   SNPs were extracted using `bcftools view`, with shell script [extract_variants.sh](./shell/extract_variants.sh)[^9]:
 
-[^8]: All curated VCF files per chromosome are stored in `./data/genotypages/` (symbolly linked with `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged`).
+[^8]: All curated VCF files per chromosome are stored in `./data/genotypages/` (linked symbolically with `/mnt/projects_tn01/Cartagene/genotypage/imputation/imputation_merged`).
 
 [^9]: `nohup` option combined with `&` character enables running variants extraction in the background, even with terminal disrupting and closing.
 
@@ -903,17 +911,22 @@ To compute the adjusted *significance threshold*, we applied a `FWER`-like appro
 
 - [Collect information on variants with LLM-like `VarChat` app](https://varchat.engenome.com/)
 
-### Explore non-coding, regulatory regions (from WES to WGS)
+### Explore non-coding and regulatory regions (from WES to WGS)
 
 - Paper [Systematic differences in discovery of genetic effects on gene expression and complex traits](https://www.nature.com/articles/s41588-023-01529-1), from @mostafavi2023ng, suggest extending extraction of genomic regions of interest beyond coding sequences (report to @sec-variant-extraction for current approach). Indeed, the article demonstrates that most of identified signals originate from nearby gene regulatory sites. 
 
 - [`EPInformer`: a scalable deep learning framework for gene expression prediction by integrating promoter-enhancer sequences with multimodal epigenomic data](https://www.biorxiv.org/content/10.1101/2024.08.01.606099v1), from @lin2024. Avalaible as a [GH package](https://github.com/pinellolab/EPInformer). Can infer and predict gene expression from promoter and enhancer sequences paired with epigenomic signals; identify the most significant enhancers; and identify *regulatory sequences* and *transcription factor binding motifs*.
+
+
+- Automatically extract and annotate variants, based on their locations, using [`VariantAnnotation::locateVariants()`](https://www.bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.html#locating-variants-in-and-around-genes) function. Variants annotations notably encompass coding, UTRs, introns and promoters.
 
 ### Post-GWAS: Explore other types of genetic variations
 
 - [Genome-wide association testing beyond SNPs](https://www.nature.com/articles/s41576-024-00778-y), from @harris2025nrg
 
 - [Benchmarking post-GWAS analysis tools in major depression: Challenges and implications](https://www.frontiersin.org/journals/genetics/articles/10.3389/fgene.2022.1006903/full), from @perez-granado2022fg.
+
+- The [VariantAnnotation::predictCoding](https://www.bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.html#amino-acid-coding-changes) computes amino acid coding changes for non-synonymous variants, while the [`SIFT` and `PolyPhen`](https://www.bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.html#sift-and-polyphen-databases)  web databases evaluate the impact of SNP substitution, based on the predicted level of changes of the 3D-protein reconfiguration.
 
 ### Post-GWAS: Retrieve automatically variants of interest {#sec-post-GWAS}
 
@@ -957,7 +970,9 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 
 Lots of intermediate files are not required for downstream analyses, hence it would be relevant to rely on an existing *Nextflow* or *Snakemake* DSL workflows:
 
--   [`nf-GWAS` 'Nextflow pipeline'](https://genepi.github.io/nf-gwas/), from @schonherr2024, is actively maintained by Curie Bioinformatics Team, and includes the latest `plink2` facilities.
+-   [`nf-GWAS` 'Nextflow pipeline'](https://genepi.github.io/nf-gwas/), from @schonherr2024, is actively maintained by Curie Bioinformatics Team, and includes the latest `plink2` facilities. Complementary tools include:
+
+  - The `Nextflow` Seqera [`multiqc`](https://seqera.io/multiqc/) initiative collects within the same repository a variety of command-line tools, such as `bcftools` and `plink2`, with notably the [`vcftools`](https://github.com/MultiQC/MultiQC/tree/main/multiqc/modules/vcftools) and [`multivcfanalyzer`](https://github.com/MultiQC/MultiQC/tree/main/multiqc/modules/multivcfanalyzer) modules. Note however that these tools are optimised in Python.
 
 -   [`PopGLen` 'Snakemake' pipeline](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf105/8069456), from @nolen2025b. [Not for running GWAS analyses, but rather for evaluating the quality and impact of preprocessing and quality mapping at the population-level genome starting from `FASTQ` files.]{fg="red"}
 

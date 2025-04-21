@@ -317,6 +317,25 @@
       ],
       "Hash": "3a09b8f08293e35a26c8ee1e98d88750"
     },
+    "ape": {
+      "Package": "ape",
+      "Version": "5.8-1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "digest",
+        "graphics",
+        "lattice",
+        "methods",
+        "nlme",
+        "parallel",
+        "stats",
+        "utils"
+      ],
+      "Hash": "54e5b03e928da23e75dc5bb633648d27"
+    },
     "aplot": {
       "Package": "aplot",
       "Version": "0.2.5",
@@ -473,6 +492,20 @@
         "utils"
       ],
       "Hash": "3f038e5ac7f41d4ac41ce658c85e3042"
+    },
+    "cluster": {
+      "Package": "cluster",
+      "Version": "2.1.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "grDevices",
+        "graphics",
+        "stats",
+        "utils"
+      ],
+      "Hash": "5edbbabab6ce0bf7900a74fd4358628e"
     },
     "colorspace": {
       "Package": "colorspace",
@@ -1114,6 +1147,18 @@
       ],
       "Hash": "e2817ccf4a065c5d9d7f2cfbe7c1d78c"
     },
+    "memuse": {
+      "Package": "memuse",
+      "Version": "4.2-3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "methods",
+        "utils"
+      ],
+      "Hash": "5cfd074e79d5443c523360bbe203d904"
+    },
     "mgcv": {
       "Package": "mgcv",
       "Version": "1.8-42",
@@ -1226,6 +1271,17 @@
       ],
       "Hash": "e23fb9ecb1258207bcb763d78d513439"
     },
+    "permute": {
+      "Package": "permute",
+      "Version": "0.9-7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "stats"
+      ],
+      "Hash": "abf0ca85c1c752e0d04f46334e635046"
+    },
     "pillar": {
       "Package": "pillar",
       "Version": "1.9.0",
@@ -1242,6 +1298,16 @@
         "vctrs"
       ],
       "Hash": "15da5a8412f317beeee6175fbc76f4bb"
+    },
+    "pinfsc50": {
+      "Package": "pinfsc50",
+      "Version": "1.3.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "8368d95a7bb029e43cf5ef8971c17dd9"
     },
     "pkgconfig": {
       "Package": "pkgconfig",
@@ -1451,6 +1517,23 @@
       ],
       "Hash": "39e1144fd75428983dc3f63aa53dfa91"
     },
+    "stringr": {
+      "Package": "stringr",
+      "Version": "1.5.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "cli",
+        "glue",
+        "lifecycle",
+        "magrittr",
+        "rlang",
+        "stringi",
+        "vctrs"
+      ],
+      "Hash": "960e2ae9e09656611e0b8214ad543207"
+    },
     "sys": {
       "Package": "sys",
       "Version": "3.4.3",
@@ -1566,6 +1649,31 @@
       ],
       "Hash": "34e965e62a41fcafb1ca60e9b142085b"
     },
+    "vcfR": {
+      "Package": "vcfR",
+      "Version": "1.15.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "ape",
+        "dplyr",
+        "grDevices",
+        "graphics",
+        "magrittr",
+        "memuse",
+        "methods",
+        "pinfsc50",
+        "stats",
+        "stringr",
+        "tibble",
+        "utils",
+        "vegan",
+        "viridisLite"
+      ],
+      "Hash": "b78b5dd40cd173149e47200b74486a71"
+    },
     "vctrs": {
       "Package": "vctrs",
       "Version": "0.6.5",
@@ -1579,6 +1687,21 @@
         "rlang"
       ],
       "Hash": "c03fa420630029418f7e6da3667aac4a"
+    },
+    "vegan": {
+      "Package": "vegan",
+      "Version": "2.6-10",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "MASS",
+        "R",
+        "cluster",
+        "lattice",
+        "mgcv",
+        "permute"
+      ],
+      "Hash": "ab11d78eb1b480f6b4d8119b6d5ae09e"
     },
     "venn": {
       "Package": "venn",
