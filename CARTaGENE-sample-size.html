@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.6.43">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Appendix A — Tools installation – GWAS Analyses utilising the CARTaGENE database</title>
+<title>2&nbsp; CartaGene Sample Size estimation – GWAS Analyses utilising the CARTaGENE database</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -60,8 +60,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./references.html" rel="next">
-<link href="./CARTaGENE-sample-size.html" rel="prev">
+<link href="./tools_installation.html" rel="next">
+<link href="./CARTaGENE-GWAS-Report.html" rel="prev">
 <link href="./assets/favicon.png" rel="icon" type="image/png">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -73,7 +73,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-47935e28dae3148b193b575e372693f2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-8caa2bbd010210c525087a13125be790.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+<link href="site_libs/bootstrap/bootstrap-dark-8caa2bbd010210c525087a13125be790.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
@@ -104,8 +107,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     document.body.classList.add('hypothesis-enabled');
   });
 </script>
-<meta property="og:title" content="Appendix A — Tools installation – GWAS Analyses utilising the CARTaGENE database">
+<meta property="og:title" content="2&nbsp; CartaGene Sample Size estimation – GWAS Analyses utilising the CARTaGENE database">
+<meta property="og:image" content="https://arnauddroitlab.github.io/cartagene-gwas/CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png">
 <meta property="og:site_name" content="GWAS Analyses utilising the CARTaGENE database">
+<meta property="og:image:height" content="960">
+<meta property="og:image:width" content="1344">
 </head>
 <body class="nav-sidebar docked">
 
@@ -114,7 +120,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tools_installation.html">Appendices</a></li><li class="breadcrumb-item"><a href="./tools_installation.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Tools installation</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./CARTaGENE-sample-size.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">CartaGene Sample Size estimation</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -159,7 +165,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./CARTaGENE-sample-size.html" class="sidebar-item-text sidebar-link">
+  <a href="./CARTaGENE-sample-size.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">CartaGene Sample Size estimation</span></span></a>
   </div>
 </li>
@@ -174,7 +180,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tools_installation.html" class="sidebar-item-text sidebar-link active">
+  <a href="./tools_installation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Tools installation</span></span></a>
   </div>
 </li>
@@ -194,19 +200,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
    
   <ul>
-<li>
-<a href="#sec-tools-install" id="toc-sec-tools-install" class="nav-link active" data-scroll-target="#sec-tools-install"><span class="header-section-number">A.1</span> Build from scratch command-line GWAS tools</a>
+<li><a href="#setup-for-statistical-power-analyses" id="toc-setup-for-statistical-power-analyses" class="nav-link active" data-scroll-target="#setup-for-statistical-power-analyses"><span class="header-section-number">2.1</span> Setup for statistical power analyses</a></li>
+  <li>
+<a href="#sec-vcfr" id="toc-sec-vcfr" class="nav-link" data-scroll-target="#sec-vcfr"><span class="header-section-number">2.2</span> VCF files Reporting with <code>vcfR</code></a>
   <ul>
-<li><a href="#bash-commands-to-install-plink2" id="toc-bash-commands-to-install-plink2" class="nav-link" data-scroll-target="#bash-commands-to-install-plink2"><span class="header-section-number">A.1.1</span> Bash commands to install <code>plink2</code></a></li>
-  <li><a href="#bash-commands-to-install-bcftools" id="toc-bash-commands-to-install-bcftools" class="nav-link" data-scroll-target="#bash-commands-to-install-bcftools"><span class="header-section-number">A.1.2</span> Bash commands to install <code>bcftools</code></a></li>
-  <li><a href="#bash-commands-to-save-path-executions" id="toc-bash-commands-to-save-path-executions" class="nav-link" data-scroll-target="#bash-commands-to-save-path-executions"><span class="header-section-number">A.1.3</span> Bash commands to save path executions</a></li>
+<li><a href="#load-vcf-files" id="toc-load-vcf-files" class="nav-link" data-scroll-target="#load-vcf-files"><span class="header-section-number">2.2.1</span> Load VCF files</a></li>
+  <li><a href="#vcf-files-qc" id="toc-vcf-files-qc" class="nav-link" data-scroll-target="#vcf-files-qc"><span class="header-section-number">2.2.2</span> VCF files QC</a></li>
   </ul>
 </li>
-  </ul><div class="toc-actions"><ul><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/edit/master/tools_installation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/blob/master/tools_installation.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
+  <li><a href="#vcf-files-qc-with-variantannotation" id="toc-vcf-files-qc-with-variantannotation" class="nav-link" data-scroll-target="#vcf-files-qc-with-variantannotation"><span class="header-section-number">2.3</span> VCF Files QC with <code>VariantAnnotation</code></a></li>
+  <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources"><span class="header-section-number">2.4</span> Additional resources</a></li>
+  </ul><div class="toc-actions"><ul><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/edit/master/CARTaGENE-sample-size.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/blob/master/CARTaGENE-sample-size.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content column-body" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tools_installation.html">Appendices</a></li><li class="breadcrumb-item"><a href="./tools_installation.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Tools installation</span></a></li></ol></nav><div class="quarto-title">
-<h1 class="title">Appendix A — Tools installation</h1>
+<main class="content column-body" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">
+<span class="chapter-number">2</span>&nbsp; <span class="chapter-title">CartaGene Sample Size estimation</span>
+</h1>
 </div>
 
 
@@ -220,55 +230,203 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   
 
 
-</header><section id="sec-tools-install" class="level2" data-number="A.1"><h2 data-number="A.1" class="anchored" data-anchor-id="sec-tools-install">
-<span class="header-section-number">A.1</span> Build from scratch command-line GWAS tools</h2>
-<section id="bash-commands-to-install-plink2" class="level3" data-number="A.1.1"><h3 data-number="A.1.1" class="anchored" data-anchor-id="bash-commands-to-install-plink2">
-<span class="header-section-number">A.1.1</span> Bash commands to install <code>plink2</code>
-</h3>
+</header><section id="setup-for-statistical-power-analyses" class="level2" data-number="2.1"><h2 data-number="2.1" class="anchored" data-anchor-id="setup-for-statistical-power-analyses">
+<span class="header-section-number">2.1</span> Setup for statistical power analyses</h2>
 <div class="cell" data-layout-align="center">
-<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Download the latest PLINK2 binary</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> <span class="at">-O</span> ./bin/plink2.zip <span class="st">"https://s3.amazonaws.com/plink2-assets/alpha6/plink2_linux_x86_64_20250129.zip"</span> </span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span> <span class="at">-d</span> ./bin/plink2 ./bin/plink2.zip <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> ./bin/plink2.zip</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4: Ensure the binary is executable</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> 777 ./bin/plink2</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 5: Verify installation</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/plink2</span> <span class="at">--version</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">## data wrangling and visualisations</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ardata-fr.github.io/flextable-book/">flextable</a></span><span class="op">)</span></span>
+<span><span class="co">## Required for code linking</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://downlit.r-lib.org/">downlit</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://xml2.r-lib.org">xml2</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Report automated QCs for VCF files</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/knausb/vcfR">vcfR</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-</section><section id="bash-commands-to-install-bcftools" class="level3" data-number="A.1.2"><h3 data-number="A.1.2" class="anchored" data-anchor-id="bash-commands-to-install-bcftools">
-<span class="header-section-number">A.1.2</span> Bash commands to install <code>bcftools</code>
-</h3>
+</section><section id="sec-vcfr" class="level2" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="sec-vcfr">
+<span class="header-section-number">2.2</span> VCF files Reporting with <code>vcfR</code>
+</h2>
+<section id="load-vcf-files" class="level3" data-number="2.2.1"><h3 data-number="2.2.1" class="anchored" data-anchor-id="load-vcf-files">
+<span class="header-section-number">2.2.1</span> Load VCF files</h3>
 <div class="cell" data-layout-align="center">
-<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> <span class="at">-O</span> ./bin/bcftools-1.21.tar.bz2 <span class="st">"https://github.com/samtools/bcftools/releases/download/1.21/bcftools-1.21.tar.bz2"</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xjvf</span> ./bin/bcftools-1.21.tar.bz2 <span class="at">-C</span> ./bin/ <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> ./bin/bcftools-1.21.tar.bz2</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ./bin/bcftools-1.21</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">./configure</span> <span class="at">--prefix</span><span class="op">=</span>/mnt/projects_tn01/Cartagene/cartagene-gwas/bin/bcftools</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> install</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> ./bin/bcftools-1.21</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vcf_file</span> <span class="op">&lt;-</span> <span class="st">"./data/variants/chr17.HDAC5.vcf"</span></span>
+<span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/io_vcfR.html">read.vcfR</a></span><span class="op">(</span><span class="va">vcf_file</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre class="code_output"><code>##  Scanning file to determine attributes.
+##  File attributes:
+##    meta lines: 24
+##    header_line: 25
+##    variant count: 91
+##    column count: 29346
+##  
+Meta line 24 read in.
+##  All meta lines processed.
+##  gt matrix initialized.
+##  Character matrix gt created.
+##    Character matrix gt rows: 91
+##    Character matrix gt cols: 29346
+##    skip: 0
+##    nrows: 91
+##    row_num: 0
+##  
+Processed variant: 91
+##  All variants processed</code></pre>
+</div>
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">chrom</span> <span class="op">&lt;-</span> <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/create_chromR.html">create.chromR</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Supercontig"</span>, vcf <span class="op">=</span> <span class="va">vcf</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="co"># removing low quality variants, none of these metrics is reported</span></span>
+<span>  <span class="co"># vcfR::masker(min_QUAL = 0, min_DP = 350, max_DP = 650, </span></span>
+<span>  <span class="co">#              min_MQ = 59.5, max_MQ = 60.5) |&gt; </span></span>
+<span>  <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/proc_chromR.html">proc.chromR</a></span><span class="op">(</span>win.size <span class="op">=</span> <span class="fl">1e2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stderr">
+<pre><code>##  Names in vcf:</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##    chr17</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  Initializing var.info slot.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  var.info slot initialized.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  Warning in vcfR::proc.chromR(vcfR::create.chromR(name = "Supercontig", vcf =
+##  vcf), : seq slot is NULL.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  Warning in vcfR::proc.chromR(vcfR::create.chromR(name = "Supercontig", vcf =
+##  vcf), : annotation slot has no rows.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  Warning in vcfR::proc.chromR(vcfR::create.chromR(name = "Supercontig", vcf =
+##  vcf), : seq slot is NULL, chromosome representation not made (seq2rects).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  Warning in vcfR::proc.chromR(vcfR::create.chromR(name = "Supercontig", vcf =
+##  vcf), : seq slot is NULL, chromosome representation not made (seq2rects,
+##  chars=n).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  Population summary complete.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##    elapsed time:  2.685</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  window_init complete.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##    elapsed time:  0.019</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  Warning in vcfR::proc.chromR(vcfR::create.chromR(name = "Supercontig", vcf =
+##  vcf), : seq slot is NULL, windowize_fasta not run.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  Warning in vcfR::proc.chromR(vcfR::create.chromR(name = "Supercontig", vcf =
+##  vcf), : ann slot has zero rows.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##  windowize_variants complete.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##    elapsed time:  0.014</code></pre>
+</div>
+</div>
+</section><section id="vcf-files-qc" class="level3" data-number="2.2.2"><h3 data-number="2.2.2" class="anchored" data-anchor-id="vcf-files-qc">
+<span class="header-section-number">2.2.2</span> VCF files QC</h3>
+<div class="cell" data-layout-align="center">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/chromo_plot.html">chromoqc</a></span><span class="op">(</span><span class="va">chrom</span>, dp.alpha <span class="op">=</span> <span class="fl">22</span>,</span>
+<span>               xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">chrom</span><span class="op">@</span><span class="va">var.info</span><span class="op">$</span><span class="va">POS</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">chrom</span><span class="op">@</span><span class="va">var.info</span><span class="op">$</span><span class="va">POS</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">chrom</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<div id="fig-plot-qc-per-chrom-1" class="quarto-float quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-plot-qc-per-chrom-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;2.1: "><img src="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png" id="fig-plot-qc-per-chrom-1" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-plot-qc-per-chrom-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1
+</figcaption></figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-plot-qc-per-chrom-2" class="quarto-float quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-plot-qc-per-chrom-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2.2: "><img src="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-2.png" id="fig-plot-qc-per-chrom-2" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-plot-qc-per-chrom-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2
+</figcaption></figure>
+</div>
+</div>
+</div>
+<ul>
+<li><p>In vcfR we refer to this form of plot as a chromo plot. This plot summarizes data from our three data sources. Annotation data is represented on the lowest plot. Features in the annotation file (e.g., gene models, exons, etc.) are represented as dark red rectangles. Above the annotation track is a sequence track. Here called nucleotides are represented in green while uncalled nucleotides (Ns) appear in red. Depending on the quality of your genome, it may include stretches of uncalled nucleotides. Above the annotation track is a windowing analysis of G/C content. This track includes marginal barplots to summarize its contents, as do the tracks above it. The next track summarizes the number of variants per window. Above that we see dot plots for quality, mapping quality and read depth.</p></li>
+<li><p>The raw read depth and mapping quality have been extracted from the INFO column of the VCF data. The quality is from the QUAL column of the VCF data. And the variant count per window was summarized during the windowing analysis performed by proc.chromR(). The raw read depth appears fairly continuous, an observation which appears consistent with the above chromo plots. Mapping quality appears to be predominantly one value (about 60), this may not have been apparent in the chromo plots. The variant count per window summarizes the degree of variability we’ve observed along our chromosome. The peak near zero indicates that many windows lack variants</p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vcf_tidy</span> <span class="op">&lt;-</span> <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcfR2tidy</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcf_field_names</a></span><span class="op">(</span><span class="va">vcf</span>, tag <span class="op">=</span> <span class="st">"INFO"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre class="code_output"><code>##  # A tibble: 3 × 5
+##    Tag   ID         Number Type  Description                         
+##    &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;                               
+##  1 INFO  IMPUTED    0      Flag  Marker was imputed but NOT genotyped
+##  2 INFO  TYPED      0      Flag  Marker was genotyped AND imputed    
+##  3 INFO  TYPED_ONLY 0      Flag  Marker was genotyped but NOT imputed</code></pre>
+</div>
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcf_field_names</a></span><span class="op">(</span><span class="va">vcf</span>, tag <span class="op">=</span> <span class="st">"FORMAT"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre class="code_output"><code>##  # A tibble: 4 × 5
+##    Tag    ID    Number Type   Description                                     
+##    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;                                           
+##  1 FORMAT GT    1      String Genotype                                        
+##  2 FORMAT DS    1      Float  Estimated Alternate Allele Dosage : [P(0/1)+2*P…
+##  3 FORMAT HDS   2      Float  Estimated Haploid Alternate Allele Dosage       
+##  4 FORMAT GP    3      Float  Estimated Posterior Probabilities for Genotypes…</code></pre>
+</div>
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">vcf_tidy</span><span class="op">$</span><span class="va">fix</span><span class="op">$</span><span class="va">TYPED_ONLY</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-</section><section id="bash-commands-to-save-path-executions" class="level3" data-number="A.1.3"><h3 data-number="A.1.3" class="anchored" data-anchor-id="bash-commands-to-save-path-executions">
-<span class="header-section-number">A.1.3</span> Bash commands to save path executions</h3>
+<p>https://knausb.github.io/vcfR_documentation/visualization_1.html</p>
+</section></section><section id="vcf-files-qc-with-variantannotation" class="level2" data-number="2.3"><h2 data-number="2.3" class="anchored" data-anchor-id="vcf-files-qc-with-variantannotation">
+<span class="header-section-number">2.3</span> VCF Files QC with <code>VariantAnnotation</code>
+</h2>
+<ul>
+<li><span data-fg="red" style="color: red;"><code>VariantAnnotation</code> provides more comprehensive features with respect to <a href="#sec-vcfr" class="quarto-xref"><span>Section 2.2</span></a>, yet, relies on external dependencies such as <code>bfctools</code>, and often faces memory limitations.</span></li>
+</ul>
 <div class="cell" data-layout-align="center">
-<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Temporary (Current Shell Session Only)</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>./bin/bcftools/bin:<span class="va">$PATH</span>  </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Semi temporary (for a given user)</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'export PATH=./bin/bcftools/bin:$PATH'</span> <span class="op">&gt;&gt;</span> ~/.bashrc</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ~/.bashrc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">readVcf</span><span class="op">(</span>file <span class="op">=</span> <span class="st">"./data/variants/chr6.HLA-A.vcf"</span>, </span>
+<span>                                  genome <span class="op">=</span> <span class="st">"hg38"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># General vcf file structure ----</span></span>
+<span></span>
+<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">header</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
+<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">samples</span><span class="op">(</span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">header</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">geno</span><span class="op">(</span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">header</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Variant-specific fields, such as alternative allele configurations</span></span>
+<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">alt</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+</section><section id="additional-resources" class="level2" data-number="2.4"><h2 data-number="2.4" class="anchored" data-anchor-id="additional-resources">
+<span class="header-section-number">2.4</span> Additional resources</h2>
+<ul>
+<li>
+<p><a href="https://bioinformaticsworkbook.org/dataAnalysis/VariantCalling/freebayes-dnaseq-workflow.html"><code>FreeBayes</code> variant calling workflow for DNA-Seq</a> is able to detect from scratch small polymorphisms, such as <em>SNPs</em> (single-nucleotide polymorphisms), <em>indels</em> (insertions and deletions), and <em>MNPs</em> (multi-nucleotide polymorphisms):</p>
+<ul>
+<li>Provides as well a comprehensive tutorial for retrieving variants annotations.</li>
+<li>QC plots with the <code>vcfR</code> package.</li>
+</ul>
+</li>
+</ul>
 
 
-</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -868,13 +1026,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><nav class="page-navigation column-body"><div class="nav-page nav-page-previous">
-      <a href="./CARTaGENE-sample-size.html" class="pagination-link" aria-label="CartaGene Sample Size estimation">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">CartaGene Sample Size estimation</span></span>
+      <a href="./CARTaGENE-GWAS-Report.html" class="pagination-link" aria-label="Main GWAS pipeline">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Main GWAS pipeline</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./references.html" class="pagination-link" aria-label="Bibliographic References">
-        <span class="nav-page-text">Bibliographic References</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./tools_installation.html" class="pagination-link" aria-label="Tools installation">
+        <span class="nav-page-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Tools installation</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -885,7 +1043,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
 <p>Written by Bastien CHASSAGNOL and Marie-Pier SCOTT-KELLY, with <a href="https://quarto.org/">Quarto</a>.</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/edit/master/tools_installation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/blob/master/tools_installation.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/edit/master/CARTaGENE-sample-size.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/blob/master/CARTaGENE-sample-size.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
 <li class="nav-item compact">
@@ -897,7 +1055,38 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </ul>
 </div>
   </div>
-</footer>
+</footer><script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 <script src="site_libs/quarto-html/zenscroll-min.js"></script>
