@@ -94,3 +94,10 @@ VariantAnnotation::geno(VariantAnnotation::header(vcf))
 VariantAnnotation::alt(vcf)[1:5]
 ```
 
+## Additional resources
+
+- [`FreeBayes` variant calling workflow for DNA-Seq](https://bioinformaticsworkbook.org/dataAnalysis/VariantCalling/freebayes-dnaseq-workflow.html) is able to detect from scratch small polymorphisms, such as *SNPs* (single-nucleotide polymorphisms), *indels* (insertions and deletions), and *MNPs* (multi-nucleotide polymorphisms):
+
+  - Provides as well a comprehensive tutorial for retrieving variants annotations.
+  - QC plots with the `vcfR` package.
+

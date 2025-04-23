@@ -886,12 +886,13 @@ ggsave("figures/gwas_HDAC9.pdf",
 
 To compute the adjusted *significance threshold*, we applied a `FWER`-like approach, conventional in the GWAS field: `{{r}} 0.05/(num_variants*length(cartagene_response_variables$Features))`, in which you divide the pre-defined threshold (standard: `0.05`) by the total number of pairwise tests carried out (number of variants times number of regression variables times). Final threshold is accordingly: `{r} 0.05/(num_variants*length(cartagene_response_variables$Features))`, as `{r} num_variants` variants were extracted, and `{r} length(cartagene_response_variables$Features)` phenotype variables were predicted.
 
-[The FWER approach is particularly **conservative**, in other words, only the most significant differences are detected.]{fg="red"}
+[The `FWER` approach is particularly **conservative**, in other words, only the most significant differences are detected.]{fg="red"}
 
 -   **Perspectives**:
 
     -   [Recent Adjusted $p$-value correction method](https://www.linkedin.com/posts/adrianolszewski_statistic-datascience-research-activity-7301605962820284417-ho3Z).
     -   [Multiple Comparisons Using R](https://www.taylorfrancis.com/books/mono/10.1201/9781420010909/multiple-comparisons-using-frank-bretz-torsten-hothorn-peter-westfall), comprehensive resource of distinct R package strategies for correcting for multiplicity of $p$-values, from @bretz2016. Report also to @nte-MTC for an overview of existing approaches.
+    - [Multiple Testing: Methods Overview](https://yasenov.com/2022/10/multiple-hypotheses-testing-a-methods-overview/) reviews the most popular approaches for controlling the false-error rate, while providing practical R code snippets to implement them. The blog concludes on the prevalance of the *Benjamini-Yekuiteli approach*, offering the best compromise between statistical power and interpretability.
 
 ::: {#nte-MTC .callout-note title = "Classes of Multiple Test correction approaches" collapse = "true"}
 
@@ -975,6 +976,10 @@ Lots of intermediate files are not required for downstream analyses, hence it wo
   - The `Nextflow` Seqera [`multiqc`](https://seqera.io/multiqc/) initiative collects within the same repository a variety of command-line tools, such as `bcftools` and `plink2`, with notably the [`vcftools`](https://github.com/MultiQC/MultiQC/tree/main/multiqc/modules/vcftools) and [`multivcfanalyzer`](https://github.com/MultiQC/MultiQC/tree/main/multiqc/modules/multivcfanalyzer) modules. Note however that these tools are optimised in Python.
 
 -   [`PopGLen` 'Snakemake' pipeline](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf105/8069456), from @nolen2025b. [Not for running GWAS analyses, but rather for evaluating the quality and impact of preprocessing and quality mapping at the population-level genome starting from `FASTQ` files.]{fg="red"}
+
+### FASTQ and FASTA Quality Controls
+
+- The 7th chapter entitled ["Quality Check, Processing and Alignment of High-throughput Sequencing Reads"](https://compgenomr.github.io/book/processingReads.html) introduces the fundamentals, using R packages, to process FASTA reads, and evaluate their quality with a variety of metrics ($k$-mer over-representation, sequence quality, percentage of duplicated reads, ..).
 
 
 <!-- ### Clean Git History -->
