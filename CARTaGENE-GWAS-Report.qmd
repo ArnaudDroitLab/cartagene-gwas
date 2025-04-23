@@ -155,6 +155,7 @@ conflicted::conflicts_prefer(dplyr::select, dplyr::filter)
 
 
 ## Retrieve gene positions
+library(GenomicFeatures) # Pre-load the package for mapping gene IDs
 library(org.Hs.eg.db)  ## Provides gene symbol to Entrez ID mapping
 
 ## for generating nice visualisations
