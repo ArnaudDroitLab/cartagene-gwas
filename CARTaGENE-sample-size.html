@@ -370,13 +370,13 @@ Processed variant: 2622
 <pre><code>##  Population summary complete.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>##    elapsed time:  91.75</code></pre>
+<pre><code>##    elapsed time:  77.811</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>##  window_init complete.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>##    elapsed time:  0.003</code></pre>
+<pre><code>##    elapsed time:  0.002</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>##  Warning in vcfR::proc.chromR(vcfR::create.chromR(name = "Supercontig", vcf =
@@ -390,7 +390,7 @@ Processed variant: 2622
 <pre><code>##  windowize_variants complete.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>##    elapsed time:  0.002</code></pre>
+<pre><code>##    elapsed time:  0.001</code></pre>
 </div>
 </div>
 </section><section id="vcf-files-qc" class="level3" data-number="2.2.2"><h3 data-number="2.2.2" class="anchored" data-anchor-id="vcf-files-qc">
@@ -421,7 +421,7 @@ Figure&nbsp;2.2: Quality control per chrosomsome, for a given variant.
 </div>
 </div>
 </div>
-<p><span class="quarto-unresolved-ref">?fig-plot-qc-per-chrom</span> is a <strong>chromo plot</strong>:</p>
+<p><a href="#fig-plot-qc-per-chrom" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-plot-qc-per-chrom</span></a> is a <strong>chromo plot</strong>:</p>
 <ul>
 <li>
 <strong>Annotation data</strong> on the lowest plot. Features in the annotation file (e.g., gene models, exons, etc.) are represented as dark red rectangles.</li>
@@ -461,7 +461,7 @@ Figure&nbsp;2.2: Quality control per chrosomsome, for a given variant.
 Table&nbsp;2.1: VCF annotations and descriptions.
 </figcaption></figure>
 </div>
-<p><strong>Minor allele frequency (MAF)</strong> for a given variant can be computed from <strong>DS (Estimated Alternate Allele Dosage)</strong>, <strong>HDS (Haploid Dosage)</strong>, or <strong>GP</strong> (Posterior Probabilities for Genotypes), as reported in <a href="#tbl-MAF-formula" class="quarto-xref">Table&nbsp;<span>2.2</span></a>, and the corresponding MAF tables and abundancies are reported in <a href="#tbl-MAF-estimation" class="quarto-xref">Table&nbsp;<span>2.3</span></a>.</p>
+<p><strong>Minor allele frequency (MAF)</strong> for a given variant can be computed from <strong>DS (Estimated Alternate Allele Dosage)</strong>, <strong>HDS (Haploid Dosage)</strong>, or <strong>GP</strong> (Posterior Probabilities for Genotypes), as reported in <a href="#tbl-MAF-formula" class="quarto-xref">Table&nbsp;<span class="quarto-unresolved-ref">tbl-MAF-formula</span></a>, and the corresponding MAF tables and abundancies are reported in <a href="#tbl-MAF-estimation" class="quarto-xref">Table&nbsp;<span class="quarto-unresolved-ref">tbl-MAF-estimation</span></a>.</p>
 <div id="tip-MAF" class="callout callout-style-default callout-tip callout-titled" title="Computation of the MAF score">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -536,57 +536,57 @@ Table&nbsp;2.2: Infer MAF formulas
 <figure class="quarto-float quarto-subfloat-tbl figure"><div aria-describedby="tbl-MAF-estimation-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <div class="tabwid">
-<style>.cl-46269ce8{}.cl-46123d34{font-family:'DejaVu Sans';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-46123eba{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-461af334{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-461af366{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-461b4db6{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-461b4dca{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-461b4dde{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-461b4de8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-461b4dfc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-461b4e10{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
-<table data-quarto-disable-processing="true" class="cl-46269ce8">
+<style>.cl-ff4f1b98{}.cl-ff3b8010{font-family:'DejaVu Sans';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-ff3b8042{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-ff45b5e4{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-ff45b60c{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-ff4603c8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ff4603e6{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ff4603f0{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ff46040e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ff460422{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ff460436{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="cl-ff4f1b98">
 <thead><tr style="overflow-wrap:break-word;">
-<th class="cl-461b4db6"><p class="cl-461af334"><span class="cl-46123d34">SNP_ID</span></p></th>
-<th class="cl-461b4dca"><p class="cl-461af366"><span class="cl-46123d34">nAllele</span></p></th>
-<th class="cl-461b4dca"><p class="cl-461af366"><span class="cl-46123d34">NA</span></p></th>
-<th class="cl-461b4dca"><p class="cl-461af366"><span class="cl-46123d34">Count</span></p></th>
-<th class="cl-461b4dca"><p class="cl-461af366"><span class="cl-46123d34">Frequency</span></p></th>
+<th class="cl-ff4603c8"><p class="cl-ff45b5e4"><span class="cl-ff3b8010">SNP_ID</span></p></th>
+<th class="cl-ff4603e6"><p class="cl-ff45b60c"><span class="cl-ff3b8010">nAllele</span></p></th>
+<th class="cl-ff4603e6"><p class="cl-ff45b60c"><span class="cl-ff3b8010">NA</span></p></th>
+<th class="cl-ff4603e6"><p class="cl-ff45b60c"><span class="cl-ff3b8010">Count</span></p></th>
+<th class="cl-ff4603e6"><p class="cl-ff45b60c"><span class="cl-ff3b8010">Frequency</span></p></th>
 </tr></thead>
 <tbody>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-461b4dde"><p class="cl-461af334"><span class="cl-46123eba">chr7:18087100:T:A</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">1,024</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0.01745236</span></p></td>
+<td class="cl-ff4603f0"><p class="cl-ff45b5e4"><span class="cl-ff3b8042">chr7:18087100:T:A</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">58,674</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">1,024</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0.01745236</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-461b4dde"><p class="cl-461af334"><span class="cl-46123eba">chr7:18087117:T:A</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">1,548</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0.02638307</span></p></td>
+<td class="cl-ff4603f0"><p class="cl-ff45b5e4"><span class="cl-ff3b8042">chr7:18087117:T:A</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">58,674</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">1,548</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0.02638307</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-461b4dde"><p class="cl-461af334"><span class="cl-46123eba">chr7:18087870:T:C</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">867</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0.01477656</span></p></td>
+<td class="cl-ff4603f0"><p class="cl-ff45b5e4"><span class="cl-ff3b8042">chr7:18087870:T:C</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">58,674</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">867</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0.01477656</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-461b4dde"><p class="cl-461af334"><span class="cl-46123eba">chr7:18088625:A:G</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">24,666</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0.42039063</span></p></td>
+<td class="cl-ff4603f0"><p class="cl-ff45b5e4"><span class="cl-ff3b8042">chr7:18088625:A:G</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">58,674</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">24,666</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0.42039063</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-461b4dde"><p class="cl-461af334"><span class="cl-46123eba">chr7:18089395:A:G</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">626</span></p></td>
-<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0.01066912</span></p></td>
+<td class="cl-ff4603f0"><p class="cl-ff45b5e4"><span class="cl-ff3b8042">chr7:18089395:A:G</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">58,674</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">626</span></p></td>
+<td class="cl-ff46040e"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0.01066912</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-461b4dfc"><p class="cl-461af334"><span class="cl-46123eba">chr7:18089923:TTTTG:T</span></p></td>
-<td class="cl-461b4e10"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
-<td class="cl-461b4e10"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
-<td class="cl-461b4e10"><p class="cl-461af366"><span class="cl-46123eba">16,876</span></p></td>
-<td class="cl-461b4e10"><p class="cl-461af366"><span class="cl-46123eba">0.28762314</span></p></td>
+<td class="cl-ff460422"><p class="cl-ff45b5e4"><span class="cl-ff3b8042">chr7:18089923:TTTTG:T</span></p></td>
+<td class="cl-ff460436"><p class="cl-ff45b60c"><span class="cl-ff3b8042">58,674</span></p></td>
+<td class="cl-ff460436"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0</span></p></td>
+<td class="cl-ff460436"><p class="cl-ff45b60c"><span class="cl-ff3b8042">16,876</span></p></td>
+<td class="cl-ff460436"><p class="cl-ff45b60c"><span class="cl-ff3b8042">0.28762314</span></p></td>
 </tr>
 </tbody>
 </table>
@@ -603,36 +603,36 @@ Table&nbsp;2.2: Infer MAF formulas
 <figure class="quarto-float quarto-subfloat-tbl figure"><div aria-describedby="tbl-MAF-estimation-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <div class="tabwid">
-<style>.cl-467f1918{}.cl-465159d8{font-family:'DejaVu Sans';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-46515a1e{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-4674d64c{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-46752444{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-4675246c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-46752480{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
-<table data-quarto-disable-processing="true" class="cl-467f1918">
+<style>.cl-ff728664{}.cl-ff6458c8{font-family:'DejaVu Sans';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-ff6458f0{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-ff6a4ea4{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-ff6a9512{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ff6a953a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ff6a953b{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="cl-ff728664">
 <thead><tr style="overflow-wrap:break-word;">
-<th class="cl-46752444"><p class="cl-4674d64c"><span class="cl-465159d8">POS</span></p></th>
-<th class="cl-46752444"><p class="cl-4674d64c"><span class="cl-465159d8">MAF</span></p></th>
+<th class="cl-ff6a9512"><p class="cl-ff6a4ea4"><span class="cl-ff6458c8">POS</span></p></th>
+<th class="cl-ff6a9512"><p class="cl-ff6a4ea4"><span class="cl-ff6458c8">MAF</span></p></th>
 </tr></thead>
 <tbody>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">18,773,294</span></p></td>
-<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4989486</span></p></td>
+<td class="cl-ff6a953a"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">18,773,294</span></p></td>
+<td class="cl-ff6a953a"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">0.4989486</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">18,769,554</span></p></td>
-<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4980236</span></p></td>
+<td class="cl-ff6a953a"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">18,769,554</span></p></td>
+<td class="cl-ff6a953a"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">0.4980236</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">18,104,245</span></p></td>
-<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4958051</span></p></td>
+<td class="cl-ff6a953a"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">18,104,245</span></p></td>
+<td class="cl-ff6a953a"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">0.4958051</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">18,092,439</span></p></td>
-<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4942534</span></p></td>
+<td class="cl-ff6a953a"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">18,092,439</span></p></td>
+<td class="cl-ff6a953a"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">0.4942534</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">18,775,850</span></p></td>
-<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4941757</span></p></td>
+<td class="cl-ff6a953a"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">18,775,850</span></p></td>
+<td class="cl-ff6a953a"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">0.4941757</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-46752480"><p class="cl-4674d64c"><span class="cl-46515a1e">18,770,620</span></p></td>
-<td class="cl-46752480"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4934447</span></p></td>
+<td class="cl-ff6a953b"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">18,770,620</span></p></td>
+<td class="cl-ff6a953b"><p class="cl-ff6a4ea4"><span class="cl-ff6458f0">0.4934447</span></p></td>
 </tr>
 </tbody>
 </table>
@@ -686,10 +686,10 @@ Figure&nbsp;2.3: Distribution of MAF (minor allele frequency values)
 <span class="header-section-number">2.3</span> Sample Size Calculation</h2>
 <ul>
 <li>
-<p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9863799/#sec5-life-13-00235">Sample Size Calculation in Genetic Association Studies: A Practical Approach</a>, from <span class="citation" data-cites="politi2023l">Politi et al. (<a href="references.html#ref-politi2023l" role="doc-biblioref">2023</a>)</span>, notably listing the following tools:</p>
+<p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9863799/#sec5-life-13-00235">Sample Size Calculation in Genetic Association Studies: A Practical Approach</a>, from <span class="citation" data-cites="politi2023l">Politi et al. (<a href="#ref-politi2023l" role="doc-biblioref">2023</a>)</span>, notably listing the following tools:</p>
 <ul>
-<li><p><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7666027/"><code>GENPWR</code>: Power and Sample Size Calculations for Genetic Association Studies in the Presence of Genetic Model Mis-Specification</a>, from <span class="citation" data-cites="moore2019hh">Moore, Jacobso, and Fingerlin (<a href="references.html#ref-moore2019hh" role="doc-biblioref">2019</a>)</span> and available as a <a href="https://cran.r-project.org/web/packages/genpwr/vignettes/vignette.html">R package</a>, is able to compute the sample size for dichotomous or continuous outcomes in gene-only studies, implementing additive, dominant and recessive models (see <a href="#tip-genetic-model" class="quarto-xref">Tip&nbsp;<span>2.2</span></a> for details). Report to <a href="#sec-GENPWR" class="quarto-xref"><span>Section 2.3.1</span></a> for a practical illustration.</p></li>
-<li><p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2387159/"><code>PGA</code>: Power for Genetic Association</a>, from <span class="citation" data-cites="menashe2008bg">Menashe, Rosenberg, and Chen (<a href="references.html#ref-menashe2008bg" role="doc-biblioref">2008</a>)</span> is able to adjust for <strong>multiple comparisons</strong>, in contrast with <code>GENPWR</code>, and LD between the marker and the disease allele. <span data-fg="red" style="color: red;">Seems not available anymore</span></p></li>
+<li><p><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7666027/"><code>GENPWR</code>: Power and Sample Size Calculations for Genetic Association Studies in the Presence of Genetic Model Mis-Specification</a>, from <span class="citation" data-cites="moore2019hh">Moore, Jacobso, and Fingerlin (<a href="#ref-moore2019hh" role="doc-biblioref">2019</a>)</span> and available as a <a href="https://cran.r-project.org/web/packages/genpwr/vignettes/vignette.html">R package</a>, is able to compute the sample size for dichotomous or continuous outcomes in gene-only studies, implementing additive, dominant and recessive models (see <a href="#tip-genetic-model" class="quarto-xref">Tip&nbsp;<span class="quarto-unresolved-ref">tip-genetic-model</span></a> for details). Report to <a href="#sec-GENPWR" class="quarto-xref"><span class="quarto-unresolved-ref">sec-GENPWR</span></a> for a practical illustration.</p></li>
+<li><p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2387159/"><code>PGA</code>: Power for Genetic Association</a>, from <span class="citation" data-cites="menashe2008bg">Menashe, Rosenberg, and Chen (<a href="#ref-menashe2008bg" role="doc-biblioref">2008</a>)</span> is able to adjust for <strong>multiple comparisons</strong>, in contrast with <code>GENPWR</code>, and LD between the marker and the disease allele. <span data-fg="red" style="color: red;">Seems not available anymore</span></p></li>
 </ul>
 </li>
 </ul>
@@ -721,9 +721,9 @@ Tip&nbsp;2.2: Genetic models
 <hr>
 <p>🧬 Genetic Models in GWAS</p>
 <ul>
-<li><p><strong>Additive model</strong>: in <a href="#eq-genetic-model" class="quarto-xref">Equation&nbsp;<span>2.1</span></a>, ‘gene cat’ is converted as <code>AA = 0</code>, <code>Aa = 1</code> and <code>aa = 2</code>. Each additional copy of the minor allele increases the trait linearly.</p></li>
-<li><p><strong>Dominant model</strong>: in <a href="#eq-genetic-model" class="quarto-xref">Equation&nbsp;<span>2.1</span></a>, ‘gene cat’ is converted as <code>AA = 0</code>, <code>Aa = 1</code> and <code>aa = 1</code>. Presence of <strong>at least one</strong> minor allele confers full effect (no dose response).</p></li>
-<li><p><strong>Recessive model</strong>: in <a href="#eq-genetic-model" class="quarto-xref">Equation&nbsp;<span>2.1</span></a>, ‘gene cat’ is converted as <code>AA = 0</code>, <code>Aa = 0</code> and <code>aa = 1</code>. Only <strong>homozygous minor</strong> genotype has an effect.</p></li>
+<li><p><strong>Additive model</strong>: in <a href="#eq-genetic-model" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-genetic-model</span></a>, ‘gene cat’ is converted as <code>AA = 0</code>, <code>Aa = 1</code> and <code>aa = 2</code>. Each additional copy of the minor allele increases the trait linearly.</p></li>
+<li><p><strong>Dominant model</strong>: in <a href="#eq-genetic-model" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-genetic-model</span></a>, ‘gene cat’ is converted as <code>AA = 0</code>, <code>Aa = 1</code> and <code>aa = 1</code>. Presence of <strong>at least one</strong> minor allele confers full effect (no dose response).</p></li>
+<li><p><strong>Recessive model</strong>: in <a href="#eq-genetic-model" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-genetic-model</span></a>, ‘gene cat’ is converted as <code>AA = 0</code>, <code>Aa = 0</code> and <code>aa = 1</code>. Only <strong>homozygous minor</strong> genotype has an effect.</p></li>
 </ul>
 <p><span id="eq-genetic-model"><span class="math display">\[
 Y = \beta_0 + \beta_1 G_{\text{gene cat}} + \beta_2 X + \epsilon
@@ -778,7 +778,7 @@ Y = \beta_0 + \beta_1 G_{\text{gene cat}} + \beta_2 X + \epsilon
 <ul>
 <li><p><span data-fg="red" style="color: red;">Noted out some bugs for <code>GENPWR</code> in extreme scenarios, like negative estimation of sample sizes, or sample sizes not increasing monotonically with decreasing <span class="math inline">\(p-\)</span> value.</span></p></li>
 <li>
-<p><span class="citation" data-cites="fadista2016ejhg">Fadista et al. (<a href="references.html#ref-fadista2016ejhg" role="doc-biblioref">2016</a>)</span> estimates the following thresholds:</p>
+<p><span class="citation" data-cites="fadista2016ejhg">Fadista et al. (<a href="#ref-fadista2016ejhg" role="doc-biblioref">2016</a>)</span> estimates the following thresholds:</p>
 <ul>
 <li>
 <span class="math inline">\(5 \times 10^{−8}\)</span> <span class="math inline">\(p\)</span>-value threshold for WGS for common genetic variations in the European population (<span class="math inline">\(\text{MAF} \ge 5 \%\)</span>).</li>
@@ -791,7 +791,7 @@ Y = \beta_0 + \beta_1 G_{\text{gene cat}} + \beta_2 X + \epsilon
 </ul>
 </li>
 <li>
-<p><span class="citation" data-cites="david2021tig">David (<a href="references.html#ref-david2021tig" role="doc-biblioref">2021</a>)</span> determines that:</p>
+<p><span class="citation" data-cites="david2021tig">David (<a href="#ref-david2021tig" role="doc-biblioref">2021</a>)</span> determines that:</p>
 <ul>
 <li>The odds-ratio was on average below 2 for frequent variants.</li>
 <li>And around 4 for rare variants, <span class="math inline">\(\text{MAF} &lt; 0.1\)</span>
@@ -799,6 +799,7 @@ Y = \beta_0 + \beta_1 G_{\text{gene cat}} + \beta_2 X + \epsilon
 </ul>
 </li>
 <li><p><code>2df</code>stands for two degrees of freedom, in other words, when no inheritance model is assumed.</p></li>
+<li><p><span data-fg="red" style="color: red;">By default, it’s the <strong>additive test</strong>, the least powerful, but also the most flexible, which is performed when running <code>plink2</code>.</span></p></li>
 </ul>
 <div class="cell" data-layout-align="center">
 <details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">cartagene_phenodata</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_tsv</a></span><span class="op">(</span><span class="st">"data/phenotypes/merge_phenos_PCs.txt"</span>, </span>
@@ -1076,7 +1077,7 @@ Figure&nbsp;2.6: With an <span class="math inline">\(\alpha\)</span>-threshold o
 </ul>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-david2021tig" class="csl-entry" role="listitem">
 David, Susana. 2021. <span>‘A Current Guide to Candidate Gene Association Studies’</span>. <em>Trends in Genetics</em> 37 (12): 1056–59. <a href="https://doi.org/10.1016/j.tig.2021.07.009">https://doi.org/10.1016/j.tig.2021.07.009</a>.
 </div>

@@ -308,10 +308,12 @@ plink2 \
 Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`. Variables of interest are reported [here](./data/phenotypes/cartagene_response_variables.xlsx):
 
 ```{r}
-#| label: cartage-pheno-meta
+#| label: tab-cartage-pheno-meta
 
 cartagene_response_variables <- readxl::read_excel("data/phenotypes/cartagene_response_variables.xlsx")
 
+flextable(cartagene_response_variables) |> 
+  bold(part = "header")
 ```
 
 ##### i) Merge genotype IDs, phenotypes and PCAs values
