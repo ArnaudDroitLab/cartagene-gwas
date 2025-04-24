@@ -519,7 +519,7 @@ Finally, we save the updated phenotype dataset as a Tab-separated file, using `r
 #| tbl-subcap:
 #|   - "Bone Damages"
 #|   - "Cardiovascular events"
-#| layout-ncol: 2
+#| layout-nrow: 2
 
 ## define Boolean categorical variables
 categorical_variables <- cartagene_response_variables$Features[
@@ -540,16 +540,21 @@ cartagene_phenodata_summary <- cartagene_phenodata |>
   dplyr::mutate(Value = tidyr::replace_na(as.character(Value), "osteosecondaire")) |> 
   dplyr::count(Features, GENDER01, Value) |> 
   dplyr::rename(Counts=n) |> 
-  dplyr::inner_join(cartagene_response_variables, by = "Features")
+  dplyr::inner_join(cartagene_response_variables, by = "Features") 
+
 
 
 cartagene_phenodata_summary |> 
   dplyr::filter(Disease == "Bone Damage") |> 
-  dplyr::select(Features, Description, GENDER01, Value, Counts)
+  dplyr::select(Features, Description, GENDER01, Value, Counts) |> 
+  flextable() |> 
+  bold(part = "header")
 
 cartagene_phenodata_summary |> 
   dplyr::filter(Disease == "Cardiovascular events") |> 
-  dplyr::select(Features, Description, GENDER01, Value, Counts)
+  dplyr::select(Features, Description, GENDER01, Value, Counts) |> 
+  flextable() |> 
+  bold(part = "header")
 ```
 
 ### Step 2: Variants extraction {#sec-variant-extraction}
