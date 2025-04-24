@@ -29,7 +29,7 @@ library(genpwr)
 #| label: vcf-file-load
 #| message: true
 #| warning: true
-#| cache: true
+#| cache: false
 
 # vcf_file <- "./data/variants/chr17.HDAC5.vcf"
 vcf_file <- "./data/variants/chr7.HDAC9.vcf"
@@ -73,7 +73,7 @@ Main [`tidy vcfR`](https://knausb.github.io/vcfR_documentation/tidy_vcfR.html) i
 #|   - "Imputed SNPs metadata"
 #|   - "Header `FORMAT` and Description for the VCF file."
 #| layout-ncol: 2
-#| cache: true
+#| cache: false
 
 vcf_tidy <- vcfR::vcfR2tidy(vcf)
 vcfR::vcf_field_names(vcf, tag = "INFO")
