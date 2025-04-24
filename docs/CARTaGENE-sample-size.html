@@ -51,6 +51,7 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
+<<<<<<< HEAD
 /* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
@@ -72,6 +73,9 @@ div.csl-right-inline {
 div.csl-indent {
   margin-left: 2em;
 }</style>
+=======
+</style>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
@@ -126,6 +130,7 @@ div.csl-indent {
   window.document.addEventListener("DOMContentLoaded", function (_event) {
     document.body.classList.add('hypothesis-enabled');
   });
+<<<<<<< HEAD
 </script><link href="site_libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
 <script src="site_libs/tabwid-1.1.3/tabwid.js"></script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
 const typesetMath = (el) => {
@@ -152,6 +157,8 @@ const typesetMath = (el) => {
 window.Quarto = {
   typesetMath
 };
+=======
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </script>
 <meta property="og:title" content="2&nbsp; CartaGene Sample Size estimation – GWAS Analyses utilising the CARTaGENE database">
 <meta property="og:image" content="https://arnauddroitlab.github.io/cartagene-gwas/CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png">
@@ -252,6 +259,7 @@ window.Quarto = {
   <ul>
 <li><a href="#load-vcf-files" id="toc-load-vcf-files" class="nav-link" data-scroll-target="#load-vcf-files"><span class="header-section-number">2.2.1</span> Load VCF files</a></li>
   <li><a href="#vcf-files-qc" id="toc-vcf-files-qc" class="nav-link" data-scroll-target="#vcf-files-qc"><span class="header-section-number">2.2.2</span> VCF files QC</a></li>
+<<<<<<< HEAD
   <li><a href="#maf-histogram-distribution" id="toc-maf-histogram-distribution" class="nav-link" data-scroll-target="#maf-histogram-distribution"><span class="header-section-number">2.2.3</span> MAF histogram distribution</a></li>
   </ul>
 </li>
@@ -261,6 +269,11 @@ window.Quarto = {
 <li><a href="#sec-GENPWR" id="toc-sec-GENPWR" class="nav-link" data-scroll-target="#sec-GENPWR"><span class="header-section-number">2.3.1</span> <code>GENPWR</code> Sample Size estimation</a></li>
   </ul>
 </li>
+=======
+  </ul>
+</li>
+  <li><a href="#vcf-files-qc-with-variantannotation" id="toc-vcf-files-qc-with-variantannotation" class="nav-link" data-scroll-target="#vcf-files-qc-with-variantannotation"><span class="header-section-number">2.3</span> VCF Files QC with <code>VariantAnnotation</code></a></li>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
   <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources"><span class="header-section-number">2.4</span> Additional resources</a></li>
   </ul><div class="toc-actions"><ul><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/edit/master/CARTaGENE-sample-size.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/blob/master/CARTaGENE-sample-size.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
@@ -294,10 +307,14 @@ window.Quarto = {
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://xml2.r-lib.org">xml2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Report automated QCs for VCF files</span></span>
+<<<<<<< HEAD
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/knausb/vcfR">vcfR</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Sample size estimation</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">genpwr</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+=======
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/knausb/vcfR">vcfR</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </details>
 </div>
 </section><section id="sec-vcfr" class="level2" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="sec-vcfr">
@@ -306,21 +323,30 @@ window.Quarto = {
 <section id="load-vcf-files" class="level3" data-number="2.2.1"><h3 data-number="2.2.1" class="anchored" data-anchor-id="load-vcf-files">
 <span class="header-section-number">2.2.1</span> Load VCF files</h3>
 <div class="cell" data-layout-align="center">
+<<<<<<< HEAD
 <details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># vcf_file &lt;- "./data/variants/chr17.HDAC5.vcf"</span></span>
 <span><span class="va">vcf_file</span> <span class="op">&lt;-</span> <span class="st">"./data/variants/chr7.HDAC9.vcf"</span></span>
+=======
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vcf_file</span> <span class="op">&lt;-</span> <span class="st">"./data/variants/chr17.HDAC5.vcf"</span></span>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 <span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/io_vcfR.html">read.vcfR</a></span><span class="op">(</span><span class="va">vcf_file</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output cell-output-stdout">
 <pre class="code_output"><code>##  Scanning file to determine attributes.
 ##  File attributes:
 ##    meta lines: 24
 ##    header_line: 25
+<<<<<<< HEAD
 ##    variant count: 2622
+=======
+##    variant count: 91
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 ##    column count: 29346
 ##  
 Meta line 24 read in.
 ##  All meta lines processed.
 ##  gt matrix initialized.
 ##  Character matrix gt created.
+<<<<<<< HEAD
 ##    Character matrix gt rows: 2622
 ##    Character matrix gt cols: 29346
 ##    skip: 0
@@ -330,18 +356,35 @@ Meta line 24 read in.
 Processed variant 1000
 Processed variant 2000
 Processed variant: 2622
+=======
+##    Character matrix gt rows: 91
+##    Character matrix gt cols: 29346
+##    skip: 0
+##    nrows: 91
+##    row_num: 0
+##  
+Processed variant: 91
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 ##  All variants processed</code></pre>
 </div>
 <details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">chrom</span> <span class="op">&lt;-</span> <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/create_chromR.html">create.chromR</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Supercontig"</span>, vcf <span class="op">=</span> <span class="va">vcf</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># removing low quality variants, none of these metrics is reported</span></span>
 <span>  <span class="co"># vcfR::masker(min_QUAL = 0, min_DP = 350, max_DP = 650, </span></span>
 <span>  <span class="co">#              min_MQ = 59.5, max_MQ = 60.5) |&gt; </span></span>
+<<<<<<< HEAD
 <span>  <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/proc_chromR.html">proc.chromR</a></span><span class="op">(</span>win.size <span class="op">=</span> <span class="fl">1e4</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+=======
+<span>  <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/proc_chromR.html">proc.chromR</a></span><span class="op">(</span>win.size <span class="op">=</span> <span class="fl">1e2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </details><div class="cell-output cell-output-stderr">
 <pre><code>##  Names in vcf:</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<<<<<<< HEAD
 <pre><code>##    chr7</code></pre>
+=======
+<pre><code>##    chr17</code></pre>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>##  Initializing var.info slot.</code></pre>
@@ -370,13 +413,21 @@ Processed variant: 2622
 <pre><code>##  Population summary complete.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<<<<<<< HEAD
 <pre><code>##    elapsed time:  100.108</code></pre>
+=======
+<pre><code>##    elapsed time:  2.685</code></pre>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>##  window_init complete.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<<<<<<< HEAD
 <pre><code>##    elapsed time:  0.002</code></pre>
+=======
+<pre><code>##    elapsed time:  0.019</code></pre>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>##  Warning in vcfR::proc.chromR(vcfR::create.chromR(name = "Supercontig", vcf =
@@ -387,38 +438,68 @@ Processed variant: 2622
 ##  vcf), : ann slot has zero rows.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<<<<<<< HEAD
 <pre><code>##  windowize_variants complete.
 ##    elapsed time:  0.002</code></pre>
+=======
+<pre><code>##  windowize_variants complete.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>##    elapsed time:  0.014</code></pre>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </div>
 </div>
 </section><section id="vcf-files-qc" class="level3" data-number="2.2.2"><h3 data-number="2.2.2" class="anchored" data-anchor-id="vcf-files-qc">
 <span class="header-section-number">2.2.2</span> VCF files QC</h3>
 <div class="cell" data-layout-align="center">
+<<<<<<< HEAD
 <details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/chromo_plot.html">chromoqc</a></span><span class="op">(</span><span class="va">chrom</span>, dp.alpha <span class="op">=</span> <span class="fl">22</span>,</span>
+=======
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/chromo_plot.html">chromoqc</a></span><span class="op">(</span><span class="va">chrom</span>, dp.alpha <span class="op">=</span> <span class="fl">22</span>,</span>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 <span>               xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">chrom</span><span class="op">@</span><span class="va">var.info</span><span class="op">$</span><span class="va">POS</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">chrom</span><span class="op">@</span><span class="va">var.info</span><span class="op">$</span><span class="va">POS</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">chrom</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
+<<<<<<< HEAD
 <div id="fig-plot-qc-per-chrom-1" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-plot-qc-per-chrom-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <a href="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;2.1: Quality control per chrosomsome, for a given variant."><img src="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-qc-per-chrom-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.1: Quality control per chrosomsome, for a given variant.
+=======
+<div id="fig-plot-qc-per-chrom-1" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-plot-qc-per-chrom-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;2.1: "><img src="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png" id="fig-plot-qc-per-chrom-1" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-plot-qc-per-chrom-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </figcaption></figure>
 </div>
 </div>
 <div class="cell-output-display">
+<<<<<<< HEAD
 <div id="fig-plot-qc-per-chrom-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-plot-qc-per-chrom-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <a href="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2.2: Quality control per chrosomsome, for a given variant."><img src="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-qc-per-chrom-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.2: Quality control per chrosomsome, for a given variant.
+=======
+<div id="fig-plot-qc-per-chrom-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-plot-qc-per-chrom-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2.2: "><img src="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-2.png" id="fig-plot-qc-per-chrom-2" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-plot-qc-per-chrom-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </figcaption></figure>
 </div>
 </div>
 </div>
+<<<<<<< HEAD
 <p><span class="quarto-unresolved-ref">?fig-plot-qc-per-chrom</span> is a <strong>chromo plot</strong>:</p>
 <ul>
 <li>
@@ -437,6 +518,17 @@ Figure&nbsp;2.2: Quality control per chrosomsome, for a given variant.
 <figure class="quarto-float quarto-float-tbl figure"><div aria-describedby="tbl-vcf-tidy-format-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="quarto-layout-row">
 <div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+=======
+<ul>
+<li><p>In vcfR we refer to this form of plot as a chromo plot. This plot summarizes data from our three data sources. Annotation data is represented on the lowest plot. Features in the annotation file (e.g., gene models, exons, etc.) are represented as dark red rectangles. Above the annotation track is a sequence track. Here called nucleotides are represented in green while uncalled nucleotides (Ns) appear in red. Depending on the quality of your genome, it may include stretches of uncalled nucleotides. Above the annotation track is a windowing analysis of G/C content. This track includes marginal barplots to summarize its contents, as do the tracks above it. The next track summarizes the number of variants per window. Above that we see dot plots for quality, mapping quality and read depth.</p></li>
+<li><p>The raw read depth and mapping quality have been extracted from the INFO column of the VCF data. The quality is from the QUAL column of the VCF data. And the variant count per window was summarized during the windowing analysis performed by proc.chromR(). The raw read depth appears fairly continuous, an observation which appears consistent with the above chromo plots. Mapping quality appears to be predominantly one value (about 60), this may not have been apparent in the chromo plots. The variant count per window summarizes the degree of variability we’ve observed along our chromosome. The peak near zero indicates that many windows lack variants</p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vcf_tidy</span> <span class="op">&lt;-</span> <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcfR2tidy</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcf_field_names</a></span><span class="op">(</span><span class="va">vcf</span>, tag <span class="op">=</span> <span class="st">"INFO"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 <pre class="code_output"><code>##  # A tibble: 3 × 5
 ##    Tag   ID         Number Type  Description                         
 ##    &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;                               
@@ -444,7 +536,12 @@ Figure&nbsp;2.2: Quality control per chrosomsome, for a given variant.
 ##  2 INFO  TYPED      0      Flag  Marker was genotyped AND imputed    
 ##  3 INFO  TYPED_ONLY 0      Flag  Marker was genotyped but NOT imputed</code></pre>
 </div>
+<<<<<<< HEAD
 <div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+=======
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcf_field_names</a></span><span class="op">(</span><span class="va">vcf</span>, tag <span class="op">=</span> <span class="st">"FORMAT"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 <pre class="code_output"><code>##  # A tibble: 4 × 5
 ##    Tag    ID    Number Type   Description                                     
 ##    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;                                           
@@ -453,6 +550,7 @@ Figure&nbsp;2.2: Quality control per chrosomsome, for a given variant.
 ##  3 FORMAT HDS   2      Float  Estimated Haploid Alternate Allele Dosage       
 ##  4 FORMAT GP    3      Float  Estimated Posterior Probabilities for Genotypes…</code></pre>
 </div>
+<<<<<<< HEAD
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl" id="tbl-vcf-tidy-format-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -1069,11 +1167,46 @@ Figure&nbsp;2.6: With an <span class="math inline">\(\alpha\)</span>-threshold o
 <ul>
 <li><p>Provides as well a comprehensive tutorial for retrieving variants annotations.</p></li>
 <li><p>QC plots with the <code>vcfR</code> package.</p></li>
+=======
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">vcf_tidy</span><span class="op">$</span><span class="va">fix</span><span class="op">$</span><span class="va">TYPED_ONLY</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>https://knausb.github.io/vcfR_documentation/visualization_1.html</p>
+</section></section><section id="vcf-files-qc-with-variantannotation" class="level2" data-number="2.3"><h2 data-number="2.3" class="anchored" data-anchor-id="vcf-files-qc-with-variantannotation">
+<span class="header-section-number">2.3</span> VCF Files QC with <code>VariantAnnotation</code>
+</h2>
+<ul>
+<li><span data-fg="red" style="color: red;"><code>VariantAnnotation</code> provides more comprehensive features with respect to <a href="#sec-vcfr" class="quarto-xref"><span>Section 2.2</span></a>, yet, relies on external dependencies such as <code>bfctools</code>, and often faces memory limitations.</span></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html">readVcf</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"./data/variants/chr6.HLA-A.vcf"</span>, </span>
+<span>                                  genome <span class="op">=</span> <span class="st">"hg38"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># General vcf file structure ----</span></span>
+<span></span>
+<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCFHeader-class.html">header</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
+<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Biobase/man/class.MIAME.html">samples</a></span><span class="op">(</span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCFHeader-class.html">header</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCF-class.html">geno</a></span><span class="op">(</span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCFHeader-class.html">header</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Variant-specific fields, such as alternative allele configurations</span></span>
+<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCF-class.html">alt</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="additional-resources" class="level2" data-number="2.4"><h2 data-number="2.4" class="anchored" data-anchor-id="additional-resources">
+<span class="header-section-number">2.4</span> Additional resources</h2>
+<ul>
+<li>
+<p><a href="https://bioinformaticsworkbook.org/dataAnalysis/VariantCalling/freebayes-dnaseq-workflow.html"><code>FreeBayes</code> variant calling workflow for DNA-Seq</a> is able to detect from scratch small polymorphisms, such as <em>SNPs</em> (single-nucleotide polymorphisms), <em>indels</em> (insertions and deletions), and <em>MNPs</em> (multi-nucleotide polymorphisms):</p>
+<ul>
+<li>Provides as well a comprehensive tutorial for retrieving variants annotations.</li>
+<li>QC plots with the <code>vcfR</code> package.</li>
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </ul>
 </li>
 </ul>
 
 
+<<<<<<< HEAD
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
 <div id="ref-david2021tig" class="csl-entry" role="listitem">
 David, Susana. 2021. <span>‘A Current Guide to Candidate Gene Association Studies’</span>. <em>Trends in Genetics</em> 37 (12): 1056–59. <a href="https://doi.org/10.1016/j.tig.2021.07.009">https://doi.org/10.1016/j.tig.2021.07.009</a>.
@@ -1091,6 +1224,8 @@ Moore, Camille M., Sean A. Jacobso, and Tasha E. Fingerlin. 2019. <span>‘Power
 Politi, Cristina, Stefanos Roumeliotis, Giovanni Tripepi, and Belinda Spoto. 2023. <span>‘Sample <span>Size Calculation</span> in <span>Genetic Association Studies</span>: <span>A Practical Approach</span>’</span>. <em>Life</em> 13 (1): 235. <a href="https://doi.org/10.3390/life13010235">https://doi.org/10.3390/life13010235</a>.
 </div>
 </div>
+=======
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -1712,7 +1847,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
 <li class="nav-item compact">
+<<<<<<< HEAD
     <a class="nav-link" href="https://github.com/ArnaudDroitLab/cartagene-gwas">
+=======
+    <a class="nav-link active" href="https://github.com/ArnaudDroitLab/cartagene-gwas" aria-current="page">
+>>>>>>> f0b0c6bbb1564c15f2ca0b7ba0504b7728bdd885
       <i class="bi bi-github" role="img">
 </i> 
     </a>
