@@ -1136,6 +1136,27 @@
       ],
       "Hash": "15e9634c0fcd294799e9b2e929ed1b86"
     },
+    "genpwr": {
+      "Package": "genpwr",
+      "Version": "1.0.4",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "camillemmoore",
+      "RemoteRepo": "Power_Genetics",
+      "RemoteSubdir": "genpwr",
+      "RemoteRef": "master",
+      "RemoteSha": "2f80276dc94adf680c1c67889b89c99c412aa8b5",
+      "Requirements": [
+        "MASS",
+        "R",
+        "ggplot2",
+        "nleqslv",
+        "stats",
+        "utils"
+      ],
+      "Hash": "9155bf5b0b15faeafe57a34392cc587e"
+    },
     "ggVennDiagram": {
       "Package": "ggVennDiagram",
       "Version": "1.5.2",
@@ -1535,6 +1556,13 @@
         "methods"
       ],
       "Hash": "4fd8900853b746af55b81fda99da7695"
+    },
+    "nleqslv": {
+      "Package": "nleqslv",
+      "Version": "3.3.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "982736cfb7276c4d9a2afa4e6b8e95a4"
     },
     "nlme": {
       "Package": "nlme",

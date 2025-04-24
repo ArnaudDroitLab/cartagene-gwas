@@ -27,14 +27,10 @@ The code, main results (figures and tables), along with reports, are versioned i
 ### Important Questions to Address!! {#sec-questions}
 
 -   [Check Human reference genome assembly, see @sec-HDAC9. Indeed, among the five genome arrays assembled in @sec-white-selection, most have been mapped against `GRCh37 (hg19)`, but at least one has been mapped against the recent `hg38 (GRCh38, 2013)` version, report to page 38 in @pelletier2022.]{fg="red"} 
-- We definitely do not have the most recent version of `CarTaGene` (in the paper, around $30000$ samples mentioned, against $20000$ in my database + )
+- We definitely do not have the most recent version of `CarTaGene` (in the paper, around $30000$ samples mentioned, against $19131$ in my genotyping arrays database)
 -   [Why starting from BAM/BED/BIM pre-processed files in @sec-white-selection, instead of `FASTQ` files available in `/mnt/projects_tn01/Cartagene/data/merged`? Related question: we use the `BAM/BED/BIM` files stored in folder `/mnt/projects_tn01/Cartagene/analyses/QC` for PCA computation in @sec-preprocessing-redundancy, but `VCF` files stored in `/mnt/projects_tn01/Cartagene/analyses/variants_extraction` for running the GWAS analyses, for which reason?]{fg="red"}
--   [Why use a biased *gene-centric approach*, instead of true GWAS (further discussed in @sec-post-GWAS)?]{fg="red"}. Specifically, in contrast with the conclusions of this limited study on a single gene, namely `HDAC-9`, running a whole GWAS analysis on `CarTaGene` revealed promising and significant SNPs, as illustrated in @fig-gwas-global. 
-    - An alternative to *candidate gene* association studies relies on the *linkage analysis approach*, which uses familial pedigrees to map genetic variants underlying common human diseases. **This strategy requires both genetic data and detailed family pedigrees.**, report to for details.
-
-- Address intrinsic heterogeneity of the sampled population, see [A benchmark study on current GWAS models in admixed populations](https://doi.org/10.1093/bib/bbad437), from @yang2024bib. 
-
-![**GWAS of `CarTaGene` SNPs using `TOPMed` Merge-Impute (first, merge all genotype arrays, then impute SNPs) strategy**.  obtained through genotyping and imputation using the `TOPMed` Imputation Server under two analytic workflows: Impute-Merge and Merge-Impute. Manhattan plots depict the genome-wide association study (GWAS) results for variants (*Single nucleotide polymorphisms* and *insertion-deletion*), before and after imputation. The $y$-axis represents the $–\log_{10}(p)$ for the association of each variant. [Variants with $p$-values equal to zero are highlighted in green]{fg="green"}, while the [horizontal red line indicates the genome-wide *significance threshold*.]{fg="red"}. The total sample consisted of $27,422$ individuals.](./figures/global-GWAS.png){#fig-gwas-global}
+-   [Why use a biased *gene-centric approach*, instead of true GWAS (further discussed in @sec-post-GWAS)?]{fg="red"}. If ou really want to use a *candidate-gene approach*, report to [A current guide to candidate gene association studies](https://www.cell.com/trends/genetics/abstract/S0168-9525), from @david2021tig. 
+- [Run sample size experiences prior to gene candidate studies, see @sec-sample-size.]{fg="red"}
 
 
 ## Introduction
@@ -47,68 +43,29 @@ The code, main results (figures and tables), along with reports, are versioned i
 
 - [Genome-wide association studies](https://www.nature.com/articles/s43586-021-00056-9), from @uffelmann2021nrmp.
 
-### Original Design
+### Design of the `CARTaGENE` study
 
-- [Cohort profile of the `CARTaGENE` study: Quebec’s population-based biobank for public health and personalized genomics](https://doi.org/10.1093/ije/dys160), from @awadalla2013ijoe. 
+- [Cohort profile of the `CARTaGENE` study: Quebec’s population-based biobank for public health and personalized genomics](https://doi.org/10.1093/ije/dys160), from @awadalla2013ijoe:
+  - Includes both Single nucleotide polymorphisms (SNPs) and insertion-deletion (InDels).
 
-### Impute unobserved GWAS in `CARTaGENE` 
+#### Impute unobserved GWAS in `CARTaGENE` 
 
-- Most of the `CARTaGENE` samples are *WES* (whole exome sequencing), instead of most complete *WGS* (whole genome sequencing).
+- Most of the `CARTaGENE` samples are *WES* (whole exome sequencing), instead of *WGS* (whole genome sequencing).
 
-- [Évaluation de l’imputation des données génétiques Canadiennes-Françaises](https://umontreal.scholaris.ca/bitstreams/83d64aa1-da20-4a6f-8ae0-9dcb0165417d/download), from @pelletier2022. **Key points**:
-  - **Introduction section**: presents the most critical issues when dealing with GWAS information: linkage disequilibrium, 
-  - Paper, corresponding to Chapter 3, named "Evaluation of genetic imputation in the French-Canadian founder population", pages 54-93. Details the underlying imputation strategy, derived from `TOPMed` (for Trans-Omics for Precision Medicine). 
-  - **Page 61**: Describes the imputation strategy, along with the preprocessing steps. Code for reproducing the analyses is [FC-imputation](https://github.com/JustinPelletier/FC-imputation), kinda messy I must admit. **Imputation performance** is much lower for SNPs exhibiting `MAF<0.01`, strongly promoting early discarding.  
-  - **Page 99**: Strong polymorphism in some regions, such as `HLA`.
-  - Reach out [Julie Hussin](mailto:julie.hussin@umontreal.ca), or [LinkedIn profile](https://www.linkedin.com/in/hussinju/), who actually ran the PCA computations and global GWAS analyses.]{fg="red"}
-
-### Sample Size Calculation
-
-- [Should be carried out prior to collecting GWAS samples!!]{fg="red"}
-- [Sample Size Calculation in Genetic Association Studies: A Practical Approach](https://pmc.ncbi.nlm.nih.gov/articles/PMC9863799/#sec5-life-13-00235), from @politi2023l, notably listing the following tools:
-  - [`GENPWR`: Power and Sample Size Calculations for Genetic Association Studies in the Presence of Genetic Model Mis-Specification](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7666027/), from @moore2019hh and available as a [R package](https://cran.r-project.org/web/packages/genpwr/vignettes/vignette.html), is able to compute the sample size for dichotomous or continuous outcomes in gene-only studies, implementing additive, dominant and recessive models (see @tip-genetic-model for details).
-  - [`PGA`: Power for Genetic Association](https://pmc.ncbi.nlm.nih.gov/articles/PMC2387159/), from @menashe2008bg is able to adjust for **multiple comparisons**, in contrast with `GENPWR`, and LD between the marker and the disease allele. [Seems not avalaible anymore]{fg="red"}
+- [Évaluation de l’imputation des données génétiques Canadiennes-Françaises](https://umontreal.scholaris.ca/bitstreams/83d64aa1-da20-4a6f-8ae0-9dcb0165417d/download), from @pelletier2022. **Key points**^[Comprehensive **Introduction section** reviewing the most critical challenges when coping with GWAS.]:
   
-::: {#tip-genetic-model .callout-tip title="Genetic models"}
+  - **Chapter 3**, named "Evaluation of genetic imputation in the French-Canadian founder population", pages 54-93. Details the underlying imputation strategy, derived from `TOPMed` (for Trans-Omics for Precision Medicine). 
+  
+  - **Page 45/61**: Describes imputation strategies, along with the preprocessing steps. Code for reproducing the analyses is [FC-imputation](https://github.com/JustinPelletier/FC-imputation). **Imputation performance** is much lower for SNPs exhibiting `MAF<0.01`, strongly promoting early removal of rare variants:
+  
+  - **Page 83/99**: Strong polymorphism in some regions, such as `HLA`.
 
-- **Genotype**: At a given SNP with alleles **A** (major) and **a** (minor), the genotypes are:
-  - **AA** (homozygous *major*)
-  - **Aa** (*heterozygous*)
-  - **aa** (homozygous *minor*)
+  <!-- - Reach out [Julie Hussin](mailto:julie.hussin@umontreal.ca), or [LinkedIn profile](https://www.linkedin.com/in/hussinju/), who actually ran the PCA computations and global GWAS analyses. -->
 
-- **Phenotype**: A continuous or binary outcome (e.g., height, disease status)
 
-- **Notations**: $Y$: phenotype, $G$: genotype, $\beta$: effect size, $X$: covariates (e.g., age, sex, PCs) and $\epsilon$: error term.
-
---- 
-
-🧬 Genetic Models in GWAS
-
-- **Additive model**: in @eq-genetic-model, 'gene cat' is converted as `AA = 0`, `Aa = 1` and `aa = 2`. Each additional copy of the minor allele increases the trait linearly.
-
-- **Dominant model**: in @eq-genetic-model, 'gene cat' is converted as `AA = 0`, `Aa = 1` and `aa = 1`. Presence of **at least one** minor allele confers full effect (no dose response).
-
-- **Recessive model**: in @eq-genetic-model, 'gene cat' is converted as `AA = 0`, `Aa = 0` and `aa = 1`. Only **homozygous minor** genotype has an effect.
-
-$$
-Y = \beta_0 + \beta_1 G_{\text{gene cat}} + \beta_2 X + \epsilon
-$$ {#eq-genetic-model}
-
----
-
-| Model     | Coding        | Assumes effect from        | Pros                                | Cons                                |
-|-----------|---------------|-----------------------------|-------------------------------------|-------------------------------------|
-| Additive  | 0 / 1 / 2     | Per additional allele       | High power, interpretable           | May miss non-linear effects         |
-| Dominant  | 0 / 1 / 1     | Any copy of minor allele    | Fits some Mendelian patterns        | Oversimplifies if dose-response     |
-| Recessive | 0 / 0 / 1     | Two copies of minor allele  | Fits true recessive traits          | Low power with rare alleles         |
-
-: Main Genetic Models. In conclusion, use **additive** by default (most comprehensive), and explore **dominant/recessive** in **post-GWAS** or when you have strong biological priors (e.g., loss-of-function){#tbl-genetic-model}
-
----
-
-Other less Frequent Models include **Overdominant**, in which the effect only occurs in **heterozygotes**. Rarely used in GWAS, but relevant for **heterozygote advantage** scenarios (e.g., sickle cell and malaria).
-
-:::
+![**GWAS of `CarTaGene` SNPs using TOPMed Merge-Impute strategy.** The [`TOPMed` Imputation Server](https://imputation.biodatacatalyst.nhlbi.nih.gov/) has been used. Manhattan plots depict the genome-wide association study (GWAS) results for variants, before and after imputation The figure is reproduced from [@pelletier2022, pp. 97-98]. The $y$-axis represents the $-\log_{10}(p)$
+$p$-value association of each variant. [Variants with 
+-values equal to zero are highlighted in green]{fg="green"}, while the [horizontal red line indicates the genome-wide *significance threshold*.]{fg="red"}. The total sample consisted of $27,422$ individuals, with the **GWAS focus being comparing ground-truth SNPs versus imputed SNPs.**](./figures/global-GWAS.png){#fig-gwas-global}
 
 ## Analyses
 
@@ -255,11 +212,8 @@ plink2 \
 
 -   **Objective**: Remove SNPs variants associated with strong **linkage disequilibrium** using prior expert knowledge, see [here](http://dougspeed.com/wp-content/uploads/highld.txt) for details.[^2]
 
-[^2]: Notably includes MHC, lactase region, and known inversions `8p23` and `17q21.31`. **Haplotypes**?
+[^2]: Notably includes MHC, lactase region, and known inversions `8p23` and `17q21.31`.
 
-```{=html}
-<!-- -->
-```
 -   **Bash command**:
 
 ``` bash
@@ -340,26 +294,23 @@ plink2 \
 
   -   [**Remark 1**: use visualizations, such as *scree plots*, elbow point or/and *Tracy-Widom Test* to select the final number of PCs, instead of hard threshold, and on the other hand, scatter plots to identify latent structures. See details [here](https://www.linkedin.com/posts/joachim-schork_statistics-research-visualanalytics-activity-7251577056570785795-b6Rk) and [there](https://www.linkedin.com/feed/update/urn:li:activity:730919293617122508)]{fg="red"}.
 
-  - **Remark 2**: The [`popgen` *'Calculating Basic Population Genetic Statistics from SNP Data'*](https://popgen.nescent.org/StartSNP.html#genetic-diversity-observed-and-expected-heterozygosity) details how to generate statistics quantifying patterns of genetic diversity, such as LD and Hardy-Weinberg, in a given population. 
-  The [`popgen` *'Calculating genetic differentiation and clustering methods from SNP data'* vignette](https://popgen.nescent.org/DifferentiationSNP.html) describes both unsupervised, PCA-like and discriminatory approaches to identify latent genetic sub-populations.  
-  Finally, the [`popgen` *'Individual Based Genetic Distance for SNP Data'*](https://popgen.nescent.org/2015-05-18-Dist-SNP.html) reports different individual genetic distances, enabling to spot and trim indiviudal outliers with a significant distinct genetic distribution.
+  - **Remark 2**: The [`popgen` *'Calculating Basic Population Genetic Statistics from SNP Data'*](https://popgen.nescent.org/StartSNP.html#genetic-diversity-observed-and-expected-heterozygosity) vignette details how to generate statistics quantifying patterns of genetic diversity, such as LD and Hardy-Weinberg, in a given population. 
+  The [`popgen` *'Calculating genetic differentiation and clustering methods from SNP data'* vignette](https://popgen.nescent.org/DifferentiationSNP.html) vignette describes both unsupervised, PCA-like and discriminatory approaches to identify latent genetic sub-populations.  
+  Finally, the [`popgen` *'Individual Based Genetic Distance for SNP Data'*](https://popgen.nescent.org/2015-05-18-Dist-SNP.html) vignette reports different individual genetic distances, enabling to spot and trim individual outliers with a significant distinct genetic distribution.
+  See also paper ['A benchmark study on current GWAS models in admixed populations'](https://doi.org/10.1093/bib/bbad437), from @yang2024bib for an unbiased and up-to-date comparison of statistical approaches to address within-patient heterogeneity.
   
-  - **Remark 3**: To evaluate within population diversity, geneticists typically report the level of *heterozygosity* as a general metric, see [`vcfR`'Genetic differentiation' Vignette](https://knausb.github.io/vcfR_documentation/genetic_differentiation.html). 
+  - **Remark 3**: To evaluate within-population diversity, geneticists typically report the level of *heterozygosity* as a general metric, see [`vcfR`'Genetic differentiation' Vignette](https://knausb.github.io/vcfR_documentation/genetic_differentiation.html). 
 
 ### Run GWAS analyses
 
 #### Step 1: Phenotype feature extraction {#sec-phenotype-extraction}
 
-Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`. Variables of interest can e downloaded [here](./data/phenotypes/cartagene_response_variables.xlsx):
+Original phenotype annotations are available in folder `/mnt/projects_tn01/Cartagene/analyses/phenotypes`. Variables of interest are reported [here](./data/phenotypes/cartagene_response_variables.xlsx):
 
 ```{r}
-#| label: tbl-cartage-pheno-features
-#| tbl-cap: Features of interest, and response variables, to predict in `CarTaGene`.
+#| label: cartage-pheno-meta
 
 cartagene_response_variables <- readxl::read_excel("data/phenotypes/cartagene_response_variables.xlsx")
-
-flextable(cartagene_response_variables) |> 
-  bold(part="header")
 
 ```
 
@@ -527,7 +478,7 @@ ggVennDiagram::ggVennDiagram(labels_OSTEO) +
 ##         rotation = 1
 ## )
 
-knitr::include_graphics("figures/venn_diagramm_fractures.png")
+knitr::include_graphics("figures/venn_diagram_fractures.png")
 
 ## final cleaning
 ## file.remove(list.files(path = "./figures", pattern = "\\.log$", full.names = TRUE))
@@ -560,24 +511,45 @@ flextable::proc_freq(cartagene_phenodata,
                      "MCASGLOBAL_PRE_M", "AVCGLOBAL_PRE_M")
 ```
 
-Finally, we save the updated phenotype dataset as a Tab-separated file, using `readr::write_tsv`, see @lst-cartagene-plink2-prep for details:
+Finally, we save the updated phenotype dataset as a Tab-separated file, using `readr::write_tsv`, see @tbl-cartage-pheno-features-and-save for details:
 
 ```{r}
-#| label: save-global-phenotype
-#| lst-label: lst-cartagene-plink2-prep
-#| lst-cap:  Turns out that newest versions of `plink2` impose explicit encoding of categorical variables, denoting as 1 'controls', and 2 as 'case'. 
+#| label: tbl-cartage-pheno-features-and-save
+#| tbl-cap: Features of interest to regress on SNPs in `CarTaGene`. Besides, recent versions of `plink2` impose explicit encoding of categorical variables, encoding 1 as 'controls', and 2 as 'cases'.
+#| tbl-subcap:
+#|   - "Bone Damages"
+#|   - "Cardiovascular events"
+#| layout-ncol: 2
 
 ## define Boolean categorical variables
-categorical_variables <- cartagene_response_variables$Features[cartagene_response_variables$Type=="Boolean"]
+categorical_variables <- cartagene_response_variables$Features[
+  cartagene_response_variables$Type == "Boolean"]
 
 cartagene_phenodata <- cartagene_phenodata |>
   dplyr::mutate(dplyr::across(dplyr::all_of(categorical_variables),
-                              \(x) dplyr::if_else(x == 0L, 1L, 2L, missing=NA)))
-
+                              \(x) dplyr::if_else(x == 0L, 1L, 2L, missing = NA)))
 readr::write_tsv(cartagene_phenodata, 
                  file="data/phenotypes/merge_phenos_PCs.txt")
 
-## cartagene_phenodata <- readr::read_tsv("data/phenotypes/merge_phenos_PCs.txt")
+
+# Report overall summaries
+cartagene_phenodata_summary <- cartagene_phenodata |> 
+  dplyr::select(dplyr::all_of(c("IID", "GENDER01", categorical_variables))) |> 
+  tidyr::pivot_longer(-dplyr::all_of(c("IID", "GENDER01")), 
+                      names_to = "Features", values_to = "Value") |> 
+  dplyr::mutate(Value = tidyr::replace_na(as.character(Value), "osteosecondaire")) |> 
+  dplyr::count(Features, GENDER01, Value) |> 
+  dplyr::rename(Counts=n) |> 
+  dplyr::inner_join(cartagene_response_variables, by = "Features")
+
+
+cartagene_phenodata_summary |> 
+  dplyr::filter(Disease == "Bone Damage") |> 
+  dplyr::select(Features, Description, GENDER01, Value, Counts)
+
+cartagene_phenodata_summary |> 
+  dplyr::filter(Disease == "Cardiovascular events") |> 
+  dplyr::select(Features, Description, GENDER01, Value, Counts)
 ```
 
 ### Step 2: Variants extraction {#sec-variant-extraction}
@@ -600,7 +572,7 @@ All the curated `VCF` files have been downloaded and processed by [Email Cartage
 [^7]: Avoid using `BiomarT` package a tall costs: it's not anymore maintained, and leveraged out-of-date `Hg37` Human Genome Build. Report to [Genome Builds Versions](https://www.linkedin.com/posts/%F0%9F%8E%AF-ming-tommy-tang-40650014_genome-builds-matter-avoid-costly-mistakes-activity-7293270985930141698-ZFkH) for details.
 
 ```{r}
-#| label: build human database reference
+#| label: build-human-database-reference
 #| eval: false
 
 txdb <- GenomicFeatures::makeTxDbFromUCSC(genome = "hg38", tablename = "refGene")
@@ -868,7 +840,7 @@ pval_threshold <- 0.05/(num_variants*length(cartagene_response_variables$Feature
 
 gwas_plots_hdac <- lapply(cartagene_response_variables$Features, 
                           function(feature_label) generate_gwas_per_phenotype (genename = "HDAC-9",
-                                                                               pheno_label = feature_label, filedate="2025-04-07", pval_threshold = 0.001)) 
+                                                                               pheno_label = feature_label, filedate = "2025-04-07", pval_threshold = pval_threshold)) 
 
 gwas_plots_hdac <- gridExtra::marrangeGrob(gwas_plots_hdac, nrow=1, ncol=1)
 
@@ -907,7 +879,7 @@ To compute the adjusted *significance threshold*, we applied a `FWER`-like appro
 
 :::
 
-## Perspectives, aka post GWAS
+## Perspectives
 
 ### Post-hoc GWAS
 
@@ -923,6 +895,8 @@ To compute the adjusted *significance threshold*, we applied a `FWER`-like appro
 - Automatically extract and annotate variants, based on their locations, using [`VariantAnnotation::locateVariants()`](https://www.bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.html#locating-variants-in-and-around-genes) function. Variants annotations notably encompass coding, UTRs, introns and promoters.
 
 ### Post-GWAS: Explore other types of genetic variations
+
+**The most typical mutations included in GWAS studies are *Single Nucleotide Polymorphisms (SNPs)*, and occasionally small indels.** Beyond them, we could have considered *Structural Variants (SVs): large insertions, deletions, duplications, inversions, translocations*, *Copy Number Variations (CNVs)*: gains or losses of large DNA segments, Microsatellites and Epigenetic changes in regulatory regions.
 
 - [Genome-wide association testing beyond SNPs](https://www.nature.com/articles/s41576-024-00778-y), from @harris2025nrg
 
@@ -943,6 +917,8 @@ Alternatively, we could consider a data-driven, and more agnostic approach, to r
 [^16]: Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.
 
 ### Post-GWAS: Incorporate familial pedigrees
+
+An alternative to *candidate gene* association studies relies on *linkage analysis*, which uses familial pedigrees to map genetic variants underlying common human diseases. **This strategy requires both genetic data and detailed family pedigrees.**
 
 -   [Genome-wide association study of fat content and fatty acid composition of shea tree.](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-025-11344-z), from @attikora2025bg. Under the hood, relies on the `mrMLM` R package to include both the *population structure matrix* and the *kinship matrix*. Provides a complete GWAS pipeline, including a number of meaningful illustrations.
 
