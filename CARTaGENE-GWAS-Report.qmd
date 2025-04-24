@@ -860,6 +860,24 @@ ggsave("figures/gwas_HDAC9.pdf",
 
 :::
 
+
+```{r}
+#| label: fig-gwas-OR-visu
+#| fig-cap: "Density plot of the OR (Odds Ratio) for variable `OSTEOPONIA`, and gene `HDAC-9`."
+gwas_results <- readr::read_tsv("./tables/HDAC-9/HDAC-9_OSTEOPONIA_2025-04-07.OSTEOPONIA.glm.logistic.hybrid",
+                                show_col_types = FALSE) 
+
+ggplot(gwas_results, aes(x = OR)) +
+  geom_histogram(binwidth = 0.05) +
+  # geom_freqpoly()
+  # geom_density(adjust = 200, col = "red") +
+  # scale_x_continuous(breaks = seq(0, 1, by = 0.05), limits = c(0, 0.5)) +
+  theme_minimal() +
+  labs(title = "Density plot of the OR (Odds Ratio) for variable `OSTEOPONIA`, and gene `HDAC-9`", 
+       x =  "Odds Ratio.")
+```
+
+
 #### iii) Multiple test correction
 
 To compute the adjusted *significance threshold*, we applied a `FWER`-like approach, conventional in the GWAS field: `{{r}} 0.05/(num_variants*length(cartagene_response_variables$Features))`, in which you divide the pre-defined threshold (standard: `0.05`) by the total number of pairwise tests carried out (number of variants times number of regression variables times). Final threshold is accordingly: `{r} 0.05/(num_variants*length(cartagene_response_variables$Features))`, as `{r} num_variants` variants were extracted, and `{r} length(cartagene_response_variables$Features)` phenotype variables were predicted.

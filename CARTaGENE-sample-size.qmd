@@ -232,6 +232,8 @@ Other less Frequent Models include **Overdominant**, in which the effect only oc
 
 - `2df`stands for two degrees of freedom, in other words, when no inheritance model is assumed. 
 
+- [By default, it's the **additive test**, the least powerful, but also the most flexible, which is performed when running `plink2`.]{fg="red"}
+
 
 
 ```{r}
