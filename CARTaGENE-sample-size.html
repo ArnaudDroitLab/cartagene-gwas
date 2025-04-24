@@ -51,7 +51,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
@@ -106,6 +126,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   window.document.addEventListener("DOMContentLoaded", function (_event) {
     document.body.classList.add('hypothesis-enabled');
   });
+</script><link href="site_libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="site_libs/tabwid-1.1.3/tabwid.js"></script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
 </script>
 <meta property="og:title" content="2&nbsp; CartaGene Sample Size estimation – GWAS Analyses utilising the CARTaGENE database">
 <meta property="og:image" content="https://arnauddroitlab.github.io/cartagene-gwas/CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png">
@@ -206,9 +252,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
 <li><a href="#load-vcf-files" id="toc-load-vcf-files" class="nav-link" data-scroll-target="#load-vcf-files"><span class="header-section-number">2.2.1</span> Load VCF files</a></li>
   <li><a href="#vcf-files-qc" id="toc-vcf-files-qc" class="nav-link" data-scroll-target="#vcf-files-qc"><span class="header-section-number">2.2.2</span> VCF files QC</a></li>
+  <li><a href="#maf-histogram-distribution" id="toc-maf-histogram-distribution" class="nav-link" data-scroll-target="#maf-histogram-distribution"><span class="header-section-number">2.2.3</span> MAF histogram distribution</a></li>
   </ul>
 </li>
-  <li><a href="#vcf-files-qc-with-variantannotation" id="toc-vcf-files-qc-with-variantannotation" class="nav-link" data-scroll-target="#vcf-files-qc-with-variantannotation"><span class="header-section-number">2.3</span> VCF Files QC with <code>VariantAnnotation</code></a></li>
+  <li>
+<a href="#sec-sample-size" id="toc-sec-sample-size" class="nav-link" data-scroll-target="#sec-sample-size"><span class="header-section-number">2.3</span> Sample Size Calculation</a>
+  <ul>
+<li><a href="#sec-GENPWR" id="toc-sec-GENPWR" class="nav-link" data-scroll-target="#sec-GENPWR"><span class="header-section-number">2.3.1</span> <code>GENPWR</code> Sample Size estimation</a></li>
+  </ul>
+</li>
   <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources"><span class="header-section-number">2.4</span> Additional resources</a></li>
   </ul><div class="toc-actions"><ul><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/edit/master/CARTaGENE-sample-size.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/blob/master/CARTaGENE-sample-size.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
@@ -242,7 +294,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://xml2.r-lib.org">xml2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Report automated QCs for VCF files</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/knausb/vcfR">vcfR</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/knausb/vcfR">vcfR</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Sample size estimation</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">genpwr</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="sec-vcfr" class="level2" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="sec-vcfr">
@@ -251,39 +306,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="load-vcf-files" class="level3" data-number="2.2.1"><h3 data-number="2.2.1" class="anchored" data-anchor-id="load-vcf-files">
 <span class="header-section-number">2.2.1</span> Load VCF files</h3>
 <div class="cell" data-layout-align="center">
-<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vcf_file</span> <span class="op">&lt;-</span> <span class="st">"./data/variants/chr17.HDAC5.vcf"</span></span>
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># vcf_file &lt;- "./data/variants/chr17.HDAC5.vcf"</span></span>
+<span><span class="va">vcf_file</span> <span class="op">&lt;-</span> <span class="st">"./data/variants/chr7.HDAC9.vcf"</span></span>
 <span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/io_vcfR.html">read.vcfR</a></span><span class="op">(</span><span class="va">vcf_file</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output cell-output-stdout">
 <pre class="code_output"><code>##  Scanning file to determine attributes.
 ##  File attributes:
 ##    meta lines: 24
 ##    header_line: 25
-##    variant count: 91
+##    variant count: 2622
 ##    column count: 29346
 ##  
 Meta line 24 read in.
 ##  All meta lines processed.
 ##  gt matrix initialized.
 ##  Character matrix gt created.
-##    Character matrix gt rows: 91
+##    Character matrix gt rows: 2622
 ##    Character matrix gt cols: 29346
 ##    skip: 0
-##    nrows: 91
+##    nrows: 2622
 ##    row_num: 0
 ##  
-Processed variant: 91
+Processed variant 1000
+Processed variant 2000
+Processed variant: 2622
 ##  All variants processed</code></pre>
 </div>
 <details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">chrom</span> <span class="op">&lt;-</span> <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/create_chromR.html">create.chromR</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Supercontig"</span>, vcf <span class="op">=</span> <span class="va">vcf</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># removing low quality variants, none of these metrics is reported</span></span>
 <span>  <span class="co"># vcfR::masker(min_QUAL = 0, min_DP = 350, max_DP = 650, </span></span>
 <span>  <span class="co">#              min_MQ = 59.5, max_MQ = 60.5) |&gt; </span></span>
-<span>  <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/proc_chromR.html">proc.chromR</a></span><span class="op">(</span>win.size <span class="op">=</span> <span class="fl">1e2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/proc_chromR.html">proc.chromR</a></span><span class="op">(</span>win.size <span class="op">=</span> <span class="fl">1e4</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output cell-output-stderr">
 <pre><code>##  Names in vcf:</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>##    chr17</code></pre>
+<pre><code>##    chr7</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>##  Initializing var.info slot.</code></pre>
@@ -312,13 +370,13 @@ Processed variant: 91
 <pre><code>##  Population summary complete.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>##    elapsed time:  2.685</code></pre>
+<pre><code>##    elapsed time:  91.75</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>##  window_init complete.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>##    elapsed time:  0.019</code></pre>
+<pre><code>##    elapsed time:  0.003</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>##  Warning in vcfR::proc.chromR(vcfR::create.chromR(name = "Supercontig", vcf =
@@ -332,7 +390,7 @@ Processed variant: 91
 <pre><code>##  windowize_variants complete.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>##    elapsed time:  0.014</code></pre>
+<pre><code>##    elapsed time:  0.002</code></pre>
 </div>
 </div>
 </section><section id="vcf-files-qc" class="level3" data-number="2.2.2"><h3 data-number="2.2.2" class="anchored" data-anchor-id="vcf-files-qc">
@@ -343,35 +401,44 @@ Processed variant: 91
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">chrom</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
-<div id="fig-plot-qc-per-chrom-1" class="quarto-float quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
+<div id="fig-plot-qc-per-chrom-1" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-plot-qc-per-chrom-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;2.1: "><img src="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png" id="fig-plot-qc-per-chrom-1" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" width="672"></a>
+<a href="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;2.1: Quality control per chrosomsome, for a given variant."><img src="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></a>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-plot-qc-per-chrom-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2.1
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-qc-per-chrom-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: Quality control per chrosomsome, for a given variant.
 </figcaption></figure>
 </div>
 </div>
 <div class="cell-output-display">
-<div id="fig-plot-qc-per-chrom-2" class="quarto-float quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
+<div id="fig-plot-qc-per-chrom-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-plot-qc-per-chrom-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2.2: "><img src="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-2.png" id="fig-plot-qc-per-chrom-2" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" width="672"></a>
+<a href="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2.2: Quality control per chrosomsome, for a given variant."><img src="CARTaGENE-sample-size_files/figure-html/fig-plot-qc-per-chrom-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></a>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-plot-qc-per-chrom-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2.2
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-qc-per-chrom-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2: Quality control per chrosomsome, for a given variant.
 </figcaption></figure>
 </div>
 </div>
 </div>
+<p><span class="quarto-unresolved-ref">?fig-plot-qc-per-chrom</span> is a <strong>chromo plot</strong>:</p>
 <ul>
-<li><p>In vcfR we refer to this form of plot as a chromo plot. This plot summarizes data from our three data sources. Annotation data is represented on the lowest plot. Features in the annotation file (e.g., gene models, exons, etc.) are represented as dark red rectangles. Above the annotation track is a sequence track. Here called nucleotides are represented in green while uncalled nucleotides (Ns) appear in red. Depending on the quality of your genome, it may include stretches of uncalled nucleotides. Above the annotation track is a windowing analysis of G/C content. This track includes marginal barplots to summarize its contents, as do the tracks above it. The next track summarizes the number of variants per window. Above that we see dot plots for quality, mapping quality and read depth.</p></li>
-<li><p>The raw read depth and mapping quality have been extracted from the INFO column of the VCF data. The quality is from the QUAL column of the VCF data. And the variant count per window was summarized during the windowing analysis performed by proc.chromR(). The raw read depth appears fairly continuous, an observation which appears consistent with the above chromo plots. Mapping quality appears to be predominantly one value (about 60), this may not have been apparent in the chromo plots. The variant count per window summarizes the degree of variability we’ve observed along our chromosome. The peak near zero indicates that many windows lack variants</p></li>
-</ul>
-<div class="cell" data-layout-align="center">
+<li>
+<strong>Annotation data</strong> on the lowest plot. Features in the annotation file (e.g., gene models, exons, etc.) are represented as dark red rectangles.</li>
+<li>Above is a <strong>sequence track</strong>, with <span data-fg="green" style="color: green;">nucleotides in green</span> while <span data-fg="red" style="color: red;">uncalled nucleotides are in red</span>.</li>
+<li>Last track summarizes the number of variants per window. Above that we see dot plots for quality, mapping quality and read depth.</li>
+<li>Generated with <a href="https://knausb.github.io/vcfR_documentation/visualization_1.html">Visualizing VCF data 1</a>
+</li>
+</ul></section><section id="maf-histogram-distribution" class="level3" data-number="2.2.3"><h3 data-number="2.2.3" class="anchored" data-anchor-id="maf-histogram-distribution">
+<span class="header-section-number">2.2.3</span> MAF histogram distribution</h3>
+<p>Main <a href="https://knausb.github.io/vcfR_documentation/tidy_vcfR.html"><code>tidy vcfR</code></a> instructions.</p>
 <details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vcf_tidy</span> <span class="op">&lt;-</span> <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcfR2tidy</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcf_field_names</a></span><span class="op">(</span><span class="va">vcf</span>, tag <span class="op">=</span> <span class="st">"INFO"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output cell-output-stdout">
+<span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcf_field_names</a></span><span class="op">(</span><span class="va">vcf</span>, tag <span class="op">=</span> <span class="st">"INFO"</span><span class="op">)</span></span>
+<span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcf_field_names</a></span><span class="op">(</span><span class="va">vcf</span>, tag <span class="op">=</span> <span class="st">"FORMAT"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div id="tbl-vcf-tidy-format" class="quarto-layout-panel anchored">
+<figure class="quarto-float quarto-float-tbl figure"><div aria-describedby="tbl-vcf-tidy-format-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <pre class="code_output"><code>##  # A tibble: 3 × 5
 ##    Tag   ID         Number Type  Description                         
 ##    &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;                               
@@ -379,8 +446,7 @@ Figure&nbsp;2.2
 ##  2 INFO  TYPED      0      Flag  Marker was genotyped AND imputed    
 ##  3 INFO  TYPED_ONLY 0      Flag  Marker was genotyped but NOT imputed</code></pre>
 </div>
-<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR_to_tidy_conversion.html">vcf_field_names</a></span><span class="op">(</span><span class="va">vcf</span>, tag <span class="op">=</span> <span class="st">"FORMAT"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output cell-output-stdout">
+<div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <pre class="code_output"><code>##  # A tibble: 4 × 5
 ##    Tag    ID    Number Type   Description                                     
 ##    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;                                           
@@ -389,43 +455,644 @@ Figure&nbsp;2.2
 ##  3 FORMAT HDS   2      Float  Estimated Haploid Alternate Allele Dosage       
 ##  4 FORMAT GP    3      Float  Estimated Posterior Probabilities for Genotypes…</code></pre>
 </div>
-<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">vcf_tidy</span><span class="op">$</span><span class="va">fix</span><span class="op">$</span><span class="va">TYPED_ONLY</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
-<p>https://knausb.github.io/vcfR_documentation/visualization_1.html</p>
-</section></section><section id="vcf-files-qc-with-variantannotation" class="level2" data-number="2.3"><h2 data-number="2.3" class="anchored" data-anchor-id="vcf-files-qc-with-variantannotation">
-<span class="header-section-number">2.3</span> VCF Files QC with <code>VariantAnnotation</code>
-</h2>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl" id="tbl-vcf-tidy-format-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.1: VCF annotations and descriptions.
+</figcaption></figure>
+</div>
+<p><strong>Minor allele frequency (MAF)</strong> for a given variant can be computed from <strong>DS (Estimated Alternate Allele Dosage)</strong>, <strong>HDS (Haploid Dosage)</strong>, or <strong>GP</strong> (Posterior Probabilities for Genotypes), as reported in <a href="#tbl-MAF-formula" class="quarto-xref">Table&nbsp;<span>2.2</span></a>, and the corresponding MAF tables and abundancies are reported in <a href="#tbl-MAF-estimation" class="quarto-xref">Table&nbsp;<span>2.3</span></a>.</p>
+<div id="tip-MAF" class="callout callout-style-default callout-tip callout-titled" title="Computation of the MAF score">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;2.1: Computation of the MAF score
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="tbl-MAF-formula" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure"><div aria-describedby="tbl-MAF-formula-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table">
+<thead><tr class="header">
+<th style="text-align: left;">Source</th>
+<th style="text-align: left;">How to compute AF</th>
+<th style="text-align: left;">Then MAF</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">DS</td>
+<td style="text-align: left;"><span class="math inline">\(\frac{\sum DS}{2N}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\min(AF, 1-AF)\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">HDS</td>
+<td style="text-align: left;"><span class="math inline">\(\frac{\sum HDS}{2N}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\min(AF, 1-AF)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">GP</td>
+<td style="text-align: left;"><span class="math inline">\(\frac{\sum (P(0/1) + 2 \times P(1/1))}{2N}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\min(AF, 1-AF)\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl" id="tbl-MAF-formula-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.2: Infer MAF formulas
+</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vcf_variants_counts</span> <span class="op">&lt;-</span> <span class="va">vcf_tidy</span><span class="op">$</span><span class="va">gt</span></span>
+<span><span class="va">N_indiv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">vcf_variants_counts</span><span class="op">$</span><span class="va">Indiv</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compute MAF from  DS (Estimated Alternate Allele Dosage)</span></span>
+<span><span class="va">vcf_maf_distributions</span> <span class="op">&lt;-</span> <span class="va">vcf_variants_counts</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">POS</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>AF  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">gt_DS</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="co"># alternate allele frequency</span></span>
+<span>    MAF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">pmin</a></span><span class="op">(</span><span class="va">AF</span>, <span class="fl">1</span> <span class="op">-</span> <span class="va">AF</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span>   <span class="co"># minor allele frequency</span></span>
+<span></span>
+<span><span class="co"># alternative computation, similar outputs (by default, return the minor allele)</span></span>
+<span><span class="va">vcf_maf_distributions_alt</span> <span class="op">&lt;-</span> <span class="fu">vcfR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/maf.html">maf</a></span><span class="op">(</span><span class="va">vcf</span>, element <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html">as_tibble</a></span><span class="op">(</span>rownames <span class="op">=</span> <span class="st">"SNP_ID"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html">flextable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR-method.html">head</a></span><span class="op">(</span><span class="va">vcf_maf_distributions_alt</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/bold.html">bold</a></span><span class="op">(</span>part <span class="op">=</span> <span class="st">"header"</span><span class="op">)</span> </span>
+<span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html">flextable</a></span><span class="op">(</span><span class="va">vcf_maf_distributions</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">POS</span>, <span class="va">MAF</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">MAF</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/vcfR/man/vcfR-method.html">head</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/bold.html">bold</a></span><span class="op">(</span>part <span class="op">=</span> <span class="st">"header"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div id="tbl-MAF-estimation" class="quarto-layout-panel anchored">
+<figure class="quarto-float quarto-float-tbl figure"><div aria-describedby="tbl-MAF-estimation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-MAF-estimation" style="flex-basis: 50.0%;justify-content: center;">
+<div id="tbl-MAF-estimation-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-tbl figure"><div aria-describedby="tbl-MAF-estimation-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid">
+<style>.cl-46269ce8{}.cl-46123d34{font-family:'DejaVu Sans';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-46123eba{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-461af334{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-461af366{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-461b4db6{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-461b4dca{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-461b4dde{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-461b4de8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-461b4dfc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-461b4e10{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="cl-46269ce8">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-461b4db6"><p class="cl-461af334"><span class="cl-46123d34">SNP_ID</span></p></th>
+<th class="cl-461b4dca"><p class="cl-461af366"><span class="cl-46123d34">nAllele</span></p></th>
+<th class="cl-461b4dca"><p class="cl-461af366"><span class="cl-46123d34">NA</span></p></th>
+<th class="cl-461b4dca"><p class="cl-461af366"><span class="cl-46123d34">Count</span></p></th>
+<th class="cl-461b4dca"><p class="cl-461af366"><span class="cl-46123d34">Frequency</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-461b4dde"><p class="cl-461af334"><span class="cl-46123eba">chr7:18087100:T:A</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">1,024</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0.01745236</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-461b4dde"><p class="cl-461af334"><span class="cl-46123eba">chr7:18087117:T:A</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">1,548</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0.02638307</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-461b4dde"><p class="cl-461af334"><span class="cl-46123eba">chr7:18087870:T:C</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">867</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0.01477656</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-461b4dde"><p class="cl-461af334"><span class="cl-46123eba">chr7:18088625:A:G</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">24,666</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0.42039063</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-461b4dde"><p class="cl-461af334"><span class="cl-46123eba">chr7:18089395:A:G</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">626</span></p></td>
+<td class="cl-461b4de8"><p class="cl-461af366"><span class="cl-46123eba">0.01066912</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-461b4dfc"><p class="cl-461af334"><span class="cl-46123eba">chr7:18089923:TTTTG:T</span></p></td>
+<td class="cl-461b4e10"><p class="cl-461af366"><span class="cl-46123eba">58,674</span></p></td>
+<td class="cl-461b4e10"><p class="cl-461af366"><span class="cl-46123eba">0</span></p></td>
+<td class="cl-461b4e10"><p class="cl-461af366"><span class="cl-46123eba">16,876</span></p></td>
+<td class="cl-461b4e10"><p class="cl-461af366"><span class="cl-46123eba">0.28762314</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-MAF-estimation-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Result from calling the <code><a href="https://rdrr.io/pkg/vcfR/man/maf.html">vcfR::maf</a></code> function on a <code>vcf</code>object. The <code>row.names</code> report the ID of the mutation (<code>chromosome:position:SNP</code>), the first column the total number of alleles identified in the cohort, the third is the count and fourth the frequency (you have to divide by 2 the <code>Counts</code> with diploid organisms).
+</figcaption></figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-MAF-estimation" style="flex-basis: 50.0%;justify-content: center;">
+<div id="tbl-MAF-estimation-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-tbl figure"><div aria-describedby="tbl-MAF-estimation-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid">
+<style>.cl-467f1918{}.cl-465159d8{font-family:'DejaVu Sans';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-46515a1e{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-4674d64c{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-46752444{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-4675246c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-46752480{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="cl-467f1918">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-46752444"><p class="cl-4674d64c"><span class="cl-465159d8">POS</span></p></th>
+<th class="cl-46752444"><p class="cl-4674d64c"><span class="cl-465159d8">MAF</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">18,773,294</span></p></td>
+<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4989486</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">18,769,554</span></p></td>
+<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4980236</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">18,104,245</span></p></td>
+<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4958051</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">18,092,439</span></p></td>
+<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4942534</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">18,775,850</span></p></td>
+<td class="cl-4675246c"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4941757</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-46752480"><p class="cl-4674d64c"><span class="cl-46515a1e">18,770,620</span></p></td>
+<td class="cl-46752480"><p class="cl-4674d64c"><span class="cl-46515a1e">0.4934447</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-MAF-estimation-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Header <code>FORMAT</code> and Description for the VCF file.
+</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl quarto-uncaptioned" id="tbl-MAF-estimation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.3
+</figcaption></figure>
+</div>
+<div class="cell" data-layout-align="center">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">vcf_maf_distributions</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">MAF</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span><span class="op">(</span>adjust <span class="op">=</span> <span class="fl">0.5</span>, linewidth <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, by <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<div id="fig-MAF-distribution" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-MAF-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-MAF-distribution-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;2.3: Distribution of MAF (minor allele frequency values)"><img src="CARTaGENE-sample-size_files/figure-html/fig-MAF-distribution-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-MAF-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.3: Distribution of MAF (minor allele frequency values)
+</figcaption></figure>
+</div>
+</div>
+</div>
+<!-- ## VCF Files QC with `VariantAnnotation` -->
+<!-- - [`VariantAnnotation` provides more comprehensive features with respect to @sec-vcfr, yet, relies on external dependencies such as `bfctools`, and often faces memory limitations.]{fg="red"} -->
+<!-- ```{r} -->
+<!-- #| label: read-vcf-file -->
+<!-- #| eval: false -->
+<!-- #| echo: true -->
+<!-- vcf <- VariantAnnotation::readVcf(file = "./data/variants/chr6.HLA-A.vcf",  -->
+<!--                                   genome = "hg38") -->
+<!-- # General vcf file structure ---- -->
+<!-- VariantAnnotation::header(vcf) -->
+<!-- VariantAnnotation::samples(VariantAnnotation::header(vcf)) -->
+<!-- VariantAnnotation::geno(VariantAnnotation::header(vcf)) -->
+<!-- # Variant-specific fields, such as alternative allele configurations -->
+<!-- VariantAnnotation::alt(vcf)[1:5] -->
+<!-- ``` -->
+</section></section><section id="sec-sample-size" class="level2" data-number="2.3"><h2 data-number="2.3" class="anchored" data-anchor-id="sec-sample-size">
+<span class="header-section-number">2.3</span> Sample Size Calculation</h2>
 <ul>
-<li><span data-fg="red" style="color: red;"><code>VariantAnnotation</code> provides more comprehensive features with respect to <a href="#sec-vcfr" class="quarto-xref"><span>Section 2.2</span></a>, yet, relies on external dependencies such as <code>bfctools</code>, and often faces memory limitations.</span></li>
+<li>
+<p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9863799/#sec5-life-13-00235">Sample Size Calculation in Genetic Association Studies: A Practical Approach</a>, from <span class="citation" data-cites="politi2023l">Politi et al. (<a href="references.html#ref-politi2023l" role="doc-biblioref">2023</a>)</span>, notably listing the following tools:</p>
+<ul>
+<li><p><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7666027/"><code>GENPWR</code>: Power and Sample Size Calculations for Genetic Association Studies in the Presence of Genetic Model Mis-Specification</a>, from <span class="citation" data-cites="moore2019hh">Moore, Jacobso, and Fingerlin (<a href="references.html#ref-moore2019hh" role="doc-biblioref">2019</a>)</span> and available as a <a href="https://cran.r-project.org/web/packages/genpwr/vignettes/vignette.html">R package</a>, is able to compute the sample size for dichotomous or continuous outcomes in gene-only studies, implementing additive, dominant and recessive models (see <a href="#tip-genetic-model" class="quarto-xref">Tip&nbsp;<span>2.2</span></a> for details). Report to <a href="#sec-GENPWR" class="quarto-xref"><span>Section 2.3.1</span></a> for a practical illustration.</p></li>
+<li><p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2387159/"><code>PGA</code>: Power for Genetic Association</a>, from <span class="citation" data-cites="menashe2008bg">Menashe, Rosenberg, and Chen (<a href="references.html#ref-menashe2008bg" role="doc-biblioref">2008</a>)</span> is able to adjust for <strong>multiple comparisons</strong>, in contrast with <code>GENPWR</code>, and LD between the marker and the disease allele. <span data-fg="red" style="color: red;">Seems not available anymore</span></p></li>
+</ul>
+</li>
+</ul>
+<div id="tip-genetic-model" class="callout callout-style-default callout-tip callout-titled" title="Genetic models">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;2.2: Genetic models
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>
+<p><strong>Genotype</strong>: At a given SNP with alleles <strong>A</strong> (major) and <strong>a</strong> (minor), the genotypes are:</p>
+<ul>
+<li>
+<strong>AA</strong> (homozygous <em>major</em>)</li>
+<li>
+<strong>Aa</strong> (<em>heterozygous</em>)</li>
+<li>
+<strong>aa</strong> (homozygous <em>minor</em>)</li>
+</ul>
+</li>
+<li><p><strong>Phenotype</strong>: A continuous or binary outcome (e.g., height, disease status)</p></li>
+<li><p><strong>Notations</strong>: <span class="math inline">\(Y\)</span>: phenotype, <span class="math inline">\(G\)</span>: genotype, <span class="math inline">\(\beta\)</span>: effect size, <span class="math inline">\(X\)</span>: covariates (e.g., age, sex, PCs) and <span class="math inline">\(\epsilon\)</span>: error term.</p></li>
+</ul>
+<hr>
+<p>🧬 Genetic Models in GWAS</p>
+<ul>
+<li><p><strong>Additive model</strong>: in <a href="#eq-genetic-model" class="quarto-xref">Equation&nbsp;<span>2.1</span></a>, ‘gene cat’ is converted as <code>AA = 0</code>, <code>Aa = 1</code> and <code>aa = 2</code>. Each additional copy of the minor allele increases the trait linearly.</p></li>
+<li><p><strong>Dominant model</strong>: in <a href="#eq-genetic-model" class="quarto-xref">Equation&nbsp;<span>2.1</span></a>, ‘gene cat’ is converted as <code>AA = 0</code>, <code>Aa = 1</code> and <code>aa = 1</code>. Presence of <strong>at least one</strong> minor allele confers full effect (no dose response).</p></li>
+<li><p><strong>Recessive model</strong>: in <a href="#eq-genetic-model" class="quarto-xref">Equation&nbsp;<span>2.1</span></a>, ‘gene cat’ is converted as <code>AA = 0</code>, <code>Aa = 0</code> and <code>aa = 1</code>. Only <strong>homozygous minor</strong> genotype has an effect.</p></li>
+</ul>
+<p><span id="eq-genetic-model"><span class="math display">\[
+Y = \beta_0 + \beta_1 G_{\text{gene cat}} + \beta_2 X + \epsilon
+\tag{2.1}\]</span></span></p>
+<hr>
+<table class="table">
+<caption>Main Genetic Models. In conclusion, use <strong>additive</strong> by default (most comprehensive), and explore <strong>dominant/recessive</strong> in <strong>post-GWAS</strong> or when you have strong biological priors (e.g., loss-of-function){#tbl-genetic-model}</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 11%">
+<col style="width: 22%">
+<col style="width: 28%">
+<col style="width: 28%">
+</colgroup>
+<thead><tr class="header">
+<th>Model</th>
+<th>Coding</th>
+<th>Assumes effect from</th>
+<th>Pros</th>
+<th>Cons</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Additive</td>
+<td>0 / 1 / 2</td>
+<td>Per additional allele</td>
+<td>High power, interpretable</td>
+<td>May miss non-linear effects</td>
+</tr>
+<tr class="even">
+<td>Dominant</td>
+<td>0 / 1 / 1</td>
+<td>Any copy of minor allele</td>
+<td>Fits some Mendelian patterns</td>
+<td>Oversimplifies if dose-response</td>
+</tr>
+<tr class="odd">
+<td>Recessive</td>
+<td>0 / 0 / 1</td>
+<td>Two copies of minor allele</td>
+<td>Fits true recessive traits</td>
+<td>Low power with rare alleles</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Other less Frequent Models include <strong>Overdominant</strong>, in which the effect only occurs in <strong>heterozygotes</strong>. Rarely used in GWAS, but relevant for <strong>heterozygous</strong> scenarios (e.g., sickle cell and malaria).</p>
+</div>
+</div>
+<section id="sec-GENPWR" class="level3" data-number="2.3.1"><h3 data-number="2.3.1" class="anchored" data-anchor-id="sec-GENPWR">
+<span class="header-section-number">2.3.1</span> <code>GENPWR</code> Sample Size estimation</h3>
+<ul>
+<li><p><span data-fg="red" style="color: red;">Noted out some bugs for <code>GENPWR</code> in extreme scenarios, like negative estimation of sample sizes, or sample sizes not increasing monotonically with decreasing <span class="math inline">\(p-\)</span> value.</span></p></li>
+<li>
+<p><span class="citation" data-cites="fadista2016ejhg">Fadista et al. (<a href="references.html#ref-fadista2016ejhg" role="doc-biblioref">2016</a>)</span> estimates the following thresholds:</p>
+<ul>
+<li>
+<span class="math inline">\(5 \times 10^{−8}\)</span> <span class="math inline">\(p\)</span>-value threshold for WGS for common genetic variations in the European population (<span class="math inline">\(\text{MAF} \ge 5 \%\)</span>).</li>
+<li>
+<span class="math inline">\(3 × 10^{−8}\)</span> for <span class="math inline">\(\text{MAF} \ge 1 \%\)</span>
+</li>
+<li>
+<span class="math inline">\(1 × 10^−8\)</span> for rare variants with <span class="math inline">\(\text{MAF} \ge 0.1 \%\)</span>.</li>
+<li>From the <strong>Conclusion section</strong>, for WES, it turns out that these thresholds can be softened by several orders of magnitude.</li>
+</ul>
+</li>
+<li>
+<p><span class="citation" data-cites="david2021tig">David (<a href="references.html#ref-david2021tig" role="doc-biblioref">2021</a>)</span> determines that:</p>
+<ul>
+<li>The odds-ratio was on average below 2 for frequent variants.</li>
+<li>And around 4 for rare variants, <span class="math inline">\(\text{MAF} &lt; 0.1\)</span>
+</li>
+</ul>
+</li>
+<li><p><code>2df</code>stands for two degrees of freedom, in other words, when no inheritance model is assumed.</p></li>
 </ul>
 <div class="cell" data-layout-align="center">
-<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">readVcf</span><span class="op">(</span>file <span class="op">=</span> <span class="st">"./data/variants/chr6.HLA-A.vcf"</span>, </span>
-<span>                                  genome <span class="op">=</span> <span class="st">"hg38"</span><span class="op">)</span></span>
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">cartagene_phenodata</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_tsv</a></span><span class="op">(</span><span class="st">"data/phenotypes/merge_phenos_PCs.txt"</span>, </span>
+<span>                                       show_col_types <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># General vcf file structure ----</span></span>
-<span></span>
-<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">header</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
-<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">samples</span><span class="op">(</span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">header</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">geno</span><span class="op">(</span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">header</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Variant-specific fields, such as alternative allele configurations</span></span>
-<span><span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu">alt</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">num_features</span> <span class="op">&lt;-</span> <span class="fl">9</span></span>
+<span><span class="va">num_variants</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">vcf_tidy</span><span class="op">$</span><span class="va">fix</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="va">case_rate_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">cartagene_phenodata</span><span class="op">$</span><span class="va">OSTEOPONIA</span><span class="op">)</span></span>
+<span><span class="va">case_rate</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span><span class="va">case_rate_tbl</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">case_rate_tbl</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">case_rate</span> <span class="op">&lt;-</span> <span class="va">case_rate_tbl</span><span class="op">[</span><span class="st">"2"</span><span class="op">]</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">case_rate</span><span class="op">)</span></span>
+<span><span class="va">case_rate</span> <span class="op">&lt;-</span> <span class="va">case_rate</span><span class="op">[[</span><span class="st">"2"</span><span class="op">]</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-</section><section id="additional-resources" class="level2" data-number="2.4"><h2 data-number="2.4" class="anchored" data-anchor-id="additional-resources">
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">Without adjustement</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Adjustement specific to the gene</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Recommended GWAS adjustement</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pval_free</span> <span class="op">&lt;-</span> <span class="fl">0.05</span></span>
+<span><span class="va">ss_not_adjusted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/genpwr/man/genpwr.calc.html">genpwr.calc</a></span><span class="op">(</span>calc <span class="op">=</span> <span class="st">"ss"</span>,</span>
+<span>                  model <span class="op">=</span> <span class="st">"logistic"</span>, </span>
+<span>                  ge.interaction <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                  OR <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>, </span>
+<span>                  Case.Rate <span class="op">=</span> <span class="va">case_rate</span>, </span>
+<span>                  Power <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>                  MAF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.02</span>, <span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.3</span><span class="op">)</span>, </span>
+<span>                  Alpha <span class="op">=</span> <span class="va">pval_free</span>,</span>
+<span>                  True.Model <span class="op">=</span> <span class="st">"All"</span>, </span>
+<span>                  Test.Model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Additive"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/genpwr/man/ss.plot.html">ss.plot</a></span><span class="op">(</span><span class="va">ss_not_adjusted</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ss_not_adjusted</span> <span class="op">&lt;-</span> <span class="va">ss_not_adjusted</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename_with</a></span><span class="op">(</span> <span class="op">~</span> <span class="st">"Pval"</span>,</span>
+<span>               .cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"N_total_at_Alpha"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">best_scenario</span> <span class="op">&lt;-</span> <span class="va">ss_not_adjusted</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">Pval</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">intermediate_scenario</span> <span class="op">&lt;-</span> <span class="va">ss_not_adjusted</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">True.Model</span> <span class="op">==</span> <span class="st">"Additive"</span>  <span class="op">&amp;</span> <span class="va">MAF</span> <span class="op">==</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">OR</span> <span class="op">==</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">worst_scenario</span> <span class="op">&lt;-</span> <span class="va">ss_not_adjusted</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">Pval</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/formatc.html">formatC</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"d"</span>, big.mark <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Most optimistic scenario (MAF: 0.3, OR: 4, Real:Recessive vs Tested:Additive) needs "</span>, <span class="va">best_scenario</span>, <span class="st">"samples.\n"</span>, </span>
+<span>              <span class="st">"Intermediate scenario (MAF: 0.05, OR: 3, Real:Additive vs Tested:Additive) needs"</span>, <span class="va">intermediate_scenario</span>, <span class="st">"samples.\n"</span>, </span>
+<span>              <span class="st">"Finally, the worst scenario (MAF: 0.01, OR: 2, Real:Recessive vs Tested:Additive) needs"</span>, <span class="va">worst_scenario</span>, <span class="st">"samples."</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stderr">
+<pre><code>##  Most optimistic scenario (MAF: 0.3, OR: 4, Real:Recessive vs Tested:Additive) needs  157 samples.
+##   Intermediate scenario (MAF: 0.05, OR: 3, Real:Additive vs Tested:Additive) needs 725 samples.
+##   Finally, the worst scenario (MAF: 0.01, OR: 2, Real:Recessive vs Tested:Additive) needs 86,593,663 samples.</code></pre>
+</div>
+<div id="fig-GENPWR-unadjusted" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-GENPWR-unadjusted-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-GENPWR-unadjusted" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-GENPWR-unadjusted-1" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-GENPWR-unadjusted-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-unadjusted-1.png" class="lightbox" data-gallery="fig-GENPWR-unadjusted" title="Figure&nbsp;2.4&nbsp;(a): Odds ratio of 2"><img src="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-unadjusted-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-ref-parent="fig-GENPWR-unadjusted" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-GENPWR-unadjusted-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Odds ratio of 2
+</figcaption></figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-GENPWR-unadjusted" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-GENPWR-unadjusted-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-GENPWR-unadjusted-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-unadjusted-2.png" class="lightbox" data-gallery="fig-GENPWR-unadjusted" title="Figure&nbsp;2.4&nbsp;(b): Odds ratio of 3"><img src="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-unadjusted-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-ref-parent="fig-GENPWR-unadjusted" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-GENPWR-unadjusted-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Odds ratio of 3
+</figcaption></figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-GENPWR-unadjusted" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-GENPWR-unadjusted-3" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-GENPWR-unadjusted-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-unadjusted-3.png" class="lightbox" data-gallery="fig-GENPWR-unadjusted" title="Figure&nbsp;2.4&nbsp;(c): Odds ratio of 4"><img src="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-unadjusted-3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-ref-parent="fig-GENPWR-unadjusted" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-GENPWR-unadjusted-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c) Odds ratio of 4
+</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-GENPWR-unadjusted-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.4: Without any adjustement, to be avoided.
+</figcaption></figure>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pval_adjusted_gene_specific</span> <span class="op">&lt;-</span> <span class="fl">0.05</span><span class="op">/</span><span class="op">(</span><span class="va">num_variants</span><span class="op">*</span><span class="va">num_features</span><span class="op">)</span></span>
+<span><span class="va">ss_gene</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/genpwr/man/genpwr.calc.html">genpwr.calc</a></span><span class="op">(</span>calc <span class="op">=</span> <span class="st">"ss"</span>,</span>
+<span>                  model <span class="op">=</span> <span class="st">"logistic"</span>, </span>
+<span>                  ge.interaction <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                  OR <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>, </span>
+<span>                  Case.Rate <span class="op">=</span> <span class="va">case_rate</span>, </span>
+<span>                  Power <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>                  MAF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.02</span>, <span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.3</span><span class="op">)</span>, </span>
+<span>                  Alpha <span class="op">=</span> <span class="va">pval_adjusted_gene_specific</span>,</span>
+<span>                  True.Model <span class="op">=</span> <span class="st">"All"</span>, </span>
+<span>                  Test.Model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Additive"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/genpwr/man/ss.plot.html">ss.plot</a></span><span class="op">(</span><span class="va">ss_gene</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ss_gene</span> <span class="op">&lt;-</span> <span class="va">ss_gene</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename_with</a></span><span class="op">(</span> <span class="op">~</span> <span class="st">"Pval"</span>,</span>
+<span>               .cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"N_total_at_Alpha"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">best_scenario</span> <span class="op">&lt;-</span> <span class="va">ss_gene</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">Pval</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">intermediate_scenario</span> <span class="op">&lt;-</span> <span class="va">ss_gene</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">True.Model</span> <span class="op">==</span> <span class="st">"Additive"</span>  <span class="op">&amp;</span> <span class="va">MAF</span> <span class="op">==</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">OR</span> <span class="op">==</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">worst_scenario</span> <span class="op">&lt;-</span> <span class="va">ss_gene</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">Pval</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/formatc.html">formatC</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"d"</span>, big.mark <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Most optimistic scenario (MAF: 0.3, OR: 4, Real:Recessive vs Tested:Additive) needs "</span>, <span class="va">best_scenario</span>, <span class="st">"samples.\n"</span>, </span>
+<span>              <span class="st">"Intermediate scenario (MAF: 0.05, OR: 3, Real:Additive vs Tested:Additive) needs"</span>, <span class="va">intermediate_scenario</span>, <span class="st">"samples.\n"</span>, </span>
+<span>              <span class="st">"Finally, the worst scenario (MAF: 0.01, OR: 2, Real:Recessive vs Tested:Additive) needs"</span>, <span class="va">worst_scenario</span>, <span class="st">"samples."</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stderr">
+<pre><code>##  Most optimistic scenario (MAF: 0.3, OR: 4, Real:Recessive vs Tested:Additive) needs  622 samples.
+##   Intermediate scenario (MAF: 0.05, OR: 3, Real:Additive vs Tested:Additive) needs 2877 samples.
+##   Finally, the worst scenario (MAF: 0.01, OR: 2, Real:Recessive vs Tested:Additive) needs 343,931,663 samples.</code></pre>
+</div>
+<div id="fig-GENPWR-gene-specific" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-GENPWR-gene-specific-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-GENPWR-gene-specific" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-GENPWR-gene-specific-1" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-GENPWR-gene-specific-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-gene-specific-1.png" class="lightbox" data-gallery="fig-GENPWR-gene-specific" title="Figure&nbsp;2.5&nbsp;(a): Odds ratio of 2"><img src="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-gene-specific-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-ref-parent="fig-GENPWR-gene-specific" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-GENPWR-gene-specific-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Odds ratio of 2
+</figcaption></figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-GENPWR-gene-specific" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-GENPWR-gene-specific-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-GENPWR-gene-specific-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-gene-specific-2.png" class="lightbox" data-gallery="fig-GENPWR-gene-specific" title="Figure&nbsp;2.5&nbsp;(b): Odds ratio of 3"><img src="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-gene-specific-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-ref-parent="fig-GENPWR-gene-specific" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-GENPWR-gene-specific-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Odds ratio of 3
+</figcaption></figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-GENPWR-gene-specific" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-GENPWR-gene-specific-3" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-GENPWR-gene-specific-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-gene-specific-3.png" class="lightbox" data-gallery="fig-GENPWR-gene-specific" title="Figure&nbsp;2.5&nbsp;(c): Odds ratio of 4"><img src="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-gene-specific-3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-ref-parent="fig-GENPWR-gene-specific" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-GENPWR-gene-specific-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c) Odds ratio of 4
+</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-GENPWR-gene-specific-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.5: With an <span class="math inline">\(\alpha\)</span>-threshold adjusted to the gene-candidate context.
+</figcaption></figure>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb32"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pval_adjusted_gwas</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="op">*</span> <span class="fl">10</span><span class="op">^</span><span class="op">-</span><span class="fl">8</span></span>
+<span><span class="va">ss_GWAS</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/genpwr/man/genpwr.calc.html">genpwr.calc</a></span><span class="op">(</span>calc <span class="op">=</span> <span class="st">"ss"</span>,</span>
+<span>                  model <span class="op">=</span> <span class="st">"logistic"</span>, </span>
+<span>                  ge.interaction <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                  OR <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>, </span>
+<span>                  Case.Rate <span class="op">=</span> <span class="fl">0.1</span>, </span>
+<span>                  Power <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>                  MAF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.02</span>, <span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.3</span><span class="op">)</span>, </span>
+<span>                  Alpha <span class="op">=</span> <span class="va">pval_adjusted_gwas</span>,</span>
+<span>                  True.Model <span class="op">=</span> <span class="st">"All"</span>, </span>
+<span>                  Test.Model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Additive"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/genpwr/man/ss.plot.html">ss.plot</a></span><span class="op">(</span><span class="va">ss_GWAS</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ss_GWAS</span> <span class="op">&lt;-</span> <span class="va">ss_GWAS</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename_with</a></span><span class="op">(</span> <span class="op">~</span> <span class="st">"Pval"</span>,</span>
+<span>               .cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"N_total_at_Alpha"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">best_scenario</span> <span class="op">&lt;-</span> <span class="va">ss_GWAS</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">Pval</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">intermediate_scenario</span> <span class="op">&lt;-</span> <span class="va">ss_GWAS</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">True.Model</span> <span class="op">==</span> <span class="st">"Additive"</span>  <span class="op">&amp;</span> <span class="va">MAF</span> <span class="op">==</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">OR</span> <span class="op">==</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/formatc.html">formatC</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"d"</span>, big.mark <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">worst_scenario</span> <span class="op">&lt;-</span> <span class="va">ss_GWAS</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">Pval</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">Pval</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/formatc.html">formatC</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"d"</span>, big.mark <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Most optimistic scenario (MAF: 0.3, OR: 4, Real:Recessive vs Tested:Additive) needs "</span>, <span class="va">best_scenario</span>, <span class="st">"samples.\n"</span>, </span>
+<span>              <span class="st">"Intermediate scenario (MAF: 0.05, OR: 3, Real:Additive vs Tested:Additive) needs"</span>, <span class="va">intermediate_scenario</span>, <span class="st">"samples.\n"</span>, </span>
+<span>              <span class="st">"Finally, the worst scenario (MAF: 0.01, OR: 2, Real:Recessive vs Tested:Additive) needs"</span>, <span class="va">worst_scenario</span>, <span class="st">"samples."</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stderr">
+<pre><code>##  Most optimistic scenario (MAF: 0.3, OR: 4, Real:Recessive vs Tested:Additive) needs  517 samples.
+##   Intermediate scenario (MAF: 0.05, OR: 3, Real:Additive vs Tested:Additive) needs 2,478 samples.
+##   Finally, the worst scenario (MAF: 0.01, OR: 2, Real:Recessive vs Tested:Additive) needs 287,495,685 samples.</code></pre>
+</div>
+<div id="fig-GENPWR-GWAS" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-GENPWR-GWAS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-GENPWR-GWAS" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-GENPWR-GWAS-1" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-GENPWR-GWAS-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-GWAS-1.png" class="lightbox" data-gallery="fig-GENPWR-GWAS" title="Figure&nbsp;2.6&nbsp;(a): Odds ratio of 2"><img src="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-GWAS-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-ref-parent="fig-GENPWR-GWAS" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-GENPWR-GWAS-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Odds ratio of 2
+</figcaption></figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-GENPWR-GWAS" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-GENPWR-GWAS-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-GENPWR-GWAS-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-GWAS-2.png" class="lightbox" data-gallery="fig-GENPWR-GWAS" title="Figure&nbsp;2.6&nbsp;(b): Odds ratio of 3"><img src="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-GWAS-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-ref-parent="fig-GENPWR-GWAS" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-GENPWR-GWAS-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Odds ratio of 3
+</figcaption></figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-GENPWR-GWAS" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-GENPWR-GWAS-3" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-GENPWR-GWAS-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-GWAS-3.png" class="lightbox" data-gallery="fig-GENPWR-GWAS" title="Figure&nbsp;2.6&nbsp;(c): Odds ratio of 4"><img src="CARTaGENE-sample-size_files/figure-html/fig-GENPWR-GWAS-3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-ref-parent="fig-GENPWR-GWAS" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-GENPWR-GWAS-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c) Odds ratio of 4
+</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-GENPWR-GWAS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.6: With an <span class="math inline">\(\alpha\)</span>-threshold of <span class="math inline">\(5 \times 10^{-8}\)</span>.
+</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+</section></section><section id="additional-resources" class="level2 appendix" data-number="2.4"><h2 class="appendix anchored" data-number="2.4" data-anchor-id="additional-resources">
 <span class="header-section-number">2.4</span> Additional resources</h2>
 <ul>
 <li>
-<p><a href="https://bioinformaticsworkbook.org/dataAnalysis/VariantCalling/freebayes-dnaseq-workflow.html"><code>FreeBayes</code> variant calling workflow for DNA-Seq</a> is able to detect from scratch small polymorphisms, such as <em>SNPs</em> (single-nucleotide polymorphisms), <em>indels</em> (insertions and deletions), and <em>MNPs</em> (multi-nucleotide polymorphisms):</p>
+<p><a href="https://bioinformaticsworkbook.org/dataAnalysis/VariantCalling/freebayes-dnaseq-workflow.html"><code>FreeBayes</code> variant calling workflow for DNA-Seq</a> for detecting from scratch small polymorphisms, such as <em>SNPs</em> (single-nucleotide polymorphisms), <em>indels</em> (insertions and deletions), and <em>MNPs</em> (multi-nucleotide polymorphisms):</p>
 <ul>
-<li>Provides as well a comprehensive tutorial for retrieving variants annotations.</li>
-<li>QC plots with the <code>vcfR</code> package.</li>
+<li><p>Provides as well a comprehensive tutorial for retrieving variants annotations.</p></li>
+<li><p>QC plots with the <code>vcfR</code> package.</p></li>
 </ul>
 </li>
 </ul>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-david2021tig" class="csl-entry" role="listitem">
+David, Susana. 2021. <span>‘A Current Guide to Candidate Gene Association Studies’</span>. <em>Trends in Genetics</em> 37 (12): 1056–59. <a href="https://doi.org/10.1016/j.tig.2021.07.009">https://doi.org/10.1016/j.tig.2021.07.009</a>.
+</div>
+<div id="ref-fadista2016ejhg" class="csl-entry" role="listitem">
+Fadista, João, Alisa K. Manning, Jose C. Florez, and Leif Groop. 2016. <span>‘The (in)famous <span class="nocase">GWAS P-value</span> Threshold Revisited and Updated for Low-Frequency Variants’</span>. <em>European Journal of Human Genetics</em> 24 (8): 1202–5. <a href="https://doi.org/10.1038/ejhg.2015.269">https://doi.org/10.1038/ejhg.2015.269</a>.
+</div>
+<div id="ref-menashe2008bg" class="csl-entry" role="listitem">
+Menashe, Idan, Philip S Rosenberg, and Bingshu E Chen. 2008. <span>‘<span>PGA</span>: Power Calculator for Case-Control Genetic Association Analyses’</span>. <em>BMC Genetics</em> 9 (May): 36. <a href="https://doi.org/10.1186/1471-2156-9-36">https://doi.org/10.1186/1471-2156-9-36</a>.
+</div>
+<div id="ref-moore2019hh" class="csl-entry" role="listitem">
+Moore, Camille M., Sean A. Jacobso, and Tasha E. Fingerlin. 2019. <span>‘Power and <span>Sample Size Calculations</span> for <span>Genetic Association Studies</span> in the <span>Presence</span> of <span>Genetic Model Mis-Specification</span>’</span>. <em>Human Heredity</em> 84 (6): 256–71. <a href="https://doi.org/10.1159/000508558">https://doi.org/10.1159/000508558</a>.
+</div>
+<div id="ref-politi2023l" class="csl-entry" role="listitem">
+Politi, Cristina, Stefanos Roumeliotis, Giovanni Tripepi, and Belinda Spoto. 2023. <span>‘Sample <span>Size Calculation</span> in <span>Genetic Association Studies</span>: <span>A Practical Approach</span>’</span>. <em>Life</em> 13 (1): 235. <a href="https://doi.org/10.3390/life13010235">https://doi.org/10.3390/life13010235</a>.
+</div>
+</div>
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -1047,7 +1714,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
 <li class="nav-item compact">
-    <a class="nav-link active" href="https://github.com/ArnaudDroitLab/cartagene-gwas" aria-current="page">
+    <a class="nav-link" href="https://github.com/ArnaudDroitLab/cartagene-gwas">
       <i class="bi bi-github" role="img">
 </i> 
     </a>
