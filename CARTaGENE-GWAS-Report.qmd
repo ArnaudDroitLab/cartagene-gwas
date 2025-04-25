@@ -2,7 +2,7 @@
 title: "Main GWAS pipeline"
 ---
 
-## Reproduce the pipeline and questions to address
+## Short tutorial
 
 ### Two-step pipeline
 
@@ -67,7 +67,7 @@ The code, main results (figures and tables), along with reports, are versioned i
 $p$-value association of each variant. [Variants with 
 -values equal to zero are highlighted in green]{fg="green"}, while the [horizontal red line indicates the genome-wide *significance threshold*.]{fg="red"}. The total sample consisted of $27,422$ individuals, with the **GWAS focus being comparing ground-truth SNPs versus imputed SNPs.**](./figures/global-GWAS.png){#fig-gwas-global}
 
-## Analyses
+## Methods
 
 ### Setup enviroment
 
@@ -748,11 +748,11 @@ cat(chromosome_vcf6_content |>
 
 <!-- ``` -->
 
-### Step 3: GWAS Analyses
+## Results: GWAS Analyses
 
 #### i) GLM and GWAS {#sec-GWAS}
 
--   **Objective**: Use of `PLINK2 + glm` with the first 10 principal components as covariates, see @lst-glm-bash, using logistic regression for categorical variables, and `lm` for continuous outcomes.
+-   **Objective**: Use of `PLINK2 + glm` with the first 10 principal components as covariates, see @lst-glm-bash, using logistic regression for categorical variables, and `lm` for continuous outcomes. [Note that in contrast with Geneviève's implementation, recent `plink2` versions automatically switch from **Standard Logistic Regression**, with potentially non-finite estimates, to logistic **Firth Hybrid Regression**, which guarantees finite and bias-reduced estimates. This was activated for instance. Automatically activated when the Case ratio over Control is below 0.1. With this new option, remark 1 is not anymore relevant (VIF inflation factor).]{fg="red"}
     
 -   **Input**:
     -   `VCF` file on the region/gene of interest
@@ -811,7 +811,7 @@ log_files <- list.files(file.path("tables", genename),
                         pattern = paste0(genename, "_", ".*", "_", filedate, "\\.log$"),
                         full.names = TRUE)
 
-if (length(log_files)>0) {
+if (length(log_files) > 0) {
   log_contents <- vapply(
   log_files,
   FUN = function(file) paste(readLines(file, warn = FALSE), collapse = "\n"),
@@ -882,7 +882,7 @@ ggplot(gwas_results, aes(x = OR)) +
 
 #### iii) Multiple test correction
 
-To compute the adjusted *significance threshold*, we applied a `FWER`-like approach, conventional in the GWAS field: `{{r}} 0.05/(num_variants*length(cartagene_response_variables$Features))`, in which you divide the pre-defined threshold (standard: `0.05`) by the total number of pairwise tests carried out (number of variants times number of regression variables times). Final threshold is accordingly: `{r} 0.05/(num_variants*length(cartagene_response_variables$Features))`, as `{r} num_variants` variants were extracted, and `{r} length(cartagene_response_variables$Features)` phenotype variables were predicted.
+To compute the adjusted *significance threshold*, we applied a `FWER`-like approach, conventional in the GWAS field: `{{r}} 0.05/(num_variants*length(cartagene_response_variables$Features))`, in which you divide the pre-defined threshold (standard: `0.05`) by the total number of pairwise tests carried out (number of variants times number of regression variables). Final threshold is accordingly: `{r} 0.05/(num_variants*length(cartagene_response_variables$Features))`, as `{r} num_variants` variants were extracted, and `{r} length(cartagene_response_variables$Features)` phenotype variables were predicted.
 
 [The `FWER` approach is particularly **conservative**, in other words, only the most significant differences are detected.]{fg="red"}
 
@@ -906,9 +906,25 @@ To compute the adjusted *significance threshold*, we applied a `FWER`-like appro
 
 ## Perspectives
 
+### Retrieve automatically variants of interest {#sec-post-GWAS}
+
+This analysis is not formally a GWAS study, but rather a *gene-candidate* study, pre-selecting genes based on prior knowledge and/or intuition.
+
+Alternatively, we could consider a data-driven, and more agnostic approach, to refine the selection of gene candidates. Several approaches to that end have been implemented:
+
+-   @gnanaolivu2025bb proposed in [A clinical knowledge graph-based framework to prioritize candidate genes for facilitating diagnosis of Mendelian diseases and rare genetic conditions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06096-2), the `phenotype prioritization and analysis for rare diseases, PPAR` algorithm to rank genes based on *human phenotype ontology (HPO)* terms.[^16]. In details, `PPAR` combines embeddings from the *human knowledge graph*, incorporating genes, HPO terms, and gene ontology annotations connections. For each input HPO term, a prioritized list of genes is returned based on their relevance and similarity to the HPO term.
+
+-   @bridges2025bb developed in [Towards a standard benchmark for phenotype-driven variant and gene prioritisation algorithms: `PhEval`, Phenotypic inference Evaluation framework](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06105-4) a unified benchmarking platform to clean inputs for *phenotype-driven VGPAs*. Variant and Gene Prioritisation Algorithms integrate complex and multi-modal datasets, such as ontologies and gene-to-phenotype associations, to predict the most influential and promising gene targets controlling the evolution of rare diseases. Model is available as GitHub Repo [`PhEval`](https://github.com/monarch-initiative/pheval).
+
+[^16]: Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.
+
 ### Post-hoc GWAS
 
-- [Collect information on variants with LLM-like `VarChat` app](https://varchat.engenome.com/)
+- Collect information on variants with LLM-like [`VarChat`](https://varchat.engenome.com/) application.
+
+- Infer the most influential **effector genes** that drive loci changes and altered diseased phenotypes in GWAS studies using the `FLAMES` (Fine-mapped Locus Assessment Model of Effector geneS) data-driven framework, combining SNP-to-gene data (chromatin interaction mapping or eQTL mapping) and prior biological pathway information. Available as an open-source and popular [GitHub Python repo](https://github.com/Marijn-Schipper/FLAMES), from @gnanaolivu2025bb.
+
+- To further extend `FLAMES`, you may harness [`TraitGym`](https://huggingface.co/datasets/songlab/TraitGym), a curated dataset of regulatory genetic variants causally related to 113 Mendelian and 83 complex traits, from @benegas2025.
 
 ### Explore non-coding and regulatory regions (from WES to WGS)
 
@@ -929,17 +945,7 @@ To compute the adjusted *significance threshold*, we applied a `FWER`-like appro
 
 - The [VariantAnnotation::predictCoding](https://www.bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.html#amino-acid-coding-changes) computes amino acid coding changes for non-synonymous variants, while the [`SIFT` and `PolyPhen`](https://www.bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.html#sift-and-polyphen-databases)  web databases evaluate the impact of SNP substitution, based on the predicted level of changes of the 3D-protein reconfiguration.
 
-### Post-GWAS: Retrieve automatically variants of interest {#sec-post-GWAS}
 
-This analysis is not formally a GWAS study, but rather a *gene-centric* study, pre-selecting genes based on prior knowledge and/or intuition.
-
-Alternatively, we could consider a data-driven, and more agnostic approach, to refine the selection of gene candidates. Several approaches to that end have been implemented:
-
--   @gnanaolivu2025bb proposed in [A clinical knowledge graph-based framework to prioritize candidate genes for facilitating diagnosis of Mendelian diseases and rare genetic conditions](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06096-2), the `phenotype prioritization and analysis for rare diseases, PPAR` algorithm to rank genes based on *human phenotype ontology (HPO)* terms.[^16]. In details, `PPAR` combines embeddings from the *human knowledge graph*, incorporating genes, HPO terms, and gene ontology annotations connections. For each input HPO term, a prioritized list of genes is returned based on their relevance and similarity to the HPO term.
-
--   @bridges2025bb developed in [Towards a standard benchmark for phenotype-driven variant and gene prioritisation algorithms: `PhEval`, Phenotypic inference Evaluation framework](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-025-06105-4) a unified benchmarking platform to clean inputs for *phenotype-driven VGPAs*. Variant and Gene Prioritisation Algorithms integrate complex and multi-modal datasets, such as ontologies and gene-to-phenotype associations, to predict the most influential and promising gene targets controlling the evolution of rare diseases. Model is available as GitHub Repo [`PhEval`](https://github.com/monarch-initiative/pheval).
-
-[^16]: Note that relying on HPO terms, for example, `HP:0004322 – Osteopenia`, would alleviate the need for standardising phenotype labels, using universally acknowledged scientific terms instead.
 
 ### Post-GWAS: Incorporate familial pedigrees
 
@@ -973,11 +979,13 @@ An alternative to *candidate gene* association studies relies on *linkage analys
 
 Lots of intermediate files are not required for downstream analyses, hence it would be relevant to rely on an existing *Nextflow* or *Snakemake* DSL workflows:
 
--   [`nf-GWAS` 'Nextflow pipeline'](https://genepi.github.io/nf-gwas/), from @schonherr2024, is actively maintained by Curie Bioinformatics Team, and includes the latest `plink2` facilities. Complementary tools include:
+-   **NextFlow**: [`nf-GWAS` 'Nextflow pipeline'](https://genepi.github.io/nf-gwas/), from @schonherr2024, is actively maintained by Curie Bioinformatics Team, and includes the latest `plink2` facilities. Complementary tools include:
 
   - The `Nextflow` Seqera [`multiqc`](https://seqera.io/multiqc/) initiative collects within the same repository a variety of command-line tools, such as `bcftools` and `plink2`, with notably the [`vcftools`](https://github.com/MultiQC/MultiQC/tree/main/multiqc/modules/vcftools) and [`multivcfanalyzer`](https://github.com/MultiQC/MultiQC/tree/main/multiqc/modules/multivcfanalyzer) modules. Note however that these tools are optimised in Python.
+  
+  - [`PGSXplorer`](https://github.com/tutkuyaras/PGSXplorer) is a Nextflow pipeline automatically retrieving and carrying out quality controls and polygenic scores computation. The workflow, starting from a `VCF` file, includes checks and automated reporting for missing SNPs, individual genotype quality, MAF, HWE, relatedness, heterozygosity, and duplicate SNPs. Additionally, it outlines the GWAS QC and **imputation** components of the pipeline. It both returns single scores (`plink`, `SBayes`) and polygenic scores (`MUSSEL`).
 
--   [`PopGLen` 'Snakemake' pipeline](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf105/8069456), from @nolen2025b. [Not for running GWAS analyses, but rather for evaluating the quality and impact of preprocessing and quality mapping at the population-level genome starting from `FASTQ` files.]{fg="red"}
+-   **SnakeMake**: [`PopGLen` 'Snakemake' pipeline](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaf105/8069456), from @nolen2025b. [Not for running GWAS analyses, but rather for evaluating the quality and impact of preprocessing and quality mapping at the population-level genome starting from `FASTQ` files.]{fg="red"}
 
 ### FASTQ and FASTA Quality Controls
 
