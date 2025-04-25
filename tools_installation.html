@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB"><head>
-
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.6.42">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-
-<title>Bibliographic References – GWAS Analyses utilising the CARTaGENE database</title>
+<title>Appendix A — Tools installation – GWAS Analyses utilising the CARTaGENE database</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,27 +17,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
 }
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
-
+</style>
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
@@ -49,7 +60,8 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./tools_installation.html" rel="prev">
+<link href="./references.html" rel="next">
+<link href="./CARTaGENE-sample-size.html" rel="prev">
 <link href="./assets/favicon.png" rel="icon" type="image/png">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -61,8 +73,7 @@ div.csl-indent {
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-0f9470d4953b37d849ae37bce3f66ad5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-614f1822cc30897a01453187531b1033.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
+<link href="site_libs/bootstrap/bootstrap-dark-614f1822cc30897a01453187531b1033.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
@@ -87,43 +98,32 @@ div.csl-indent {
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
-}</script>
-<style>html{ scroll-behavior: smooth; }</style>
-<script async="" src="https://hypothes.is/embed.js"></script>
-<script>
+}</script><style>html{ scroll-behavior: smooth; }</style>
+<script async="" src="https://hypothes.is/embed.js"></script><script>
   window.document.addEventListener("DOMContentLoaded", function (_event) {
     document.body.classList.add('hypothesis-enabled');
   });
 </script>
-
-
-<meta property="og:title" content="Bibliographic References – GWAS Analyses utilising the CARTaGENE database">
+<meta property="og:title" content="Appendix A — Tools installation – GWAS Analyses utilising the CARTaGENE database">
 <meta property="og:site_name" content="GWAS Analyses utilising the CARTaGENE database">
 </head>
-
 <body class="nav-sidebar docked">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tools_installation.html">Appendices</a></li><li class="breadcrumb-item"><a href="./references.html">Bibliographic References</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tools_installation.html">Appendices</a></li><li class="breadcrumb-item"><a href="./tools_installation.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Tools installation</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
-  </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">GWAS and CartaGene</a> 
         <div class="sidebar-tools-main tools-wide">
@@ -145,7 +145,7 @@ div.csl-indent {
         </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Welcome</span></a>
@@ -157,6 +157,12 @@ div.csl-indent {
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Main GWAS pipeline</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./CARTaGENE-sample-size.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">CartaGene Sample Size estimation</span></span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
@@ -165,40 +171,47 @@ div.csl-indent {
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tools_installation.html" class="sidebar-item-text sidebar-link">
+  <a href="./tools_installation.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Tools installation</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link active">
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Bibliographic References</span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
     </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li>
+<a href="#sec-tools-install" id="toc-sec-tools-install" class="nav-link active" data-scroll-target="#sec-tools-install"><span class="header-section-number">A.1</span> Build from scratch command-line GWAS tools</a>
+  <ul>
+<li><a href="#bash-commands-to-install-plink2" id="toc-bash-commands-to-install-plink2" class="nav-link" data-scroll-target="#bash-commands-to-install-plink2"><span class="header-section-number">A.1.1</span> Bash commands to install <code>plink2</code></a></li>
+  <li><a href="#bash-commands-to-install-bcftools" id="toc-bash-commands-to-install-bcftools" class="nav-link" data-scroll-target="#bash-commands-to-install-bcftools"><span class="header-section-number">A.1.2</span> Bash commands to install <code>bcftools</code></a></li>
+  <li><a href="#bash-commands-to-save-path-executions" id="toc-bash-commands-to-save-path-executions" class="nav-link" data-scroll-target="#bash-commands-to-save-path-executions"><span class="header-section-number">A.1.3</span> Bash commands to save path executions</a></li>
+  </ul>
+</li>
+  </ul><div class="toc-actions"><ul><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/edit/master/tools_installation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/blob/master/tools_installation.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content column-page-right" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tools_installation.html">Appendices</a></li><li class="breadcrumb-item"><a href="./references.html">Bibliographic References</a></li></ol></nav>
-<div class="quarto-title">
-<h1 class="title">Bibliographic References</h1>
+<main class="content column-body" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tools_installation.html">Appendices</a></li><li class="breadcrumb-item"><a href="./tools_installation.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Tools installation</span></a></li></ol></nav><div class="quarto-title">
+<h1 class="title">Appendix A — Tools installation</h1>
 </div>
 
 
 
-<div class="quarto-title-meta column-page-right">
+<div class="quarto-title-meta column-body">
 
     
   
@@ -207,175 +220,55 @@ div.csl-indent {
   
 
 
-</header>
-
-
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-attikora2025bg" class="csl-entry" role="listitem">
-Attikora, Affi Jean Paul, Kouakou Alfred Kouassi, Saraka Didier Martial
-Yao, Dougba Noel Dago, Souleymane Silué, Caroline De Clerck, Nafan
-Diarrassouba, et al. 2025. <span>“Genome-Wide Association Study of Fat
-Content and Fatty Acid Composition of Shea Tree (<span>Vitellaria</span>
-Paradoxa <span>C</span>.<span>F</span>. <span>Gaertn</span> Subsp.
-Paradoxa).”</span> <em>BMC Genomics</em> 26 (1): 164. <a href="https://doi.org/10.1186/s12864-025-11344-z">https://doi.org/10.1186/s12864-025-11344-z</a>.
+</header><section id="sec-tools-install" class="level2" data-number="A.1"><h2 data-number="A.1" class="anchored" data-anchor-id="sec-tools-install">
+<span class="header-section-number">A.1</span> Build from scratch command-line GWAS tools</h2>
+<section id="bash-commands-to-install-plink2" class="level3" data-number="A.1.1"><h3 data-number="A.1.1" class="anchored" data-anchor-id="bash-commands-to-install-plink2">
+<span class="header-section-number">A.1.1</span> Bash commands to install <code>plink2</code>
+</h3>
+<div class="cell" data-layout-align="center">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Download the latest PLINK2 binary</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> <span class="at">-O</span> ./bin/plink2.zip <span class="st">"https://s3.amazonaws.com/plink2-assets/alpha6/plink2_linux_x86_64_20250129.zip"</span> </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span> <span class="at">-d</span> ./bin/plink2 ./bin/plink2.zip <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> ./bin/plink2.zip</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4: Ensure the binary is executable</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> 777 ./bin/plink2</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 5: Verify installation</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/plink2</span> <span class="at">--version</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-<div id="ref-awadalla2013ijoe" class="csl-entry" role="listitem">
-Awadalla, Philip, Catherine Boileau, Yves Payette, Youssef Idaghdour,
-Jean-Philippe Goulet, Bartha Knoppers, Pavel Hamet, Claude Laberge, and
-on behalf of the CARTaGENE Project. 2013. <span>“Cohort Profile of the
-<span>CARTaGENE</span> Study: <span>Quebec</span>’s Population-Based
-Biobank for Public Health and Personalized Genomics.”</span>
-<em>International Journal of Epidemiology</em> 42 (5): 1285–99. <a href="https://doi.org/10.1093/ije/dys160">https://doi.org/10.1093/ije/dys160</a>.
+</section><section id="bash-commands-to-install-bcftools" class="level3" data-number="A.1.2"><h3 data-number="A.1.2" class="anchored" data-anchor-id="bash-commands-to-install-bcftools">
+<span class="header-section-number">A.1.2</span> Bash commands to install <code>bcftools</code>
+</h3>
+<div class="cell" data-layout-align="center">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> <span class="at">-O</span> ./bin/bcftools-1.21.tar.bz2 <span class="st">"https://github.com/samtools/bcftools/releases/download/1.21/bcftools-1.21.tar.bz2"</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xjvf</span> ./bin/bcftools-1.21.tar.bz2 <span class="at">-C</span> ./bin/ <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> ./bin/bcftools-1.21.tar.bz2</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ./bin/bcftools-1.21</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">./configure</span> <span class="at">--prefix</span><span class="op">=</span>/mnt/projects_tn01/Cartagene/cartagene-gwas/bin/bcftools</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> install</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> ./bin/bcftools-1.21</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-<div id="ref-bretz2016" class="csl-entry" role="listitem">
-Bretz, Frank, Torsten Hothorn, and Peter Westfall. 2016. <em>Multiple
-<span>Comparisons Using R</span></em>. New York: <span>Chapman and
-Hall/CRC</span>. <a href="https://doi.org/10.1201/9781420010909">https://doi.org/10.1201/9781420010909</a>.
-</div>
-<div id="ref-bridges2025bb" class="csl-entry" role="listitem">
-Bridges, Yasemin, Vinicius de Souza, Katherina G. Cortes, Melissa
-Haendel, Nomi L. Harris, Daniel R. Korn, Nikolaos M. Marinakis, et al.
-2025. <span>“Towards a Standard Benchmark for Phenotype-Driven Variant
-and Gene Prioritisation Algorithms:
-<span>PhEval</span>&nbsp;-&nbsp;<span>Phenotypic</span> Inference
-<span>Evaluation</span> Framework.”</span> <em>BMC Bioinformatics</em>
-26 (1): 87. <a href="https://doi.org/10.1186/s12859-025-06105-4">https://doi.org/10.1186/s12859-025-06105-4</a>.
-</div>
-<div id="ref-chen2025b" class="csl-entry" role="listitem">
-Chen, Ting-Huei, Chia-Jung Lee, Syue-Pu Chen, Shang-Jung Wu, and Cathy S
-J Fann. 2025. <span>“<span>PNL</span>: A Software to Build Polygenic
-Risk Scores Using a Super Learner Approach Based on
-<span>PairNet</span>, a <span>Convolutional Neural
-Network</span>.”</span> <em>Bioinformatics</em> 41 (2): btaf071. <a href="https://doi.org/10.1093/bioinformatics/btaf071">https://doi.org/10.1093/bioinformatics/btaf071</a>.
-</div>
-<div id="ref-gnanaolivu2025bb" class="csl-entry" role="listitem">
-Gnanaolivu, Rohan, Gavin Oliver, Garrett Jenkinson, Emily Blake, Wenan
-Chen, Nicholas Chia, Eric W. Klee, and Chen Wang. 2025. <span>“A
-Clinical Knowledge Graph-Based Framework to Prioritize Candidate Genes
-for Facilitating Diagnosis of <span>Mendelian</span> Diseases and Rare
-Genetic Conditions.”</span> <em>BMC Bioinformatics</em> 26 (1): 82. <a href="https://doi.org/10.1186/s12859-025-06096-2">https://doi.org/10.1186/s12859-025-06096-2</a>.
-</div>
-<div id="ref-harris2025nrg" class="csl-entry" role="listitem">
-Harris, Laura, Ellen M. McDonagh, Xiaolei Zhang, Katherine Fawcett, Amy
-Foreman, Petr Daneck, Panagiotis I. Sergouniotis, et al. 2025.
-<span>“Genome-Wide Association Testing Beyond <span>SNPs</span>.”</span>
-<em>Nature Reviews Genetics</em> 26 (3): 156–70. <a href="https://doi.org/10.1038/s41576-024-00778-y">https://doi.org/10.1038/s41576-024-00778-y</a>.
-</div>
-<div id="ref-hayes2013gasagp" class="csl-entry" role="listitem">
-Hayes, Ben. 2013. <span>“Overview of <span>Statistical Methods</span>
-for <span>Genome-Wide Association Studies</span>
-(<span>GWAS</span>).”</span> In <em>Genome-<span>Wide Association
-Studies</span> and <span>Genomic Prediction</span></em>, edited by
-Cedric Gondro, Julius van der Werf, and Ben Hayes, 149–69. Totowa, NJ:
-Humana Press. <a href="https://doi.org/10.1007/978-1-62703-447-0_6">https://doi.org/10.1007/978-1-62703-447-0_6</a>.
-</div>
-<div id="ref-kim2025b" class="csl-entry" role="listitem">
-Kim, Na Yeon, and Seunggeun Lee. 2025. <span>“<span>XPRS</span>: <span>A
-Tool</span> for <span>Interpretable</span> and <span>Explainable
-Polygenic Risk Score</span>.”</span> <em>Bioinformatics</em>, March,
-btaf143. <a href="https://doi.org/10.1093/bioinformatics/btaf143">https://doi.org/10.1093/bioinformatics/btaf143</a>.
-</div>
-<div id="ref-leeuw2015pcb" class="csl-entry" role="listitem">
-Leeuw, Christiaan A. de, Joris M. Mooij, Tom Heskes, and Danielle
-Posthuma. 2015. <span>“<span>MAGMA</span>: <span>Generalized Gene-Set
-Analysis</span> of <span>GWAS Data</span>.”</span> <em>PLOS
-Computational Biology</em> 11 (4): e1004219. <a href="https://doi.org/10.1371/journal.pcbi.1004219">https://doi.org/10.1371/journal.pcbi.1004219</a>.
-</div>
-<div id="ref-lin2024" class="csl-entry" role="listitem">
-Lin, Jiecong, Ruibang Luo, and Luca Pinello. 2024.
-<span>“<span>EPInformer</span>: A Scalable Deep Learning Framework for
-Gene Expression Prediction by Integrating Promoter-Enhancer Sequences
-with Multimodal Epigenomic Data.”</span> August 1, 2024. <a href="https://doi.org/10.1101/2024.08.01.606099">https://doi.org/10.1101/2024.08.01.606099</a>.
-</div>
-<div id="ref-menashe2008bg" class="csl-entry" role="listitem">
-Menashe, Idan, Philip S Rosenberg, and Bingshu E Chen. 2008.
-<span>“<span>PGA</span>: Power Calculator for Case-Control Genetic
-Association Analyses.”</span> <em>BMC Genetics</em> 9 (May): 36. <a href="https://doi.org/10.1186/1471-2156-9-36">https://doi.org/10.1186/1471-2156-9-36</a>.
-</div>
-<div id="ref-moore2019hh" class="csl-entry" role="listitem">
-Moore, Camille M., Sean A. Jacobso, and Tasha E. Fingerlin. 2019.
-<span>“Power and <span>Sample Size Calculations</span> for <span>Genetic
-Association Studies</span> in the <span>Presence</span> of <span>Genetic
-Model Mis-Specification</span>.”</span> <em>Human Heredity</em> 84 (6):
-256–71. <a href="https://doi.org/10.1159/000508558">https://doi.org/10.1159/000508558</a>.
-</div>
-<div id="ref-mostafavi2023ng" class="csl-entry" role="listitem">
-Mostafavi, Hakhamanesh, Jeffrey P. Spence, Sahin Naqvi, and Jonathan K.
-Pritchard. 2023. <span>“Systematic Differences in Discovery of Genetic
-Effects on Gene Expression and Complex Traits.”</span> <em>Nature
-Genetics</em> 55 (11): 1866–75. <a href="https://doi.org/10.1038/s41588-023-01529-1">https://doi.org/10.1038/s41588-023-01529-1</a>.
-</div>
-<div id="ref-nolen2025b" class="csl-entry" role="listitem">
-Nolen, Zachary J. 2025. <span>“<span>PopGLen</span>—<span>A
-Snakemake</span> Pipeline for Performing Population Genomic Analyses
-Using Genotype Likelihood-Based Methods.”</span>
-<em>Bioinformatics</em>, March, btaf105. <a href="https://doi.org/10.1093/bioinformatics/btaf105">https://doi.org/10.1093/bioinformatics/btaf105</a>.
-</div>
-<div id="ref-pelletier2022" class="csl-entry" role="listitem">
-Pelletier, Justin. 2022. <span>“Évaluation de l’imputation Des Données
-Génétiques <span>Canadiennes-Françaises</span>,”</span> April. <a href="http://hdl.handle.net/1866/27582">http://hdl.handle.net/1866/27582</a>.
-</div>
-<div id="ref-perez-granado2022fg" class="csl-entry" role="listitem">
-Pérez-Granado, Judith, Janet Piñero, and Laura I. Furlong. 2022.
-<span>“Benchmarking Post-<span>GWAS</span> Analysis Tools in Major
-Depression: <span>Challenges</span> and Implications.”</span>
-<em>Frontiers in Genetics</em> 13 (October). <a href="https://doi.org/10.3389/fgene.2022.1006903">https://doi.org/10.3389/fgene.2022.1006903</a>.
-</div>
-<div id="ref-politi2023l" class="csl-entry" role="listitem">
-Politi, Cristina, Stefanos Roumeliotis, Giovanni Tripepi, and Belinda
-Spoto. 2023. <span>“Sample <span>Size Calculation</span> in
-<span>Genetic Association Studies</span>: <span>A Practical
-Approach</span>.”</span> <em>Life</em> 13 (1): 235. <a href="https://doi.org/10.3390/life13010235">https://doi.org/10.3390/life13010235</a>.
-</div>
-<div id="ref-schonherr2024" class="csl-entry" role="listitem">
-Schönherr, Sebastian, and Lukas Forer. (2021) 2024. <span>“Nf-Gwas -
-<span>A</span> Nextflow Pipeline to Perform <span>GWAS</span>.”</span>
-<a href="https://github.com/genepi/nf-gwas">https://github.com/genepi/nf-gwas</a>.
-</div>
-<div id="ref-sun2025bb" class="csl-entry" role="listitem">
-Sun, Na, Qiang Han, Yu Wang, Mengtong Sun, Ziqing Sun, Hongpeng Sun, and
-Yueping Shen. 2025. <span>“<span>BHCox</span>: <span>Bayesian</span>
-Heredity-Constrained <span>Cox</span> Proportional Hazards Models for
-Detecting Gene-Environment Interactions.”</span> <em>BMC
-Bioinformatics</em> 26 (1): 58. <a href="https://doi.org/10.1186/s12859-025-06077-5">https://doi.org/10.1186/s12859-025-06077-5</a>.
-</div>
-<div id="ref-uffelmann2021nrmp" class="csl-entry" role="listitem">
-Uffelmann, Emil, Qin Qin Huang, Nchangwi Syntia Munung, Jantina de
-Vries, Yukinori Okada, Alicia R. Martin, Hilary C. Martin, Tuuli
-Lappalainen, and Danielle Posthuma. 2021. <span>“Genome-Wide Association
-Studies.”</span> <em>Nature Reviews Methods Primers</em> 1 (1): 1–21. <a href="https://doi.org/10.1038/s43586-021-00056-9">https://doi.org/10.1038/s43586-021-00056-9</a>.
-</div>
-<div id="ref-wang2005nrg" class="csl-entry" role="listitem">
-Wang, William Y. S., Bryan J. Barratt, David G. Clayton, and John A.
-Todd. 2005. <span>“Genome-Wide Association Studies: Theoretical and
-Practical Concerns.”</span> <em>Nature Reviews Genetics</em> 6 (2):
-109–18. <a href="https://doi.org/10.1038/nrg1522">https://doi.org/10.1038/nrg1522</a>.
-</div>
-<div id="ref-yang2024bib" class="csl-entry" role="listitem">
-Yang, Zikun, Basilio Cieza, Dolly Reyes-Dumeyer, Rosa Montesinos, Marcio
-Soto-Añari, Nilton Custodio, and Giuseppe Tosto. 2024. <span>“A
-Benchmark Study on Current <span>GWAS</span> Models in Admixed
-Populations.”</span> <em>Briefings in Bioinformatics</em> 25 (1):
-bbad437. <a href="https://doi.org/10.1093/bib/bbad437">https://doi.org/10.1093/bib/bbad437</a>.
-</div>
-<div id="ref-zhao2025bib" class="csl-entry" role="listitem">
-Zhao, Gefei, and Binbin Lai. 2025. <span>“<span>SC-VAR</span>: A
-Computational Tool for Interpreting Polygenic Disease Risks Using
-Single-Cell Epigenomic Data.”</span> <em>Briefings in
-Bioinformatics</em> 26 (2): bbaf123. <a href="https://doi.org/10.1093/bib/bbaf123">https://doi.org/10.1093/bib/bbaf123</a>.
-</div>
-<div id="ref-zhao2024gb" class="csl-entry" role="listitem">
-Zhao, Zijie, Tim Gruenloh, Meiyi Yan, Yixuan Wu, Zhongxuan Sun, Jiacheng
-Miao, Yuchang Wu, Jie Song, and Qiongshi Lu. 2024. <span>“Optimizing and
-Benchmarking Polygenic Risk Scores with <span>GWAS</span> Summary
-Statistics.”</span> <em>Genome Biology</em> 25 (1): 260. <a href="https://doi.org/10.1186/s13059-024-03400-w">https://doi.org/10.1186/s13059-024-03400-w</a>.
-</div>
+</section><section id="bash-commands-to-save-path-executions" class="level3" data-number="A.1.3"><h3 data-number="A.1.3" class="anchored" data-anchor-id="bash-commands-to-save-path-executions">
+<span class="header-section-number">A.1.3</span> Bash commands to save path executions</h3>
+<div class="cell" data-layout-align="center">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Temporary (Current Shell Session Only)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>./bin/bcftools/bin:<span class="va">$PATH</span>  </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Semi temporary (for a given user)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'export PATH=./bin/bcftools/bin:$PATH'</span> <span class="op">&gt;&gt;</span> ~/.bashrc</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ~/.bashrc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 
 
-
-</main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
+</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -974,39 +867,37 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>
-<nav class="page-navigation column-page-right">
-  <div class="nav-page nav-page-previous">
-      <a href="./tools_installation.html" class="pagination-link" aria-label="Tools installation">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Tools installation</span></span>
+</script><nav class="page-navigation column-body"><div class="nav-page nav-page-previous">
+      <a href="./CARTaGENE-sample-size.html" class="pagination-link" aria-label="CartaGene Sample Size estimation">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">CartaGene Sample Size estimation</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link" aria-label="Bibliographic References">
+        <span class="nav-page-text">Bibliographic References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->
-<footer class="footer">
-  <div class="nav-footer">
+<footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
       &nbsp;
     </div>   
     <div class="nav-footer-center">
 <p>Written by Bastien CHASSAGNOL and Marie-Pier SCOTT-KELLY, with <a href="https://quarto.org/">Quarto</a>.</p>
-<div class="toc-actions"><ul><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/edit/master/references.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/blob/master/references.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/edit/master/tools_installation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/ArnaudDroitLab/cartagene-gwas/blob/master/tools_installation.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
-    <li class="nav-item compact">
+<li class="nav-item compact">
     <a class="nav-link active" href="https://github.com/ArnaudDroitLab/cartagene-gwas" aria-current="page">
       <i class="bi bi-github" role="img">
 </i> 
     </a>
   </li>  
 </ul>
-    </div>
+</div>
   </div>
 </footer>
-
-
 
 
 <script src="site_libs/quarto-html/zenscroll-min.js"></script>

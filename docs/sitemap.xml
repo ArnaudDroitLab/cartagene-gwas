@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://arnauddroitlab.github.io/cartagene-gwas/index.html</loc>
-    <lastmod>2025-04-20T19:55:43.263Z</lastmod>
-  </url>
-  <url>
     <loc>https://arnauddroitlab.github.io/cartagene-gwas/CARTaGENE-GWAS-Report.html</loc>
-    <lastmod>2025-04-20T19:55:42.994Z</lastmod>
-  </url>
-  <url>
-    <loc>https://arnauddroitlab.github.io/cartagene-gwas/tools_installation.html</loc>
-    <lastmod>2025-04-20T19:55:42.517Z</lastmod>
-  </url>
-  <url>
-    <loc>https://arnauddroitlab.github.io/cartagene-gwas/references.html</loc>
-    <lastmod>2025-04-20T19:55:42.368Z</lastmod>
-  </url>
-  <url>
-    <loc>https://arnauddroitlab.github.io/cartagene-gwas/GWAS-Analyses-utilising-the-CARTaGENE-database.docx</loc>
-    <lastmod>2025-04-20T19:57:46.033Z</lastmod>
+    <lastmod>2025-04-24T14:00:37.310Z</lastmod>
   </url>
 </urlset>
