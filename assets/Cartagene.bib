@@ -33,6 +33,22 @@
   abstract = {The CARTaGENE (CaG) study is both a population-based biobank and the largest ongoing prospective health study of men and women in Quebec. In population-based cohorts, participants are not recruited for a particular disease but represent a random selection among the population, minimizing the need to correct for bias in measured phenotypes. CaG targeted the segment of the population that is most at risk of developing chronic disorders, that is 40–69 years of age, from four metropolitan areas in Quebec. Over 20 000 participants consented to visiting 1 of 12 assessment sites where detailed health and socio-demographic information, physiological measures and biological samples (blood, serum and urine) were captured for a total of 650 variables. Significant correlations of diseases and chronic conditions are observed across these regions, implicating complex interactions, some of which we describe for major chronic conditions. The CaG study is one of the few population-based cohorts in the world where blood is stored not only for DNA and protein based science but also for gene expression analyses, opening the door for multiple systems genomics approaches that identify genetic and environmental factors associated with disease-related quantitative traits. Interested researchers are encouraged to submit project proposals on the study website (www.cartagene.qc.ca).}
 }
 
+@online{benegas2025,
+  title = {Benchmarking {{DNA Sequence Models}} for {{Causal Regulatory Variant Prediction}} in {{Human Genetics}}},
+  author = {Benegas, Gonzalo and Eraslan, Gökcen and Song, Yun S.},
+  date = {2025-03-04},
+  eprinttype = {bioRxiv},
+  eprintclass = {New Results},
+  pages = {2025.02.11.637758},
+  doi = {10.1101/2025.02.11.637758},
+  url = {https://www.biorxiv.org/content/10.1101/2025.02.11.637758v2},
+  urldate = {2025-04-25},
+  abstract = {Machine learning holds immense promise in biology, particularly for the challenging task of identifying causal variants for Mendelian and complex traits. Two primary approaches have emerged for this task: supervised sequence-to-function models trained on functional genomics experimental data and self-supervised DNA language models that learn evolutionary constraints on sequences. However, the field currently lacks consistently curated datasets with accurate labels, especially for non-coding variants, that are necessary to comprehensively benchmark these models and advance the field. In this work, we present TraitGym, a curated dataset of regulatory genetic variants that are either known to be causal or are strong candidates across 113 Mendelian and 83 complex traits, along with carefully constructed control variants. We frame the causal variant prediction task as a binary classification problem and benchmark various models, including functional-genomics-supervised models, self-supervised models, models that combine machine learning predictions with curated annotation features, and ensembles of these. Our results provide insights into the capabilities and limitations of different approaches for predicting the functional consequences of non-coding genetic variants. We find that alignment-based models CADD and GPN-MSA compare favorably for Mendelian traits and complex disease traits, while functional-genomics-supervised models Enformer and Borzoi perform better for complex non-disease traits. Evo2 shows substantial performance gains with scale, but still lags somewhat behind alignment-based models, struggling particularly with enhancer variants. The benchmark, including a Google Colab notebook to evaluate a model in a few minutes, is available at https://huggingface.co/datasets/songlab/TraitGym.},
+  langid = {english},
+  pubstate = {prepublished},
+  file = {C:\Users\basti\Zotero\storage\UXZE27J9\Benegas et al. - 2025 - Benchmarking DNA Sequence Models for Causal Regulatory Variant Prediction in Human Genetics.pdf}
+}
+
 @book{bretz2016,
   title = {Multiple {{Comparisons Using R}}},
   author = {Bretz, Frank and Hothorn, Torsten and Westfall, Peter},
@@ -233,6 +249,41 @@
   file = {C:\Users\basti\Zotero\storage\6UFVCKHF\Lin et al. - 2024 - EPInformer a scalable deep learning framework for gene expression prediction by integrating promote.pdf}
 }
 
+@online{liu2025,
+  title = {Rare-Variant Aggregate Association Analysis Using Imputed Data Is a Powerful Approach},
+  author = {Liu, Tianyi and Auer, Paul L. and Wang, Gao T. and Naderi, Elnaz and DeWan, Andrew T. and Leal, Suzanne M.},
+  date = {2025-04-22},
+  eprinttype = {bioRxiv},
+  eprintclass = {New Results},
+  pages = {2025.04.17.649394},
+  doi = {10.1101/2025.04.17.649394},
+  url = {https://www.biorxiv.org/content/10.1101/2025.04.17.649394v1},
+  urldate = {2025-04-25},
+  abstract = {Imputation can cost-effectively generate genotypes for millions of variants. The power of performing rare variant aggregate association tests using imputed genotypes was evaluated. White Europeans from the UK Biobank with exome sequence and genotype array data were analyzed. Using the genotype type array data from the UK Biobank, imputation was performed using the HRC r1.1 (N=64,976 Haplotypes) and TOPMed r3 (N=267,194 haplotypes) reference panels. Simulations were used to compare the power of performing rare variant aggregate association analysis using sequence and imputed data. Additionally, the number of genes with {$>$}2 rare variants (missense, nonsense, splice site) was approximately the same for exome sequence and TOPMed imputed data, but HRC imputed data had ∼10\% fewer genes. For the imputed data, using a less stringent R2 threshold (i.e., {$>$}0.3 vs. {$>$}0.8) led to greater power to detect aggregate associations due to additional rare variants included in the test. Exome sequence data provided the highest power for rare variant aggregate association testing, with TOPMed imputed variants usually having less than a 20\% reduction in power. HRC imputed variants provided substantially less power. We also performed rare variant aggregate association analyses using UK Biobank phenotype, exome sequence data, and imputed variants for PCSK9 and low-density lipoprotein (N=159,904 study subjects) and APOC3 and triglyceride levels (N=160,036 study subjects). For these analyses, even when ultra-rare variants (minor allele frequency{$<$}0.001) were analyzed, significant aggregate associations could be detected for the exome sequence data and TOPMed and HRC imputed variants. Although there is a decrease in power for rare variant aggregate association tests when analyzing imputed variants compared to sequence data due to missing variants and uncertainty in genotypes, analysis of imputed data is a viable approach to detect rare variant aggregate associations when sequence data is unavailable.},
+  langid = {english},
+  pubstate = {prepublished},
+  file = {C:\Users\basti\Zotero\storage\VW7Y37GE\Liu et al. - 2025 - Rare-variant aggregate association analysis using imputed data is a powerful approach.pdf}
+}
+
+@article{manios2025bb,
+  title = {{{PRED-LD}}: Efficient Imputation of {{GWAS}} Summary Statistics},
+  shorttitle = {{{PRED-LD}}},
+  author = {Manios, Georgios A. and Michailidi, Aikaterini and Kontou, Panagiota I. and Bagos, Pantelis G.},
+  date = {2025-04-16},
+  journaltitle = {BMC Bioinformatics},
+  shortjournal = {BMC Bioinformatics},
+  volume = {26},
+  number = {1},
+  pages = {107},
+  issn = {1471-2105},
+  doi = {10.1186/s12859-025-06119-y},
+  url = {https://doi.org/10.1186/s12859-025-06119-y},
+  urldate = {2025-04-25},
+  abstract = {Genome-wide association studies have identified connections between genetic variations and diseases, but they only examine a small portion of single nucleotide polymorphisms. To enhance genetic findings, researchers suggest imputing genotypes for unmeasured SNPs to improve coverage and statistical power. When this is not possible, summary statistics imputation can be used as an alternative. The available summary statistics imputation tools rely on reference panels, such as the 1000 Genomes Project, to estimate linkage disequilibrium (LD) between variants for accurate imputation. Tools like FAPI and SSIMP use these reference panels in variant call format (VCF) for this purpose, though this process can be time-consuming. A more effective approach for processing reference panels in summary statistics imputation was proposed in RAISS. In this approach, the LD among the variants is precomputed from the reference panel, prior to imputation, thereby reducing computational time.},
+  keywords = {Genome-wide association studies,Imputation,Linkage disequilibrium,Summary statistics},
+  file = {C:\Users\basti\Zotero\storage\52MHA8YT\Manios et al. - 2025 - PRED-LD efficient imputation of GWAS summary statistics.pdf}
+}
+
 @article{menashe2008bg,
   title = {{{PGA}}: Power Calculator for Case-Control Genetic Association Analyses},
   shorttitle = {{{PGA}}},
@@ -359,6 +410,21 @@
   file = {C:\Users\basti\Zotero\storage\DCJ2UWKT\Politi et al. - 2023 - Sample Size Calculation in Genetic Association Studies A Practical Approach.pdf}
 }
 
+@online{schipper2024,
+  title = {Gene Prioritization in {{GWAS}} Loci Using Multimodal Evidence},
+  author = {Schipper, Marijn and family=Leeuw, given=Christiaan A., prefix=de, useprefix=false and Maciel, Bernardo A. P. C. and Wightman, Douglas P. and Hubers, Nikki and Boomsma, Dorret I. and O’Donovan, Michael C. and Posthuma, Danielle},
+  date = {2024-01-29},
+  eprinttype = {medRxiv},
+  pages = {2023.12.23.23300360},
+  doi = {10.1101/2023.12.23.23300360},
+  url = {https://www.medrxiv.org/content/10.1101/2023.12.23.23300360v2},
+  urldate = {2025-04-25},
+  abstract = {Genome-wide association studies (GWAS) yield large numbers of genetic loci associated with traits and diseases. Predicting the effector genes that mediate these locus associations remains challenging. Here we present the FLAMES framework, which predicts the most likely effector gene in a locus. FLAMES integrates machine learning predictions from biological data linking single nucleotide polymorphisms (SNPs) to genes with GWAS-wide convergence of gene interactions. We benchmark FLAMES on gene-locus pairs derived by expert curation, rare variant implication, and domain knowledge of molecular traits. We demonstrate that combining SNP-based and convergence-based modalities outperforms prioritization strategies using a single line of evidence. Applying FLAMES, we resolve the FSHB locus in the GWAS for dizygotic twinning and further leverage this framework to find novel schizophrenia risk genes that converge with rare coding evidence and are relevant in different stages of life. Genome-wide association studies (GWAS) yield large numbers of genetic loci associated with traits and diseases. Predicting the effector genes that mediate these locus associations remains challenging. Here we present the FLAMES framework, which predicts the most likely effector gene in a locus. FLAMES integrates machine learning predictions from biological data linking single nucleotide polymorphisms (SNPs) to genes with GWAS-wide convergence of gene interactions. We benchmark FLAMES on gene-locus pairs derived by expert curation, rare variant implication, and domain knowledge of molecular traits. We demonstrate that combining SNP-based and convergence-based modalities outperforms prioritization strategies using a single line of evidence. Applying FLAMES, we resolve the FSHB locus in the GWAS for dizygotic twinning and further leverage this framework to find novel schizophrenia risk genes that converge with rare coding evidence and are relevant in different stages of life.},
+  langid = {english},
+  pubstate = {prepublished},
+  file = {C:\Users\basti\Zotero\storage\7JAZ6TQ9\Schipper et al. - 2024 - Gene prioritization in GWAS loci using multimodal evidence.pdf}
+}
+
 @software{schonherr2024,
   title = {Nf-Gwas - {{A}} Nextflow Pipeline to Perform {{GWAS}}.},
   author = {Schönherr, Sebastian and Forer, Lukas},
@@ -444,6 +510,25 @@
   urldate = {2025-04-09},
   abstract = {The performances of popular genome-wide association study (GWAS) models have not been examined yet in a consistent manner under the scenario of genetic admixture, which introduces several challenging aspects: heterogeneity of minor allele frequency (MAF), wide spectrum of case–control ratio, varying effect sizes, etc.We generated a cohort of synthetic individuals (N\,=\,19~234) that simulates (i) a large sample size; (ii) two-way admixture (Native American and European ancestry) and (iii) a binary phenotype. We then benchmarked three popular GWAS tools [generalized linear mixed model associated test (GMMAT), scalable and accurate implementation of generalized mixed model (SAIGE) and Tractor] by computing inflation factors and power calculations under different MAFs, case–control ratios, sample sizes and varying ancestry proportions. We also employed a cohort of Peruvians (N\,=\,249) to further examine the performances of the testing models on (i) real genetic and phenotype data and (ii) small sample sizes.In the synthetic cohort, SAIGE performed better than GMMAT and Tractor in terms of type-I error rate, especially under severe unbalanced case–control ratio. On the contrary, power analysis identified Tractor as the best method to pinpoint ancestry-specific causal variants but showed decreased power when the effect size displayed limited heterogeneity between ancestries. In the Peruvian cohort, only Tractor identified two suggestive loci (P-value \$\textbackslash le 1\textbackslash ast\{10\}\textasciicircum\{-5\}\$) associated with Native American ancestry.The current study illustrates best practice and limitations for available GWAS tools under the scenario of genetic admixture. Incorporating local ancestry in GWAS analyses boosts power, although careful consideration of complex scenarios (small sample sizes, imbalance case–control ratio, MAF heterogeneity) is needed.},
   file = {C:\Users\basti\Zotero\storage\TV628PAV\Yang et al. - 2024 - A benchmark study on current GWAS models in admixed populations.pdf}
+}
+
+@article{yaras2025p,
+  title = {{{PGSXplorer}}: An Integrated Nextflow Pipeline for Comprehensive Quality Control and Polygenic Score Model Development},
+  shorttitle = {{{PGSXplorer}}},
+  author = {Yaraş, Tutku and Oktay, Yavuz and Karakülah, Gökhan},
+  date = {2025-02-12},
+  journaltitle = {PeerJ},
+  shortjournal = {PeerJ},
+  volume = {13},
+  pages = {e18973},
+  publisher = {PeerJ Inc.},
+  issn = {2167-8359},
+  doi = {10.7717/peerj.18973},
+  url = {https://peerj.com/articles/18973},
+  urldate = {2025-04-25},
+  abstract = {The rapid development of next-generation sequencing technologies and genomic data sharing initiatives during the post-Human Genome Project-era has catalyzed major advances in individualized medicine research. Genome-wide association studies (GWAS) have become a cornerstone of efforts towards understanding the genetic basis of complex diseases, leading to the development of polygenic scores (PGS). Despite their immense potential, the scarcity of standardized PGS development pipelines limits widespread adoption of PGS. Herein, we introduce PGSXplorer, a comprehensive Nextflow DSL2 pipeline that enables quality control of genomic data and automates the phasing, imputation, and construction of PGS models using reference GWAS data. PGSXplorer integrates various PGS development tools such as PLINK, PRSice-2, LD-Pred2, Lassosum2, MegaPRS, SBayesR-C, PRS-CSx and MUSSEL, improving the generalizability of PGS through multi-origin data integration. Tested with synthetic datasets, our fully Docker-encapsulated tool has demonstrated scalability and effectiveness for both single- and multi-population analyses. Continuously updated as an open-source tool, PGSXplorer is freely available with user tutorials at https://github.com/tutkuyaras/PGSXplorer, making it a valuable resource for advancing precision medicine in genetic research.},
+  langid = {english},
+  file = {C:\Users\basti\Zotero\storage\DFTD7HM5\Yaraş et al. - 2025 - PGSXplorer an integrated nextflow pipeline for comprehensive quality control and polygenic score mo.pdf}
 }
 
 @article{zhao2024gb,

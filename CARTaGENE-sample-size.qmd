@@ -34,33 +34,7 @@ library(genpwr)
 # vcf_file <- "./data/variants/chr17.HDAC5.vcf"
 vcf_file <- "./data/variants/chr7.HDAC9.vcf"
 vcf <- vcfR::read.vcfR(vcf_file)
-
-
-chrom <- vcfR::create.chromR(name = "Supercontig", vcf = vcf) |> 
-  # removing low quality variants, none of these metrics is reported
-  # vcfR::masker(min_QUAL = 0, min_DP = 350, max_DP = 650, 
-  #              min_MQ = 59.5, max_MQ = 60.5) |> 
-  vcfR::proc.chromR(win.size = 1e4)
-
 ```
-
-### VCF files QC
-
-```{r}
-#| label: fig-plot-qc-per-chrom
-#| fig-cap: "Quality control per chrosomsome, for a given variant."
-vcfR::chromoqc(chrom, dp.alpha = 22,
-               xlim = c(min(chrom@var.info$POS), max(chrom@var.info$POS)))
-
-plot(chrom)
-```
-
-@fig-plot-qc-per-chrom is a **chromo plot**:
-
-- **Annotation data** on the lowest plot. Features in the annotation file (e.g., gene models, exons, etc.) are represented as dark red rectangles.
-- Above is a **sequence track**, with [nucleotides in green]{fg="green"} while [uncalled nucleotides are in red]{fg="red"}. 
-- Last track summarizes the number of variants per window. Above that we see dot plots for quality, mapping quality and read depth. 
-- Generated with [Visualizing VCF data 1](https://knausb.github.io/vcfR_documentation/visualization_1.html)
 
 ### MAF histogram distribution
 
@@ -142,28 +116,6 @@ ggplot(vcf_maf_distributions, aes(x = MAF)) +
 ```
 
 
-<!-- ## VCF Files QC with `VariantAnnotation` -->
-
-<!-- - [`VariantAnnotation` provides more comprehensive features with respect to @sec-vcfr, yet, relies on external dependencies such as `bfctools`, and often faces memory limitations.]{fg="red"} -->
-
-<!-- ```{r} -->
-<!-- #| label: read-vcf-file -->
-<!-- #| eval: false -->
-<!-- #| echo: true -->
-
-<!-- vcf <- VariantAnnotation::readVcf(file = "./data/variants/chr6.HLA-A.vcf",  -->
-<!--                                   genome = "hg38") -->
-
-<!-- # General vcf file structure ---- -->
-
-<!-- VariantAnnotation::header(vcf) -->
-<!-- VariantAnnotation::samples(VariantAnnotation::header(vcf)) -->
-<!-- VariantAnnotation::geno(VariantAnnotation::header(vcf)) -->
-
-<!-- # Variant-specific fields, such as alternative allele configurations -->
-<!-- VariantAnnotation::alt(vcf)[1:5] -->
-<!-- ``` -->
-
 ## Sample Size Calculation {#sec-sample-size}
 
 - [Sample Size Calculation in Genetic Association Studies: A Practical Approach](https://pmc.ncbi.nlm.nih.gov/articles/PMC9863799/#sec5-life-13-00235), from @politi2023l, notably listing the following tools:
@@ -216,7 +168,7 @@ Other less Frequent Models include **Overdominant**, in which the effect only oc
 
 ### `GENPWR` Sample Size estimation {#sec-GENPWR}
 
-- [Noted out some bugs for `GENPWR` in extreme scenarios, like negative estimation of sample sizes, or sample sizes not increasing monotonically with decreasing $p-$ value.]{fg="red"}
+- [Reported some bugs for `GENPWR` in extreme scenarios, like negative estimation of sample sizes, or sample sizes not increasing monotonically with decreasing $p-$ value.]{fg="red"}
 
 - @fadista2016ejhg estimates the following thresholds: 
 
