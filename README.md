@@ -1,9 +1,7 @@
 # CARTaGENE-GWAS
 
-Analyse biological interactions between HLA genes, and cardiovascular or osteoporosis disease in `CARTaGENE`.
+Pair SNPs with phenotype features: cardiovascular events and bone damages, using the `CARTaGENE` GWAS genotyping database.
 
 ## Pipeline
 
-### Genome sequencing and mappig
 
-The `CARTaGENE` project involves 43,000 participants overall. 
